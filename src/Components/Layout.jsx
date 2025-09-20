@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 // Placeholder imports - you will need to create these files
-import useThemeStore from '../store/themeStore'; // For managing light/dark mode
 import Header from './Header';     // Your site's header component
 import Sidebar from './Sidebar';   // Your site's sidebar/navigation component
 import Footer from './Footer';     // Your site's footer component
@@ -12,7 +11,7 @@ import Footer from './Footer';     // Your site's footer component
 function Layout({ children }) {
   // State to manage the sidebar visibility on mobile
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const { theme } = useThemeStore();
+
 
   // State to check if the view is mobile
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -41,7 +40,7 @@ function Layout({ children }) {
   };
 
   return (
-    <div className={`${theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-800'} min-h-screen flex`}>
+    <div className=" min-h-screen flex">
       {/* This is the main container for the Sidebar.
         On desktop, it's always visible.
         On mobile, it appears as an overlay.
@@ -54,10 +53,10 @@ function Layout({ children }) {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'tween', duration: 0.3 }}
-            className={`
+            className="
               fixed top-0 left-0 h-full z-40 md:relative md:translate-x-0
-              ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}
-            `}
+             
+            "
           >
             <Sidebar />
           </motion.div>

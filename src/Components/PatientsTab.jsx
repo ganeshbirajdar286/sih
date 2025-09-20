@@ -23,7 +23,7 @@ export default function PatientsTab() {
         <h2 className="text-3xl font-bold text-gray-800">Patient Management</h2>
         <button
           onClick={() => setShowPatientForm(!showPatientForm)}
-          className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition duration-200 flex items-center space-x-2"
+          className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition duration-200 flex items-center space-x-2 "
         >
           <FaPlus />
           <span>New Patient</span>
@@ -75,7 +75,7 @@ export default function PatientsTab() {
             </button>
             <button
               type="submit"
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition"
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition "
             >
               Save Patient
             </button>

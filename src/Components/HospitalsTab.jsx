@@ -35,7 +35,7 @@ export default function HospitalsTab() {
                 <button className="flex items-center text-blue-600 hover:text-blue-800">
                   <FaPhone className="mr-1" /> Call
                 </button>
-                <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+                <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 ml-3 rounded-lg">
                   View Details
                 </button>
               </div>

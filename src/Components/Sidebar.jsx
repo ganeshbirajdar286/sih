@@ -8,7 +8,6 @@ import {
 
 export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) {
 
-  // Aliases for icons if needed
   const UserMd = User;
 
   const mainTabs = [
@@ -29,7 +28,6 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
     { key: "logout", label: "Logout", icon: <LogOut className="text-lg" /> },
   ];
 
-  // Close sidebar when clicking outside on mobile
   useEffect(() => {
     const handleClickOutside = (event) => {
       const target = event.target;
@@ -45,7 +43,6 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [sidebarOpen, setSidebarOpen]);
 
-  // Prevent body scrolling when sidebar is open on mobile
   useEffect(() => {
     if (sidebarOpen && window.innerWidth < 768) {
       document.body.style.overflow = 'hidden';
@@ -58,7 +55,6 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
     };
   }, [sidebarOpen]);
 
-  // Close sidebar on escape key
   useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === 'Escape' && sidebarOpen) {
@@ -100,7 +96,7 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
 
         {/* Mobile Dropdown Menu */}
         <div
-          className={`absolute left-0 right-0 bg-white shadow-xl border-t border-gray-200 transform transition-all duration-300 ease-in-out ${
+          className={`sidebar absolute left-0 right-0 bg-white shadow-xl border-t border-gray-200 transform transition-all duration-300 ease-in-out z-40 ${
             sidebarOpen 
               ? "translate-y-0 opacity-100 pointer-events-auto" 
               : "-translate-y-2 opacity-0 pointer-events-none"

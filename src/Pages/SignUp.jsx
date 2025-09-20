@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Add this
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ const SignUp = () => {
     certificates: [],
     specialization: "",
   });
+  const navigate = useNavigate(); // ✅ Initialize
 
   const [isFocused, setIsFocused] = useState({
     name: false,
@@ -26,16 +28,16 @@ const SignUp = () => {
   const handleBlur = (field) => setIsFocused({ ...isFocused, [field]: false });
   const handleChange = (field, value) => setFormData({ ...formData, [field]: value });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!termsChecked) return alert("Please accept Terms & Conditions");
-    if (formData.password !== formData.confirmPassword) return alert("Passwords do not match!");
-    setIsLoading(true);
-    setTimeout(() => {
-      console.log("Sign Up Data:", formData);
-      setIsLoading(false);
-    }, 1500);
-  };
+   const handleSubmit = (e) => {
+  e.preventDefault();
+  setIsLoading(true);
+
+  // fake delay just for UX
+  setTimeout(() => {
+    setIsLoading(false);
+    navigate("/dashboard"); // ✅ Redirect works
+  }, 1000);
+};
 
   const handleDemoSignup = () => {
     setFormData({
@@ -334,3 +336,4 @@ const SignUp = () => {
 };
 
 export default SignUp;
+

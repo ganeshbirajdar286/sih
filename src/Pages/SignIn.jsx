@@ -15,15 +15,20 @@ const SignIn = () => {
   const handleBlur = (field) => setIsFocused({ ...isFocused, [field]: false });
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log("Sign In:", { email, password, role });
-      navigate("/dashboard");
-    }, 1000);
-  };
+  setTimeout(() => {
+    setIsLoading(false);
+    console.log("Sign In:", { email, password, role });
+    
+    if (role === "doctor") {
+      navigate("/doctor-dashboard");
+    } else {
+      navigate("/patient-dashboard");
+    }
+  }, 1000);
+};
 
   const handleDemoLogin = () => {
     setRole("patient");

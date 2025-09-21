@@ -32,10 +32,15 @@ const SignUp = () => {
   e.preventDefault();
   setIsLoading(true);
 
-  // fake delay just for UX
   setTimeout(() => {
     setIsLoading(false);
-    navigate("/dashboard"); // ✅ Redirect works
+    console.log("Sign In:", { email, password, role });
+    
+    if (role === "doctor") {
+      navigate("/doctor-dashboard");
+    } else {
+      navigate("/patient-dashboard");
+    }
   }, 1000);
 };
 

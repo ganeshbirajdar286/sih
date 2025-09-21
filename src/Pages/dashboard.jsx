@@ -3,10 +3,13 @@ import React, { useState } from "react";
 // Component Imports
 import Sidebar from "../Components/Sidebar";
 import Header from "../Components/Header";
-import PatientsTab from "../Components/PatientsTab";
+import PatientsTab from "../Components/PatientDashboard";
 import DoctorsTab from "../Components/DoctorsTab";
 import HospitalsTab from "../Components/HospitalsTab";
 import DepartmentsTab from "../Components/DepartmentsTab";
+import Appointments from "../Components/Appointment";
+import HealthRecords from "../Components/HealthRecord";
+import Reports from "../Components/Reports";
 
 // Placeholder Components
 const AppointmentsTab = () => <div className="p-6 sm:p-8"><h1 className="text-2xl sm:text-3xl font-bold">Appointments</h1></div>;
@@ -24,9 +27,9 @@ export default function Dashboard() {
     doctors: <DoctorsTab searchQuery={searchQuery} />,
     hospitals: <HospitalsTab searchQuery={searchQuery} />,
     departments: <DepartmentsTab searchQuery={searchQuery} />,
-    appointments: <AppointmentsTab />,
-    reports: <ReportsTab />,
-    records: <HealthRecordsTab />,
+    appointments: <Appointments />,
+    reports: <Reports />,
+    records: <HealthRecords />,
     settings: <SettingsTab />,
   };
 

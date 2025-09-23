@@ -18,6 +18,24 @@ import {
   BarChart3,
   Printer,
   Target,
+  TrendingUp,
+  Clock,
+  MessageSquare,
+  Star,
+  AlertCircle,
+  Pill,
+  Heart,
+  Zap,
+  Coffee,
+  Activity,
+  Shield,
+  Award,
+  Brain,
+  Eye,
+  Microscope,
+  TestTube,
+  Scale,
+  Thermometer,
 } from "lucide-react";
 
 // Example doctor tabs (you can create actual components later)
@@ -32,19 +50,44 @@ import ReportsTab from "../components/DoctorComponents/ReportsTab.jsx";
 import ProfileTab from "../components/DoctorComponents/ProfileTab.jsx";
 import SettingsTab from "../components/DoctorComponents/SettingsTab.jsx";
 
-// Sidebar items (same structure as patient dashboard)
+// Sidebar items (enhanced structure)
 const sidebarItems = [
-  { id: "overview", icon: BarChart3, label: "Dashboard Overview" },
-  { id: "patients", icon: Users, label: "My Patients" },
-  { id: "appointments", icon: Calendar, label: "Appointments" },
-  { id: "dietCharts", icon: FileText, label: "Diet Charts" },
-  { id: "consultations", icon: Stethoscope, label: "Consultations" },
-  { id: "foodDatabase", icon: BookOpen, label: "Food Database" },
-  { id: "recipes", icon: ChefHat, label: "Recipe Library" },
-  { id: "ayurveda", icon: Leaf, label: "Ayurvedic Analysis" },
-  { id: "reports", icon: Printer, label: "Reports & Analytics" },
-  { id: "profile", icon: User, label: "Doctor Profile" },
-  { id: "settings", icon: Settings, label: "Settings" },
+  { id: "overview", icon: BarChart3, label: "Dashboard Overview", badge: "New" },
+  { id: "patients", icon: Users, label: "My Patients", badge: "1.2k" },
+  { id: "appointments", icon: Calendar, label: "Appointments", badge: "18" },
+  { id: "dietCharts", icon: FileText, label: "Diet Charts", badge: "863" },
+  { id: "consultations", icon: Stethoscope, label: "Consultations", badge: "24" },
+  { id: "foodDatabase", icon: BookOpen, label: "Food Database", badge: "2.5k" },
+  { id: "recipes", icon: ChefHat, label: "Recipe Library", badge: "500+" },
+  { id: "ayurveda", icon: Leaf, label: "Ayurvedic Analysis", badge: "Pro" },
+  { id: "reports", icon: Printer, label: "Reports & Analytics", badge: "📊" },
+  { id: "profile", icon: User, label: "Doctor Profile", badge: "⭐" },
+  { id: "settings", icon: Settings, label: "Settings", badge: "⚙️" },
+];
+
+// Quick stats data
+const quickStats = [
+  { label: "Active Patients", value: "247", change: "+12", icon: Users, color: "emerald" },
+  { label: "Pending Charts", value: "18", change: "-3", icon: FileText, color: "amber" },
+  { label: "Today's Consult", value: "8", change: "+2", icon: Stethoscope, color: "blue" },
+  { label: "Success Rate", value: "94.2%", change: "+2.1%", icon: TrendingUp, color: "green" },
+];
+
+// Recent activities data
+const recentActivities = [
+  { time: "2 min ago", action: "New patient registration", patient: "Rahul Sharma", type: "success" },
+  { time: "15 min ago", action: "Diet chart created", patient: "Priya Patel", type: "info" },
+  { time: "1 hour ago", action: "Consultation completed", patient: "Amit Kumar", type: "success" },
+  { time: "2 hours ago", action: "Follow-up scheduled", patient: "Neha Singh", type: "warning" },
+  { time: "3 hours ago", action: "Lab results received", patient: "Vikram Joshi", type: "info" },
+];
+
+// Upcoming appointments
+const upcomingAppointments = [
+  { time: "09:30 AM", patient: "Anita Desai", type: "New Patient", status: "confirmed" },
+  { time: "10:45 AM", patient: "Rajesh Mehta", type: "Follow-up", status: "confirmed" },
+  { time: "11:30 AM", patient: "Sneha Reddy", type: "Consultation", status: "pending" },
+  { time: "02:15 PM", patient: "Kiran Patil", type: "Diet Review", status: "confirmed" },
 ];
 
 export default function DoctorDashboard() {
@@ -52,52 +95,202 @@ export default function DoctorDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // 👇 Content map (same pattern as PatientDashboard)
-  const contentMap = {
-    overview: (
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Dashboard Overview</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Example stat cards */}
-          <StatCard
-            stat={{
-              title: "Total Patients",
-              value: "1,247",
-              change: "+12%",
-              icon: Users,
-              color: "bg-emerald-500",
-            }}
-          />
-          <StatCard
-            stat={{
-              title: "Today's Appointments",
-              value: "18",
-              change: "+3",
-              icon: Calendar,
-              color: "bg-emerald-600",
-            }}
-          />
-          <StatCard
-            stat={{
-              title: "Diet Charts Created",
-              value: "863",
-              change: "+8%",
-              icon: FileText,
-              color: "bg-teal-500",
-            }}
-          />
-          <StatCard
-            stat={{
-              title: "Success Rate",
-              value: "94.2%",
-              change: "+2.1%",
-              icon: Target,
-              color: "bg-green-600",
-            }}
-          />
+  // Enhanced Overview Content
+  const EnhancedOverview = () => (
+    <div className="space-y-8">
+      {/* Welcome Section */}
+      <div className="bg-gradient-to-r from-emerald-500 to-green-600 rounded-3xl p-8 text-white shadow-2xl shadow-emerald-500/25">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Welcome back, Dr. Sharma! 👋</h1>
+            <p className="text-emerald-100 text-lg">Here's what's happening with your practice today</p>
+            <div className="flex items-center space-x-4 mt-4">
+              <div className="flex items-center space-x-2 bg-white/20 px-4 py-2 rounded-full">
+                <Clock className="w-4 h-4" />
+                <span>Last login: Today, 08:45 AM</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-white/20 px-4 py-2 rounded-full">
+                <Activity className="w-4 h-4" />
+                <span>System: All services operational</span>
+              </div>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-5xl font-bold mb-2">18</div>
+            <div className="text-emerald-100">Appointments Today</div>
+          </div>
         </div>
       </div>
-    ),
+
+      {/* Quick Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {quickStats.map((stat, index) => (
+          <div key={index} className="bg-white rounded-2xl p-6 shadow-lg border border-emerald-100/50 hover:shadow-xl transition-all duration-300 group">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-xl bg-${stat.color}-100 group-hover:scale-110 transition-transform duration-300`}>
+                <stat.icon className={`w-6 h-6 text-${stat.color}-600`} />
+              </div>
+              <span className={`text-sm font-semibold px-3 py-1 rounded-full bg-${stat.color}-50 text-${stat.color}-700`}>
+                {stat.change}
+              </span>
+            </div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
+            <div className="text-sm text-gray-600">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Main Stats and Activities Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column - Main Stats */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Enhanced Stat Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <StatCard
+              stat={{
+                title: "Total Patients",
+                value: "1,247",
+                change: "+12% vs last month",
+                icon: Users,
+                color: "bg-gradient-to-br from-emerald-500 to-green-600",
+                trend: "up"
+              }}
+            />
+            <StatCard
+              stat={{
+                title: "Today's Appointments",
+                value: "18",
+                change: "+3 vs yesterday",
+                icon: Calendar,
+                color: "bg-gradient-to-br from-blue-500 to-cyan-600",
+                trend: "up"
+              }}
+            />
+            <StatCard
+              stat={{
+                title: "Diet Charts Created",
+                value: "863",
+                change: "+8% this month",
+                icon: FileText,
+                color: "bg-gradient-to-br from-teal-500 to-emerald-600",
+                trend: "up"
+              }}
+            />
+            <StatCard
+              stat={{
+                title: "Patient Satisfaction",
+                value: "96.4%",
+                change: "+1.2% improvement",
+                icon: Star,
+                color: "bg-gradient-to-br from-amber-500 to-orange-600",
+                trend: "up"
+              }}
+            />
+          </div>
+
+          {/* Health Metrics Overview */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-emerald-100/50">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Health Metrics Overview</h3>
+              <span className="text-sm text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">Live</span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { icon: Heart, label: "Avg. BP", value: "120/80", status: "normal" },
+                { icon: Scale, label: "Avg. Weight", value: "68.2kg", status: "good" },
+                { icon: Thermometer, label: "Avg. BMI", value: "23.1", status: "healthy" },
+                { icon: Brain, label: "Mental Score", value: "8.2/10", status: "excellent" },
+              ].map((metric, index) => (
+                <div key={index} className="text-center p-4 bg-gray-50 rounded-xl">
+                  <metric.icon className={`w-8 h-8 mx-auto mb-2 ${
+                    metric.status === 'excellent' ? 'text-green-600' :
+                    metric.status === 'good' ? 'text-blue-600' :
+                    metric.status === 'normal' ? 'text-emerald-600' : 'text-amber-600'
+                  }`} />
+                  <div className="font-semibold text-gray-900">{metric.value}</div>
+                  <div className="text-sm text-gray-600">{metric.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Activities and Appointments */}
+        <div className="space-y-8">
+          {/* Recent Activities */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-emerald-100/50">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Recent Activities</h3>
+              <MessageSquare className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div className="space-y-4">
+              {recentActivities.map((activity, index) => (
+                <div key={index} className="flex items-start space-x-3 p-3 hover:bg-emerald-50 rounded-xl transition-colors duration-200">
+                  <div className={`w-2 h-2 mt-2 rounded-full ${
+                    activity.type === 'success' ? 'bg-green-500' :
+                    activity.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'
+                  }`}></div>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">{activity.action}</div>
+                    <div className="text-sm text-gray-600">{activity.patient}</div>
+                    <div className="text-xs text-gray-400">{activity.time}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Upcoming Appointments */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-emerald-100/50">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Upcoming Appointments</h3>
+              <Clock className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div className="space-y-4">
+              {upcomingAppointments.map((appointment, index) => (
+                <div key={index} className="flex items-center justify-between p-3 hover:bg-emerald-50 rounded-xl transition-colors duration-200">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-3 h-3 rounded-full ${
+                      appointment.status === 'confirmed' ? 'bg-green-500' : 'bg-amber-500'
+                    }`}></div>
+                    <div>
+                      <div className="font-semibold text-gray-900">{appointment.time}</div>
+                      <div className="text-sm text-gray-600">{appointment.patient}</div>
+                    </div>
+                  </div>
+                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                    appointment.type === 'New Patient' ? 'bg-blue-100 text-blue-800' :
+                    appointment.type === 'Follow-up' ? 'bg-green-100 text-green-800' :
+                    'bg-purple-100 text-purple-800'
+                  }`}>
+                    {appointment.type}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Ayurvedic Insights */}
+      <div className="bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-bold mb-2">Ayurvedic Insights</h3>
+            <p className="text-amber-100">Latest analysis shows improved patient outcomes with traditional treatments</p>
+          </div>
+          <div className="text-right">
+            <div className="text-3xl font-bold">87%</div>
+            <div className="text-amber-100">Effectiveness Rate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // 👇 Enhanced Content Map
+  const contentMap = {
+    overview: <EnhancedOverview />,
     patients: <PatientsTab searchQuery={searchQuery} />,
     appointments: <AppointmentsTab searchQuery={searchQuery} />,
     dietCharts: <DietChartsTab />,
@@ -111,8 +304,8 @@ export default function DoctorDashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
-      {/* Sidebar */}
+    <div className="flex h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 overflow-hidden">
+      {/* Enhanced Sidebar */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -129,8 +322,12 @@ export default function DoctorDashboard() {
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />
-        <div className="flex-1 overflow-y-auto p-6 transition-all duration-300">
-          {contentMap[activeTab]}
+        
+        {/* Enhanced Main Content Area */}
+        <div className="flex-1 overflow-y-auto p-8 transition-all duration-300">
+          <div className="max-w-7xl mx-auto">
+            {contentMap[activeTab]}
+          </div>
         </div>
       </main>
     </div>

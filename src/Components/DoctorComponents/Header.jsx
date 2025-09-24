@@ -1,5 +1,5 @@
 import React from "react";
-import { Search, Stethoscope, Menu } from "lucide-react";
+import { Stethoscope, Menu } from "lucide-react";
 
 const Header = ({ sidebarOpen, setSidebarOpen }) => {
   return (
@@ -21,26 +21,13 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
           </div>
         </div>
 
-        {/* Search Bar (always visible) */}
-        <div className="flex-1 max-w-lg">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search patients, appointments..."
-              className="w-full pl-12 pr-4 py-2 rounded-xl border border-emerald-200 
-                         focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 
-                         bg-white text-gray-700 text-sm shadow-sm"
-            />
-          </div>
-        </div>
 
         {/* Doctor Info */}
-        <div className="hidden sm:flex items-center space-x-3 sm:space-x-4 pl-3 sm:pl-4 border-l border-emerald-100">
+        <div className="flex items-center space-x-3 sm:space-x-4 pl-3 sm:pl-4 border-l border-emerald-100">
           <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-100 to-green-100 rounded-full flex items-center justify-center shadow-sm">
             <Stethoscope className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
           </div>
-          <div className="hidden md:block">
+          <div className="block">
             <p className="font-semibold text-gray-900 text-sm sm:text-base">
               Dr. Ayurveda Sharma
             </p>
@@ -49,6 +36,7 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
             </p>
           </div>
         </div>
+
 
         {/* Mobile menu icon */}
         <div className="md:hidden">

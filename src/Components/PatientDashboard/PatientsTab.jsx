@@ -19,7 +19,7 @@ export default function PatientsTab() {
       </div>
 
       {/* Grid Layout */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-4">
         
         {/* Column 1 */}
         <div className="grid gap-6">
@@ -32,7 +32,7 @@ export default function PatientsTab() {
         </div>
 
         {/* Column 2 (main content, spans 2 cols on XL) */}
-        <div className="grid gap-6 md:col-span-2 lg:col-span-1 xl:col-span-2">
+        <div className="grid gap-6 md:col-span-2 lg:col-span-2 xl:col-span-2">
           <WeightTrend data={patientData.weightTrend} />
           <DietaryTracker analysis={patientData.dietaryAnalysis} />
           <ActiveDietPlan plan={patientData.activeDietPlan} />

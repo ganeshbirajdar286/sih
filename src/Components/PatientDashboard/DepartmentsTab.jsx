@@ -246,11 +246,10 @@ export default function DepartmentsTab() {
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2">
             <button
               onClick={() => setSelectedDepartment("All Departments")}
-              className={`px-3 py-1 rounded-full text-sm ${
-                selectedDepartment === "All Departments"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
+              className={`px-3 py-1 rounded-full text-sm ${selectedDepartment === "All Departments"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
             >
               All Departments
             </button>
@@ -258,11 +257,10 @@ export default function DepartmentsTab() {
               <button
                 key={dept}
                 onClick={() => setSelectedDepartment(dept)}
-                className={`px-3 py-1 rounded-full text-sm ${
-                  selectedDepartment === dept
-                    ? `bg-${departmentColors[dept]}-600 text-white`
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
+                className={`px-3 py-1 rounded-full text-sm ${selectedDepartment === dept
+                  ? `bg-${departmentColors[dept]}-600 text-white`
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
               >
                 {dept}
               </button>
@@ -336,41 +334,44 @@ export default function DepartmentsTab() {
                 </div>
 
                 {/* Services */}
+                {/* Services */}
                 <div className="grid gap-2">
-                  <h4 className="text-sm font-medium text-gray-700">
-                    Key Services:
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2">
+                  <h4 className="text-sm font-medium text-gray-700">Key Services:</h4>
+                  <div className="flex flex-wrap gap-2">
                     {dept.services.slice(0, 3).map((service, idx) => (
                       <span
                         key={idx}
-                        className={`bg-${departmentColors[dept.name]}-100 text-${departmentColors[dept.name]}-800 text-xs px-2 py-1 rounded-full`}
+                        className={`inline-flex items-center whitespace-nowrap bg-${departmentColors[dept.name]}-100 text-${departmentColors[dept.name]}-800 text-xs px-3 py-1 rounded-full`}
                       >
                         {service}
                       </span>
                     ))}
                     {dept.services.length > 3 && (
-                      <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
+                      <span className="inline-flex items-center whitespace-nowrap bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">
                         +{dept.services.length - 3} more
                       </span>
                     )}
                   </div>
                 </div>
 
+
                 {/* Buttons */}
-                <div className="grid grid-cols-3 gap-2">
-                  <button className="col-span-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
+                {/* Buttons */}
+                <div className="flex items-center gap-2">
+                  {/* Main button takes remaining space */}
+                  <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
                     View Department <FaArrowRight className="ml-2" size={12} />
                   </button>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
-                      <FaPhone size={14} />
-                    </button>
-                    <button className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
-                      <FaCalendarAlt size={14} />
-                    </button>
-                  </div>
+
+                  {/* Icon buttons - fixed width */}
+                  <button className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
+                    <FaPhone size={14} />
+                  </button>
+                  <button className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
+                    <FaCalendarAlt size={14} />
+                  </button>
                 </div>
+
               </div>
             </div>
           ))}

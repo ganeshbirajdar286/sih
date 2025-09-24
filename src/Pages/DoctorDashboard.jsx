@@ -90,7 +90,8 @@ const doshaDistribution = [
 const quickActions = [
   { icon: Plus, label: "New Patient", description: "Add new patient record", color: "bg-emerald-500", link: "patients" },
   { icon: FileText, label: "Create Diet Chart", description: "Generate Ayurvedic diet plan", color: "bg-blue-500", link: "dietCharts" },
-  { icon: ChefHat, label: "Add Recipe", description: "Create new recipe", color: "bg-orange-500", link: "recipes" },
+  { icon: Calendar, label: "Schedule Consult", description: "Book patient consultation", color: "bg-purple-500", link: "appointments" },  
+  { icon: Stethoscope, label: "New Consultation", description: "Start a new consultation", color: "bg-green-500", link: "consultations" },
 ];
 
 // Enhanced Overview Component

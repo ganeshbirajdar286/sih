@@ -80,6 +80,13 @@ const upcomingAppointments = [
   { time: "02:15 PM", patient: "Kiran Patil", type: "Diet Review", status: "confirmed" },
 ];
 
+const healthMetrix = [
+  { icon: Heart, label: "Avg. BP", value: "120/80", status: "normal" },
+  { icon: Scale, label: "Avg. Weight", value: "68.2kg", status: "good" },
+  { icon: Thermometer, label: "Avg. BMI", value: "23.1", status: "healthy" },
+  { icon: Brain, label: "Mental Score", value: "8.2/10", status: "excellent" },
+]
+
 export default function DoctorDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -118,7 +125,7 @@ export default function DoctorDashboard() {
         </div>
 
         {/* Quick Stats Grid */}
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {quickStats.map((stat, index) => (
             <StatCard key={index} stat={stat} />
           ))}
@@ -136,23 +143,17 @@ export default function DoctorDashboard() {
                 <span className="text-sm text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">Live</span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { icon: Heart, label: "Avg. BP", value: "120/80", status: "normal" },
-                  { icon: Scale, label: "Avg. Weight", value: "68.2kg", status: "good" },
-                  { icon: Thermometer, label: "Avg. BMI", value: "23.1", status: "healthy" },
-                  { icon: Brain, label: "Mental Score", value: "8.2/10", status: "excellent" },
-                ].map((metric, index) => (
+                {healthMetrix.map((metric, index) => (
                   <div key={index} className="text-center p-4 bg-gray-50 rounded-xl">
                     <metric.icon
-                      className={`w-8 h-8 mx-auto mb-2 ${
-                        metric.status === "excellent"
+                      className={`w-8 h-8 mx-auto mb-2 ${metric.status === "excellent"
                           ? "text-green-600"
                           : metric.status === "good"
-                          ? "text-blue-600"
-                          : metric.status === "normal"
-                          ? "text-emerald-600"
-                          : "text-amber-600"
-                      }`}
+                            ? "text-blue-600"
+                            : metric.status === "normal"
+                              ? "text-emerald-600"
+                              : "text-amber-600"
+                        }`}
                     />
                     <div className="font-semibold text-gray-900">{metric.value}</div>
                     <div className="text-sm text-gray-600">{metric.label}</div>
@@ -177,13 +178,12 @@ export default function DoctorDashboard() {
                     className="flex items-start space-x-3 p-3 hover:bg-emerald-50 rounded-xl transition-colors duration-200"
                   >
                     <div
-                      className={`w-2 h-2 mt-2 rounded-full ${
-                        activity.type === "success"
+                      className={`w-2 h-2 mt-2 rounded-full ${activity.type === "success"
                           ? "bg-green-500"
                           : activity.type === "warning"
-                          ? "bg-amber-500"
-                          : "bg-blue-500"
-                      }`}
+                            ? "bg-amber-500"
+                            : "bg-blue-500"
+                        }`}
                     ></div>
                     <div className="flex-1">
                       <div className="font-medium text-gray-900">{activity.action}</div>
@@ -209,9 +209,8 @@ export default function DoctorDashboard() {
                   >
                     <div className="flex items-center space-x-3">
                       <div
-                        className={`w-3 h-3 rounded-full ${
-                          appointment.status === "confirmed" ? "bg-green-500" : "bg-amber-500"
-                        }`}
+                        className={`w-3 h-3 rounded-full ${appointment.status === "confirmed" ? "bg-green-500" : "bg-amber-500"
+                          }`}
                       ></div>
                       <div>
                         <div className="font-semibold text-gray-900">{appointment.time}</div>
@@ -219,13 +218,12 @@ export default function DoctorDashboard() {
                       </div>
                     </div>
                     <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        appointment.type === "New Patient"
+                      className={`text-xs font-medium px-2 py-1 rounded-full ${appointment.type === "New Patient"
                           ? "bg-blue-100 text-blue-800"
                           : appointment.type === "Follow-up"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-purple-100 text-purple-800"
-                      }`}
+                            ? "bg-green-100 text-green-800"
+                            : "bg-purple-100 text-purple-800"
+                        }`}
                     >
                       {appointment.type}
                     </span>
@@ -268,7 +266,7 @@ export default function DoctorDashboard() {
     profile: <ProfileTab />,
     settings: <SettingsTab />,
   };
-   return (
+  return (
     <div className="flex h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 overflow-hidden">
       {/* Sidebar */}
       <Sidebar

@@ -228,51 +228,51 @@ const Reports = () => {
         </div>
 
         {/* Controls */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
-            {/* Tabs */}
-            <div className="flex space-x-4 mb-4 sm:mb-0 overflow-x-auto pb-2 sm:pb-0 whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-              {reportTypes.map((type) => (
-                <button
-                  key={type.id}
-                  className={`whitespace-nowrap pb-2 px-1 font-medium transition ${
-                    activeTab === type.id
-                      ? "text-green-700 border-b-2 border-green-700"
-                      : "text-gray-500 hover:text-green-600"
-                  }`}
-                  onClick={() => setActiveTab(type.id)}
-                >
-                  {type.name}
-                </button>
-              ))}
-            </div>
-
-            {/* Search and Filter */}
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-              <div className="relative w-full sm:w-64">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaSearch className="text-gray-400" />
+       <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  {/* Tabs */}
+                  <div className="flex space-x-4 overflow-x-auto pb-2 whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    {reportTypes.map((type) => (
+                      <button
+                        key={type.id}
+                        className={`whitespace-nowrap pb-2 px-1 font-medium transition ${activeTab === type.id
+                            ? "text-green-700 border-b-2 border-green-700"
+                            : "text-gray-500 hover:text-green-600"
+                          }`}
+                        onClick={() => setActiveTab(type.id)}
+                      >
+                        {type.name}
+                      </button>
+                    ))}
+                  </div>
+      
+                  {/* Search and Filter */}
+                  <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 w-full">
+                    {/* Search */}
+                    <div className="relative w-full">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FaSearch className="text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Search reports..."
+                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 w-full"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+      
+                    {/* Filter */}
+                    <button
+                      className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto justify-center sm:justify-start"
+                      onClick={() => setShowFilters(!showFilters)}
+                    >
+                      <FaFilter className="text-gray-400 mr-2" /> Filter
+                    </button>
+                  </div>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search reports..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 w-full"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
               </div>
-
-              <div className="relative w-full sm:w-auto">
-                <button
-                  className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto justify-center sm:justify-start"
-                  onClick={() => setShowFilters(!showFilters)}
-                >
-                  <FaFilter className="text-gray-400 mr-2" /> Filter
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      
 
         {/* Reports List */}
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 gap-6">

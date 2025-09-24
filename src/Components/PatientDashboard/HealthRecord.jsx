@@ -84,7 +84,7 @@ const HealthRecords = () => {
     if (activeTab === 'imaging') return record.type === 'Imaging';
     if (activeTab === 'vaccination') return record.type === 'Vaccination';
     return true;
-  }).filter(record => 
+  }).filter(record =>
     record.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     record.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     record.doctor.toLowerCase().includes(searchTerm.toLowerCase())
@@ -131,10 +131,10 @@ const HealthRecords = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           {recordTypes.map(type => (
-            <div 
-              key={type.id} 
+            <div
+              key={type.id}
               className={`bg-white p-4 rounded-xl shadow-sm cursor-pointer transition hover:shadow-md ${activeTab === type.id ? 'border-l-4 border-green-500' : ''}`}
               onClick={() => setActiveTab(type.id)}
             >
@@ -149,13 +149,16 @@ const HealthRecords = () => {
 
         {/* Controls */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {/* Tabs */}
-            <div className="flex space-x-4 mb-4 md:mb-0 overflow-x-auto pb-2 md:pb-0">
-              {recordTypes.map(type => (
+            <div className="flex space-x-4 overflow-x-auto pb-2 whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+              {recordTypes.map((type) => (
                 <button
                   key={type.id}
-                  className={`whitespace-nowrap pb-2 px-1 font-medium transition ${activeTab === type.id ? 'text-green-700 border-b-2 border-green-700' : 'text-gray-500 hover:text-green-600'}`}
+                  className={`whitespace-nowrap pb-2 px-1 font-medium transition ${activeTab === type.id
+                      ? "text-green-700 border-b-2 border-green-700"
+                      : "text-gray-500 hover:text-green-600"
+                    }`}
                   onClick={() => setActiveTab(type.id)}
                 >
                   {type.name}
@@ -164,32 +167,32 @@ const HealthRecords = () => {
             </div>
 
             {/* Search and Filter */}
-            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 w-full md:w-auto">
-              <div className="relative">
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 w-full">
+              {/* Search */}
+              <div className="relative w-full">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FaSearch className="text-gray-400" />
                 </div>
                 <input
                   type="text"
-                  placeholder="Search records..."
+                  placeholder="Search reports..."
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 w-full"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              
-              <div className="relative">
-                <button 
-                  className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 w-full md:w-auto"
-                  onClick={() => setShowFilters(!showFilters)}
-                >
-                  <FaFilter className="text-gray-400 mr-2" />
-                  Filter
-                </button>
-              </div>
+
+              {/* Filter */}
+              <button
+                className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto justify-center sm:justify-start"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <FaFilter className="text-gray-400 mr-2" /> Filter
+              </button>
             </div>
           </div>
         </div>
+
 
         {/* Records List */}
         <div className="space-y-4">
@@ -208,7 +211,7 @@ const HealthRecords = () => {
                       <h3 className="text-xl font-semibold text-gray-900">{record.title}</h3>
                       <p className="text-gray-600">{record.type} • {record.doctor}</p>
                       <p className="text-gray-700 mt-2">{record.description}</p>
-                      
+
                       <div className="flex flex-wrap gap-2 mt-3">
                         {record.tags.map(tag => (
                           <span key={tag} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
@@ -226,11 +229,11 @@ const HealthRecords = () => {
                         {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
                       </span>
                     </div>
-                    
+
                     <div className="mt-4 text-sm text-gray-500">
                       {formatDate(record.date)}
                     </div>
-                    
+
                     <div className="flex mt-4 space-x-2">
                       <button className="p-2 text-gray-500 hover:text-green-600 rounded-lg hover:bg-green-50 transition">
                         <FaEye className="text-lg" />
@@ -253,7 +256,7 @@ const HealthRecords = () => {
               </div>
               <h3 className="text-xl font-medium text-gray-600">No health records found</h3>
               <p className="text-gray-500 mt-2">No records match your current filters.</p>
-              <button 
+              <button
                 className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition"
                 onClick={() => {
                   setActiveTab('all');

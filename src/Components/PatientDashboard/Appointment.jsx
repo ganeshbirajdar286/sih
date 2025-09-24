@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { FaUserMd, FaCalendarAlt, FaClock, FaVideo, FaMapMarkerAlt, FaPhoneAlt, FaEllipsisV, FaPlus, FaChevronDown, FaSearch, FaFilter } from 'react-icons/fa';
+import { 
+  FaUserMd, FaCalendarAlt, FaClock, FaVideo, FaMapMarkerAlt, 
+  FaPhoneAlt, FaEllipsisV, FaPlus, FaChevronDown, FaSearch, FaFilter 
+} from 'react-icons/fa';
 
 const Appointments = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
@@ -53,7 +56,6 @@ const Appointments = () => {
       doctorImage: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80'
     }
   ]);
-
   const filteredAppointments = appointments
     .filter(app => {
       if (activeTab === 'upcoming') return app.status === 'confirmed' || app.status === 'pending';
@@ -95,7 +97,7 @@ const Appointments = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
@@ -107,9 +109,6 @@ const Appointments = () => {
             Schedule Appointment
           </button>
         </div>
-
-        {/* Stats Cards */}
-        
 
         {/* Controls */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
@@ -131,7 +130,7 @@ const Appointments = () => {
               ))}
             </div>
 
-            {/* Search and Filter */}
+            {/* Search + Sort */}
             <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 w-full md:w-auto">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -183,96 +182,85 @@ const Appointments = () => {
           </div>
         </div>
 
-        {/* Appointments List */}
-        <div className="space-y-4">
-          {filteredAppointments.length > 0 ? (
-            filteredAppointments.map(appointment => (
+        {/* Appointments Grid */}
+        {filteredAppointments.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredAppointments.map(appointment => (
               <div key={appointment.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden">
-                <div className="p-6 md:flex md:justify-between">
-                  {/* Left Section */}
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mr-4">
-                      <img 
-                        src={appointment.doctorImage} 
-                        alt={appointment.doctor}
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                    </div>
+                <div className="p-6 flex flex-col h-full">
+                  {/* Doctor Info */}
+                  <div className="flex items-start mb-4">
+                    <img 
+                      src={appointment.doctorImage} 
+                      alt={appointment.doctor}
+                      className="w-16 h-16 rounded-full object-cover mr-4"
+                    />
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900">{appointment.doctor}</h3>
-                      <p className="text-gray-600">{appointment.specialty}</p>
-                      
-                      <div className="flex flex-wrap gap-4 mt-3 text-gray-600">
-                        <div className="flex items-center">
-                          <FaCalendarAlt className="text-green-600 mr-2" />
-                          <span>{formatDate(appointment.date)}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <FaClock className="text-green-600 mr-2" />
-                          <span>{appointment.time}</span>
-                        </div>
-                        <div className="flex items-center">
-                          {appointment.type === 'In-person' ? (
-                            <FaMapMarkerAlt className="text-green-600 mr-2" />
-                          ) : (
-                            <FaVideo className="text-green-600 mr-2" />
-                          )}
-                          <span>{appointment.type}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="mt-2 text-sm text-gray-500 flex items-center">
-                        <FaMapMarkerAlt className="mr-2" />
-                        {appointment.location}
-                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900">{appointment.doctor}</h3>
+                      <p className="text-gray-600 text-sm">{appointment.specialty}</p>
+                      <span className={`inline-flex mt-2 items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
+                        {getStatusIcon(appointment.status)} {appointment.status}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Right Section */}
-                  <div className="mt-4 md:mt-0 flex flex-col items-end">
+                  {/* Details */}
+                  <div className="space-y-2 text-sm text-gray-600 mb-4 flex-1">
                     <div className="flex items-center">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(appointment.status)}`}>
-                        <span className="mr-1">{getStatusIcon(appointment.status)}</span>
-                        {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-                      </span>
-                      <button className="ml-2 text-gray-400 hover:text-gray-600">
-                        <FaEllipsisV />
-                      </button>
+                      <FaCalendarAlt className="text-green-600 mr-2" />
+                      {formatDate(appointment.date)}
                     </div>
-                    
-                    <div className="flex mt-4 space-x-2">
-                      {appointment.status !== 'completed' && (
-                        <>
-                          <button className="px-4 py-2 border border-green-600 text-green-700 rounded-lg text-sm font-medium hover:bg-green-50 transition">
-                            Reschedule
-                          </button>
-                          <button className="px-4 py-2 border border-red-300 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 transition">
-                            Cancel
-                          </button>
-                        </>
+                    <div className="flex items-center">
+                      <FaClock className="text-green-600 mr-2" />
+                      {appointment.time}
+                    </div>
+                    <div className="flex items-center">
+                      {appointment.type === 'In-person' ? (
+                        <FaMapMarkerAlt className="text-green-600 mr-2" />
+                      ) : (
+                        <FaVideo className="text-green-600 mr-2" />
                       )}
-                      <button className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition flex items-center">
-                        <FaPhoneAlt className="mr-2" />
-                        {appointment.type === 'Telemedicine' ? 'Join Call' : 'View Details'}
-                      </button>
+                      {appointment.type}
                     </div>
+                    <div className="flex items-center text-gray-500">
+                      <FaMapMarkerAlt className="mr-2" />
+                      {appointment.location}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="grid grid-cols-1 gap-3 mt-4">
+                    {appointment.status !== 'completed' && (
+                      <>
+                        <button className="flex items-center justify-center border border-green-500 text-green-600 px-3 py-2 rounded-lg hover:bg-green-50 transition-colors text-sm sm:text-base">
+                          Reschedule
+                        </button>
+                        <button className="flex items-center justify-center border border-red-300  px-3 py-2 rounded-lg hover:bg-green-50 transition-colors text-sm sm:text-base text-red-500">
+                          Cancel
+                        </button>
+                      </>
+                    )}
+                    <button className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition flex items-center justify-center">
+                      <FaPhoneAlt className="mr-2" />
+                      {appointment.type === 'Telemedicine' ? 'Join Call' : 'View Details'}
+                    </button>
                   </div>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="text-center py-12 bg-white rounded-xl shadow-sm">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                <FaCalendarAlt className="text-3xl text-green-600" />
-              </div>
-              <h3 className="text-xl font-medium text-gray-600">No {activeTab} appointments found</h3>
-              <p className="text-gray-500 mt-2">You don't have any {activeTab} appointments scheduled.</p>
-              <button className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">
-                Schedule Appointment
-              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 bg-white rounded-xl shadow-sm">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+              <FaCalendarAlt className="text-3xl text-green-600" />
             </div>
-          )}
-        </div>
+            <h3 className="text-xl font-medium text-gray-600">No {activeTab} appointments found</h3>
+            <p className="text-gray-500 mt-2">You don't have any {activeTab} appointments scheduled.</p>
+            <button className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">
+              Schedule Appointment
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

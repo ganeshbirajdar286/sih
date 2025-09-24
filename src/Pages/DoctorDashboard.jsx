@@ -3,7 +3,7 @@ import React, { useState } from "react";
 // Doctor-specific components
 import Header from "../Components/DoctorComponents/Header.jsx";
 import Sidebar from "../Components/DoctorComponents/Sidebar.jsx";
-import StatCard from "../components/DoctorComponents/StatCard.jsx";
+import StatCard from "../Components/DoctorComponents/StatCard.jsx";
 
 import {
   Users,
@@ -29,16 +29,16 @@ import {
 } from "lucide-react";
 
 // Example doctor tabs
-import PatientsTab from "../components/DoctorComponents/PatientsTab.jsx";
-import AppointmentsTab from "../components/DoctorComponents/AppointmentsTab.jsx";
-import DietChartsTab from "../components/DoctorComponents/DietChartsTab.jsx";
-import ConsultationsTab from "../components/DoctorComponents/ConsultationsTab.jsx";
-import FoodDatabaseTab from "../components/DoctorComponents/FoodDatabaseTab.jsx";
-import RecipeLibraryTab from "../components/DoctorComponents/RecipeLibraryTab.jsx";
-import AyurvedaTab from "../components/DoctorComponents/AyurvedaTab.jsx";
-import ReportsTab from "../components/DoctorComponents/ReportsTab.jsx";
-import ProfileTab from "../components/DoctorComponents/ProfileTab.jsx";
-import SettingsTab from "../components/DoctorComponents/SettingsTab.jsx";
+import PatientsTab from "../Components/DoctorComponents/PatientsTab.jsx";
+import AppointmentsTab from "../Components/DoctorComponents/AppointmentsTab.jsx";
+import DietChartsTab from "../Components/DoctorComponents/DietChartsTab.jsx";
+import ConsultationsTab from "../Components/DoctorComponents/ConsultationsTab.jsx";
+import FoodDatabaseTab from "../Components/DoctorComponents/FoodDatabaseTab.jsx";
+import RecipeLibraryTab from "../Components/DoctorComponents/RecipeLibraryTab.jsx";
+import AyurvedaTab from "../Components/DoctorComponents/AyurvedaTab.jsx";
+import ReportsTab from "../Components/DoctorComponents/ReportsTab.jsx";
+import ProfileTab from "../Components/DoctorComponents/ProfileTab.jsx";
+import SettingsTab from "../Components/DoctorComponents/SettingsTab.jsx";
 
 // Sidebar items
 const sidebarItems = [

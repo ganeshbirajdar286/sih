@@ -36,12 +36,9 @@ import PatientsTab from "../Components/DoctorComponents/PatientsTab.jsx";
 import AppointmentsTab from "../Components/DoctorComponents/AppointmentsTab.jsx";
 import DietChartsTab from "../Components/DoctorComponents/DietChartsTab.jsx";
 import ConsultationsTab from "../Components/DoctorComponents/ConsultationsTab.jsx";
-import FoodDatabaseTab from "../Components/DoctorComponents/FoodDatabaseTab.jsx";
-import RecipeLibraryTab from "../Components/DoctorComponents/RecipeLibraryTab.jsx";
 import AyurvedaTab from "../Components/DoctorComponents/AyurvedaTab.jsx";
 import ReportsTab from "../Components/DoctorComponents/ReportsTab.jsx";
 import ProfileTab from "../Components/DoctorComponents/ProfileTab.jsx";
-import SettingsTab from "../Components/DoctorComponents/SettingsTab.jsx";
 
 // Sidebar items
 const sidebarItems = [
@@ -50,12 +47,9 @@ const sidebarItems = [
   { id: "appointments", icon: Calendar, label: "Appointments", badge: "18" },
   { id: "dietCharts", icon: FileText, label: "Diet Charts", badge: "863" },
   { id: "consultations", icon: Stethoscope, label: "Consultations", badge: "24" },
-  { id: "foodDatabase", icon: BookOpen, label: "Food Database", badge: "2.5k" },
-  { id: "recipes", icon: ChefHat, label: "Recipe Library", badge: "500+" },
   { id: "ayurveda", icon: Leaf, label: "Ayurvedic Analysis", badge: "Pro" },
   { id: "reports", icon: Printer, label: "Reports & Analytics", badge: "📊" },
   { id: "profile", icon: User, label: "Doctor Profile", badge: "⭐" },
-  { id: "settings", icon: Settings, label: "Settings", badge: "⚙️" },
 ];
 
 // Quick stats
@@ -96,7 +90,6 @@ const doshaDistribution = [
 const quickActions = [
   { icon: Plus, label: "New Patient", description: "Add new patient record", color: "bg-emerald-500", link: "patients" },
   { icon: FileText, label: "Create Diet Chart", description: "Generate Ayurvedic diet plan", color: "bg-blue-500", link: "dietCharts" },
-  { icon: BookOpen, label: "Food Database", description: "Browse 8000+ items", color: "bg-purple-500", link: "foodDatabase" },
   { icon: ChefHat, label: "Add Recipe", description: "Create new recipe", color: "bg-orange-500", link: "recipes" },
 ];
 
@@ -308,12 +301,9 @@ export default function DoctorDashboard() {
     appointments: <AppointmentsTab searchQuery={searchQuery} />,
     dietCharts: <DietChartsTab />,
     consultations: <ConsultationsTab />,
-    foodDatabase: <FoodDatabaseTab />,
-    recipes: <RecipeLibraryTab />,
     ayurveda: <AyurvedaTab />,
     reports: <ReportsTab />,
     profile: <ProfileTab />,
-    settings: <SettingsTab />,
   };
 
   return (

@@ -1,15 +1,17 @@
-@import "tailwindcss";  
-
-
-
-/* Google Fonts */
+/* 1️⃣ Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+/* 2️⃣ Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "tailwindcss";
+/* 3️⃣ Custom styles */
 body {
   font-family: 'Inter', sans-serif;
 }
 
-/* ✅ Custom Scrollbar */
+/* Scrollbars */
 .sidebar-scroll::-webkit-scrollbar {
   width: 6px;
 }
@@ -27,7 +29,6 @@ body {
   background: linear-gradient(to bottom, #059669, #047857);
 }
 
-/* Firefox support */
 .sidebar-scroll {
   scrollbar-width: thin;
   scrollbar-color: #10b981 transparent;

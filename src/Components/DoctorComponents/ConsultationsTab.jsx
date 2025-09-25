@@ -230,9 +230,9 @@ const ConsultationsTab = () => {
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 grid gap-6">
       {/* Header Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center">
         <div>
           <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             Patient Consultations
@@ -241,13 +241,14 @@ const ConsultationsTab = () => {
             Manage your Ayurvedic consultations and patient interactions
           </p>
         </div>
-        
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg">
+
+        {/* Buttons aligned right on desktop */}
+        <div className="grid grid-cols-2 gap-3 lg:justify-end">
+          <button className="flex items-center justify-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg">
             <Plus className="w-4 h-4" />
             New Consultation
           </button>
-          <button className="flex items-center gap-2 border border-purple-200 text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-xl font-medium transition-all duration-200">
+          <button className="flex items-center justify-center gap-2 border border-purple-200 text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-xl font-medium transition-all duration-200">
             <Calendar className="w-4 h-4" />
             Schedule
           </button>
@@ -255,15 +256,14 @@ const ConsultationsTab = () => {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
         {filters.map((filter) => (
-          <div 
+          <div
             key={filter.value}
-            className={`p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:scale-105 ${
-              selectedFilter === filter.value 
-                ? 'border-purple-300 bg-purple-50 shadow-lg' 
-                : 'border-gray-100 bg-white shadow-sm'
-            }`}
+            className={`p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:scale-105 ${selectedFilter === filter.value
+              ? "border-purple-300 bg-purple-50 shadow-lg"
+              : "border-gray-100 bg-white shadow-sm"
+              }`}
             onClick={() => setSelectedFilter(filter.value)}
           >
             <div className="flex items-center justify-between">
@@ -279,69 +279,84 @@ const ConsultationsTab = () => {
 
       {/* Quick Actions Bar */}
       <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-4 border border-purple-100">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-          <div className="flex items-center gap-4 flex-wrap">
-            <div className="relative">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
+
+          {/* Left Section - Search + Date */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="relative w-full sm:w-auto">
               <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search patients, complaints, doshas..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
-            
+
             <select className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
               <option>Today</option>
               <option>This Week</option>
               <option>This Month</option>
               <option>All Time</option>
             </select>
-
-            <div className="flex items-center gap-2">
-              {consultationTypes.map((type) => (
-                <button
-                  key={type.value}
-                  className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-xl hover:bg-white transition-colors"
-                >
-                  <type.icon className="w-4 h-4" />
-                  <span className="text-sm">{type.label}</span>
-                </button>
-              ))}
-            </div>
           </div>
-          
-          <div className="flex items-center gap-2 text-sm text-purple-700">
-            <Stethoscope className="w-4 h-4" />
-            <span>{filteredConsultations.length} consultations</span>
+
+          {/* Center Section - Type Filters */}
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            {consultationTypes.map((type) => (
+              <button
+                key={type.value}
+                className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-xl bg-white hover:bg-purple-50 transition-colors text-sm"
+              >
+                <type.icon className="w-4 h-4" />
+                <span>{type.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Right Section - Count */}
+          <div className="flex items-center justify-end text-sm text-purple-700 font-medium">
+            <Stethoscope className="w-4 h-4 mr-2" />
+            {filteredConsultations.length} consultations
           </div>
         </div>
       </div>
 
-      {/* Consultations List */}
-      <div className="space-y-4">
+
+
+      {/* Consultations Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-4">
         {filteredConsultations.map((consultation) => (
-          <div 
+          <div
             key={consultation.id}
             className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
           >
             {/* Consultation Header */}
-            <div className="p-4 cursor-pointer" onClick={() => toggleConsultation(consultation.id)}>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-50 rounded-lg">
+            <div
+              className="p-4 cursor-pointer"
+              onClick={() => toggleConsultation(consultation.id)}
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                {/* Left Section */}
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-purple-50 rounded-lg shrink-0">
                     <Stethoscope className="w-5 h-5 text-purple-600" />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-gray-900">{consultation.patientName}</h3>
-                      <span className="text-sm text-gray-500">• {consultation.age}yrs • {consultation.gender}</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="font-semibold text-gray-900">
+                        {consultation.patientName}
+                      </h3>
+                      <span className="text-sm text-gray-500">
+                        • {consultation.age}yrs • {consultation.gender}
+                      </span>
                       <span className={getPriorityBadge(consultation.priority)}>
                         {consultation.priority} priority
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 mt-1 text-sm text-gray-600">
+
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
                       <span className="flex items-center gap-1">
                         {getTypeIcon(consultation.type)}
                         {consultation.type}
@@ -356,28 +371,31 @@ const ConsultationsTab = () => {
                     </div>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-3">
+
+                {/* Right Section */}
+                <div className="flex items-start justify-end gap-3">
                   <span className={getStatusBadge(consultation.status)}>
                     {consultation.status}
                   </span>
-                  {expandedConsultation === consultation.id ? (
-                    <ChevronDown className="w-5 h-5 text-gray-400 rotate-180" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-400" />
-                  )}
+                  <ChevronDown
+                    className={`w-5 h-5 text-gray-400 transition-transform ${expandedConsultation === consultation.id ? "rotate-180" : ""
+                      }`}
+                  />
                 </div>
               </div>
 
               {/* Chief Complaint */}
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
                   <span className="text-sm text-gray-600">Chief Complaint: </span>
-                  <span className="text-sm font-medium text-gray-900">{consultation.chiefComplaint}</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {consultation.chiefComplaint}
+                  </span>
                 </div>
                 <div className="text-sm text-gray-600">{consultation.payment}</div>
               </div>
             </div>
+
 
             {/* Expanded Details */}
             {expandedConsultation === consultation.id && (
@@ -391,9 +409,14 @@ const ConsultationsTab = () => {
                     </h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       {Object.entries(consultation.vitals).map(([key, value]) => (
-                        <div key={key} className="bg-white p-2 rounded-lg text-center">
+                        <div
+                          key={key}
+                          className="bg-white p-2 rounded-lg text-center"
+                        >
                           <div className="font-bold text-gray-900">{value}</div>
-                          <div className="text-xs text-gray-600 capitalize">{key}</div>
+                          <div className="text-xs text-gray-600 capitalize">
+                            {key}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -418,7 +441,10 @@ const ConsultationsTab = () => {
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {consultation.prescription.map((medicine, index) => (
-                        <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                        <span
+                          key={index}
+                          className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
+                        >
                           {medicine}
                         </span>
                       ))}
@@ -429,14 +455,18 @@ const ConsultationsTab = () => {
                 {/* Notes & Actions */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Clinical Notes</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">
+                      Clinical Notes
+                    </h4>
                     <p className="text-sm text-gray-600 bg-white p-3 rounded-lg">
                       {consultation.notes}
                     </p>
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Quick Actions</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">
+                      Quick Actions
+                    </h4>
                     <div className="flex flex-wrap gap-2">
                       <button className="flex items-center gap-2 bg-purple-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-purple-600 transition-colors">
                         <Edit3 className="w-4 h-4" />
@@ -455,11 +485,13 @@ const ConsultationsTab = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                <div className="flex flex-wrap items-center justify-between mt-4 pt-4 border-t border-gray-200 gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">Follow-up in: {consultation.followUp}</span>
+                    <span className="text-sm text-gray-600">
+                      Follow-up in: {consultation.followUp}
+                    </span>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     {consultation.satisfaction && (
                       <div className="flex items-center gap-1 text-amber-600">
@@ -483,13 +515,17 @@ const ConsultationsTab = () => {
         ))}
       </div>
 
+
+
       {/* Empty State */}
       {filteredConsultations.length === 0 && (
         <div className="text-center py-12">
           <Stethoscope className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No consultations found</h3>
           <p className="text-gray-600 mb-4">
-            {searchQuery ? `No consultations match "${searchQuery}". Try adjusting your search.` : "Schedule your first consultation to get started."}
+            {searchQuery
+              ? `No consultations match "${searchQuery}". Try adjusting your search.`
+              : "Schedule your first consultation to get started."}
           </p>
           <button className="flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded-xl font-medium mx-auto">
             <Plus className="w-4 h-4" />
@@ -500,7 +536,7 @@ const ConsultationsTab = () => {
 
       {/* Quick Stats Footer */}
       <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-4 border border-purple-100">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
           <div>
             <div className="text-2xl font-bold text-purple-600">₹24.5k</div>
             <div className="text-sm text-gray-600">Revenue Today</div>
@@ -520,6 +556,7 @@ const ConsultationsTab = () => {
         </div>
       </div>
     </div>
+
   );
 };
 

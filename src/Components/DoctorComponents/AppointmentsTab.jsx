@@ -154,14 +154,14 @@ const AppointmentsTab = ({ searchQuery }) => {
   };
 
   const filteredAppointments = appointments.filter(appointment => {
-    const matchesSearch = searchQuery 
+    const matchesSearch = searchQuery
       ? appointment.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        appointment.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        appointment.dosha.toLowerCase().includes(searchQuery.toLowerCase())
+      appointment.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      appointment.dosha.toLowerCase().includes(searchQuery.toLowerCase())
       : true;
-    
+
     const matchesStatus = selectedStatus === "all" || appointment.status === selectedStatus;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -178,7 +178,7 @@ const AppointmentsTab = ({ searchQuery }) => {
             Manage your patient appointments efficiently
           </p>
         </div>
-        
+
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg">
             <Calendar className="w-4 h-4" />
@@ -192,15 +192,14 @@ const AppointmentsTab = ({ searchQuery }) => {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {statusFilters.map((filter) => (
-          <div 
+          <div
             key={filter.value}
-            className={`p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:scale-105 ${
-              selectedStatus === filter.value 
-                ? 'border-emerald-300 bg-emerald-50 shadow-lg' 
-                : 'border-gray-100 bg-white shadow-sm'
-            }`}
+            className={`p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:scale-105 ${selectedStatus === filter.value
+              ? 'border-emerald-300 bg-emerald-50 shadow-lg'
+              : 'border-gray-100 bg-white shadow-sm'
+              }`}
             onClick={() => setSelectedStatus(filter.value)}
           >
             <div className="flex items-center justify-between">
@@ -225,8 +224,8 @@ const AppointmentsTab = ({ searchQuery }) => {
               className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             />
           </div>
-          
-          <select 
+
+          <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
@@ -236,7 +235,7 @@ const AppointmentsTab = ({ searchQuery }) => {
             <option value="priority">Sort by Priority</option>
           </select>
         </div>
-        
+
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <Zap className="w-4 h-4 text-amber-500" />
           <span>{filteredAppointments.length} appointments found</span>
@@ -246,45 +245,54 @@ const AppointmentsTab = ({ searchQuery }) => {
       {/* Appointments List */}
       <div className="space-y-3">
         {filteredAppointments.map((appointment) => (
-          <div 
+          <div
             key={appointment.id}
             className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
           >
             {/* Appointment Header */}
-            <div className="p-4 cursor-pointer" onClick={() => toggleAppointment(appointment.id)}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-emerald-50 rounded-lg">
-                      <User className="w-5 h-5 text-emerald-600" />
+            <div
+              className="p-4 cursor-pointer border-b hover:bg-gray-50 transition"
+              onClick={() => toggleAppointment(appointment.id)}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                {/* Left Side - Patient Info */}
+                <div className="flex items-start sm:items-center gap-3">
+                  <div className="p-2 bg-emerald-50 rounded-lg shrink-0">
+                    <User className="w-5 h-5 text-emerald-600" />
+                  </div>
+
+                  <div className="flex flex-col">
+                    {/* Patient Name, Age, Priority */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="font-semibold text-gray-900">{appointment.patientName}</h3>
+                      <span className="text-sm text-gray-500">
+                        • {appointment.age} yrs • {appointment.gender}
+                      </span>
+                      <span className={`${getPriorityBadge(appointment.priority)} text-xs`}>
+                        {appointment.priority} priority
+                      </span>
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-gray-900">{appointment.patientName}</h3>
-                        <span className="text-sm text-gray-500">• {appointment.age} yrs • {appointment.gender}</span>
-                        <span className={getPriorityBadge(appointment.priority)}>
-                          {appointment.priority} priority
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 mt-1 text-sm text-gray-600">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {appointment.time} • {appointment.duration}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          {getStatusIcon(appointment.status)}
-                          {appointment.type}
-                        </span>
-                        <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full text-xs">
-                          {appointment.dosha} Dosha
-                        </span>
-                      </div>
+
+                    {/* Time, Type, Dosha */}
+                    <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-600">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {appointment.time} • {appointment.duration}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        {getStatusIcon(appointment.status)}
+                        {appointment.type}
+                      </span>
+                      <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full text-xs">
+                        {appointment.dosha} Dosha
+                      </span>
                     </div>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
+
+                {/* Right Side - Date & Expand Icon */}
+                <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                  <div className="text-left sm:text-right">
                     <div className="font-medium text-gray-900">{appointment.date}</div>
                     <div className="text-sm text-gray-500">Last visit: {appointment.lastVisit}</div>
                   </div>
@@ -296,6 +304,7 @@ const AppointmentsTab = ({ searchQuery }) => {
                 </div>
               </div>
             </div>
+
 
             {/* Expanded Details */}
             {expandedAppointment === appointment.id && (
@@ -359,29 +368,34 @@ const AppointmentsTab = ({ searchQuery }) => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-emerald-600 transition-colors">
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {/* Confirm */}
+                    <button className="flex items-center justify-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-emerald-600 transition-colors">
                       <CheckCircle className="w-4 h-4" />
-                      Confirm Appointment
+                      Confirm
                     </button>
-                    <button className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-amber-600 transition-colors">
+
+                    {/* Call */}
+                    <button className="flex items-center justify-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-amber-600 transition-colors">
                       <Phone className="w-4 h-4" />
-                      Call Patient
+                      Call
                     </button>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+
+                    {/* Share */}
+                    <button className="flex items-center justify-center gap-2 border border-gray-200 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
                       <Share2 className="w-4 h-4" />
                       Share
                     </button>
-                    <button className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+
+                    {/* Cancel */}
+                    <button className="flex items-center justify-center gap-2 border border-gray-200 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
                       <Trash2 className="w-4 h-4 text-red-500" />
                       Cancel
                     </button>
                   </div>
                 </div>
+
               </div>
             )}
           </div>

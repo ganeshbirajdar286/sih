@@ -7,57 +7,57 @@ const MyPatients = () => {
   const [activeFilter, setActiveFilter] = useState('all');
 
   const [patients, setPatients] = useState([
-    { 
-      id: 1, 
-      name: 'Priya Sharma', 
-      age: 34, 
-      condition: 'Digestive Issues', 
-      dosha: 'Vata Imbalance', 
-      lastVisit: '2 days ago', 
-      status: 'active', 
-      priority: 'high', 
+    {
+      id: 1,
+      name: 'Priya Sharma',
+      age: 34,
+      condition: 'Digestive Issues',
+      dosha: 'Vata Imbalance',
+      lastVisit: '2 days ago',
+      status: 'active',
+      priority: 'high',
       nextAppointment: 'Tomorrow, 10:00 AM',
       email: 'priya.sharma@email.com',
       phone: '+91 98765 43210',
       location: 'Mumbai'
     },
-    { 
-      id: 2, 
-      name: 'Rajesh Kumar', 
-      age: 45, 
-      condition: 'Weight Management', 
-      dosha: 'Kapha Excess', 
-      lastVisit: '1 week ago', 
-      status: 'active', 
-      priority: 'medium', 
+    {
+      id: 2,
+      name: 'Rajesh Kumar',
+      age: 45,
+      condition: 'Weight Management',
+      dosha: 'Kapha Excess',
+      lastVisit: '1 week ago',
+      status: 'active',
+      priority: 'medium',
       nextAppointment: 'Sep 28, 2:30 PM',
       email: 'rajesh.kumar@email.com',
       phone: '+91 87654 32109',
       location: 'Delhi'
     },
-    { 
-      id: 3, 
-      name: 'Anita Desai', 
-      age: 28, 
-      condition: 'Stress & Anxiety', 
-      dosha: 'Pitta Aggravation', 
-      lastVisit: '3 days ago', 
-      status: 'inactive', 
-      priority: 'low', 
+    {
+      id: 3,
+      name: 'Anita Desai',
+      age: 28,
+      condition: 'Stress & Anxiety',
+      dosha: 'Pitta Aggravation',
+      lastVisit: '3 days ago',
+      status: 'inactive',
+      priority: 'low',
       nextAppointment: 'Not scheduled',
       email: 'anita.desai@email.com',
       phone: '+91 76543 21098',
       location: 'Bangalore'
     },
-    { 
-      id: 4, 
-      name: 'Vikram Singh', 
-      age: 52, 
-      condition: 'Diabetes Management', 
-      dosha: 'Tri-Dosha', 
-      lastVisit: '5 days ago', 
-      status: 'active', 
-      priority: 'high', 
+    {
+      id: 4,
+      name: 'Vikram Singh',
+      age: 52,
+      condition: 'Diabetes Management',
+      dosha: 'Tri-Dosha',
+      lastVisit: '5 days ago',
+      status: 'active',
+      priority: 'high',
       nextAppointment: 'Today, 4:00 PM',
       email: 'vikram.singh@email.com',
       phone: '+91 65432 10987',
@@ -84,7 +84,7 @@ const MyPatients = () => {
 
   const filteredPatients = patients.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         p.condition.toLowerCase().includes(searchTerm.toLowerCase());
+      p.condition.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = activeFilter === 'all' || p.status === activeFilter;
     return matchesSearch && matchesFilter;
   });
@@ -135,7 +135,8 @@ const MyPatients = () => {
       {/* Search and Filters */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <div className="flex flex-col lg:flex-row gap-4 justify-between">
-          <div className="relative flex-1">
+          {/* Search Bar */}
+          <div className="relative flex-1 min-w-[150px]">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
@@ -145,21 +146,23 @@ const MyPatients = () => {
               className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          
-          <div className="flex gap-2">
-            {['all', 'active', 'inactive'].map(filter => (
+
+          {/* Filters */}
+          <div className="flex flex-wrap gap-2">
+            {['all', 'active', 'inactive'].map((filter) => (
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                  activeFilter === filter
-                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                    : 'text-gray-600 hover:bg-gray-100 border border-transparent'
-                }`}
+                className={`px-4 py-2 rounded-xl font-medium transition-all ${activeFilter === filter
+                  ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                  : 'text-gray-600 hover:bg-gray-100 border border-transparent'
+                  }`}
               >
                 {filter.charAt(0).toUpperCase() + filter.slice(1)}
               </button>
             ))}
+
+            {/* Filter Icon */}
             <button className="p-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
               <Filter className="w-5 h-5 text-gray-600" />
             </button>
@@ -167,13 +170,14 @@ const MyPatients = () => {
         </div>
       </div>
 
+
       {/* Patients Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredPatients.map((patient) => (
           <div key={patient.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 overflow-hidden">
             {/* Header with Priority Indicator */}
             <div className={`h-2 ${getPriorityColor(patient.priority)}`}></div>
-            
+
             <div className="p-6">
               {/* Patient Header */}
               <div className="flex justify-between items-start mb-4">
@@ -186,7 +190,7 @@ const MyPatients = () => {
                     <p className="text-sm text-gray-600">{patient.age} years • {patient.location}</p>
                   </div>
                 </div>
-                
+
                 {/* Priority Badge */}
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityBadge(patient.priority)}`}>
                   {patient.priority} priority
@@ -194,13 +198,16 @@ const MyPatients = () => {
               </div>
 
               {/* Contact Info */}
-              <div className="flex gap-4 text-sm text-gray-600 mb-4">
-                <div className="flex items-center gap-1">
-                  <Phone className="w-4 h-4" />
-                  <span>{patient.phone}</span>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm text-gray-600 mb-4">
+                {/* Phone */}
+                <div className="flex items-center gap-1 min-w-0">
+                  <Phone className="w-4 h-4 shrink-0" />
+                  <span className="truncate">{patient.phone}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Mail className="w-4 h-4" />
+
+                {/* Email */}
+                <div className="flex items-center gap-1 min-w-0">
+                  <Mail className="w-4 h-4 shrink-0" />
                   <span className="truncate">{patient.email}</span>
                 </div>
               </div>
@@ -229,7 +236,7 @@ const MyPatients = () => {
                   <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(patient.status)}`}>
                     {patient.status.charAt(0).toUpperCase() + patient.status.slice(1)}
                   </span>
-                  
+
                   <div className="flex items-center gap-1 text-sm text-gray-600">
                     <Calendar className="w-4 h-4" />
                     <span className={patient.nextAppointment.includes('Today') ? 'text-green-600 font-medium' : 'text-gray-700'}>
@@ -250,20 +257,20 @@ const MyPatients = () => {
                   {dropdownOpen === patient.id && (
                     <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-10 py-2">
                       <button className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm">
-                        <Edit className="w-4 h-4 text-blue-600"/> 
+                        <Edit className="w-4 h-4 text-blue-600" />
                         Edit Patient
                       </button>
                       <button className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm">
-                        <Calendar className="w-4 h-4 text-green-600"/> 
+                        <Calendar className="w-4 h-4 text-green-600" />
                         Schedule Visit
                       </button>
                       <button className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm">
-                        <Phone className="w-4 h-4 text-purple-600"/> 
+                        <Phone className="w-4 h-4 text-purple-600" />
                         Contact Patient
                       </button>
                       <div className="border-t border-gray-100 my-1"></div>
                       <button className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-sm text-red-600">
-                        <Trash2 className="w-4 h-4"/> 
+                        <Trash2 className="w-4 h-4" />
                         Delete Patient
                       </button>
                     </div>
@@ -281,7 +288,7 @@ const MyPatients = () => {
           <UserX className="w-16 h-16 mx-auto mb-4 text-gray-400" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No patients found</h3>
           <p className="text-gray-600 mb-4">Try adjusting your search or filter criteria</p>
-          <button 
+          <button
             onClick={() => { setSearchTerm(''); setActiveFilter('all'); }}
             className="text-blue-600 hover:text-blue-700 font-medium"
           >

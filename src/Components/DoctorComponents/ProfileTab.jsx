@@ -58,19 +58,19 @@ export default function ProfileTab() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50 to-blue-50/30 p-6">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Header */}
         <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl shadow-lg p-8 mb-8 text-white relative overflow-hidden">
           <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -translate-x-16 -translate-y-16"></div>
           <div className="absolute bottom-0 right-0 w-24 h-24 bg-white/10 rounded-full translate-x-12 translate-y-12"></div>
-          
+
           <div className="flex flex-col lg:flex-row items-center gap-6 relative z-10">
             {/* Profile Image */}
             <div className="relative group">
               <div className="w-32 h-32 rounded-2xl border-4 border-white/20 shadow-lg overflow-hidden">
-                <img 
-                  src={profileImage} 
-                  alt="Profile" 
+                <img
+                  src={profileImage}
+                  alt="Profile"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -105,11 +105,10 @@ export default function ProfileTab() {
             {/* Edit Button */}
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                isEditing 
-                  ? 'bg-white text-amber-600 hover:bg-amber-50' 
+              className={`px-6 py-3 rounded-lg font-semibold transition-all ${isEditing
+                  ? 'bg-white text-amber-600 hover:bg-amber-50'
                   : 'bg-white/20 backdrop-blur-sm text-white hover:bg-white/30'
-              }`}
+                }`}
             >
               {isEditing ? '✕ Cancel' : '✏️ Edit Profile'}
             </button>
@@ -117,22 +116,21 @@ export default function ProfileTab() {
         </div>
 
         {/* Main Content */}
-        <div className="grid lg:grid-cols-3 gap-8">
-          
+        <div className="grid lg:grid-cols-3 gap-8  ">
+
           {/* Left Column - Profile Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
               {/* Navigation Tabs */}
-              <div className="flex space-x-1 bg-slate-100 rounded-xl p-1 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-slate-100 rounded-xl p-1 mb-6">
                 {['personal', 'professional', 'settings'].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
-                      activeTab === tab
+                    className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${activeTab === tab
                         ? 'bg-white text-amber-600 shadow-sm'
                         : 'text-slate-600 hover:text-slate-800'
-                    }`}
+                      }`}
                   >
                     {tab === 'personal' && '👤 Personal'}
                     {tab === 'professional' && '💼 Professional'}
@@ -145,12 +143,10 @@ export default function ProfileTab() {
               {activeTab === 'personal' && (
                 <div className="space-y-6">
                   <h3 className="text-xl font-bold text-slate-800 mb-4">Personal Information</h3>
-                  
-                  <div className="grid md:grid-cols-2 gap-6">
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Full Name
-                      </label>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
                       <input
                         type="text"
                         name="name"
@@ -162,9 +158,7 @@ export default function ProfileTab() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Email Address
-                      </label>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
                       <input
                         type="email"
                         name="email"
@@ -176,9 +170,7 @@ export default function ProfileTab() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Phone Number
-                      </label>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
                       <input
                         type="text"
                         name="phone"
@@ -190,9 +182,7 @@ export default function ProfileTab() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Experience
-                      </label>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Experience</label>
                       <input
                         type="text"
                         name="experience"
@@ -205,9 +195,7 @@ export default function ProfileTab() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Bio
-                    </label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Bio</label>
                     <textarea
                       name="bio"
                       value={profile.bio}
@@ -224,12 +212,10 @@ export default function ProfileTab() {
               {activeTab === 'professional' && (
                 <div className="space-y-6">
                   <h3 className="text-xl font-bold text-slate-800 mb-4">Professional Details</h3>
-                  
-                  <div className="grid md:grid-cols-2 gap-6">
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Specialization
-                      </label>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Specialization</label>
                       <input
                         type="text"
                         name="specialization"
@@ -241,9 +227,7 @@ export default function ProfileTab() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Qualifications
-                      </label>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Qualifications</label>
                       <input
                         type="text"
                         name="qualifications"
@@ -255,9 +239,7 @@ export default function ProfileTab() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Clinic Name
-                      </label>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Clinic Name</label>
                       <input
                         type="text"
                         name="clinicName"
@@ -269,9 +251,7 @@ export default function ProfileTab() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Consultation Fee
-                      </label>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Consultation Fee</label>
                       <input
                         type="text"
                         name="consultationFee"
@@ -284,9 +264,7 @@ export default function ProfileTab() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Clinic Address
-                    </label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Clinic Address</label>
                     <textarea
                       name="clinicAddress"
                       value={profile.clinicAddress}
@@ -298,9 +276,7 @@ export default function ProfileTab() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Availability
-                    </label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Availability</label>
                     <input
                       type="text"
                       name="availability"
@@ -317,8 +293,8 @@ export default function ProfileTab() {
               {activeTab === 'settings' && (
                 <div className="space-y-6">
                   <h3 className="text-xl font-bold text-slate-800 mb-4">Account Settings</h3>
-                  
-                  <div className="space-y-4">
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
                       <h4 className="font-semibold text-blue-800 mb-2">Change Password</h4>
                       <div className="space-y-3">
@@ -332,7 +308,7 @@ export default function ProfileTab() {
                           placeholder="New Password"
                           className="w-full border border-blue-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
-                        <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        <button className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
                           Update Password
                         </button>
                       </div>
@@ -361,16 +337,16 @@ export default function ProfileTab() {
 
               {/* Save Button */}
               {isEditing && (
-                <div className="flex gap-3 mt-8 pt-6 border-t border-slate-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8 pt-6 border-t border-slate-200">
                   <button
                     onClick={handleSave}
-                    className="flex-1 bg-amber-500 text-white py-3 rounded-xl font-semibold hover:bg-amber-600 transition-colors"
+                    className="w-full bg-amber-500 text-white py-3 rounded-xl font-semibold hover:bg-amber-600 transition-colors"
                   >
                     💾 Save Changes
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="flex-1 bg-slate-200 text-slate-700 py-3 rounded-xl font-semibold hover:bg-slate-300 transition-colors"
+                    className="w-full bg-slate-200 text-slate-700 py-3 rounded-xl font-semibold hover:bg-slate-300 transition-colors"
                   >
                     Cancel
                   </button>
@@ -378,6 +354,7 @@ export default function ProfileTab() {
               )}
             </div>
           </div>
+
 
           {/* Right Column - Quick Stats */}
           <div className="space-y-6">

@@ -492,22 +492,28 @@ const ConsultationsTab = () => {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 sm:gap-3">
+                    {/* Rating */}
                     {consultation.satisfaction && (
                       <div className="flex items-center gap-1 text-amber-600">
                         <Star className="w-4 h-4 fill-current" />
                         <span className="text-sm">{consultation.satisfaction}/5</span>
                       </div>
                     )}
+
+                    {/* Complete button */}
                     <button className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 transition-colors">
                       <CheckCircle className="w-4 h-4" />
                       Complete
                     </button>
+
+                    {/* Share button */}
                     <button className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
                       <Share2 className="w-4 h-4" />
                       Share
                     </button>
                   </div>
+
                 </div>
               </div>
             )}

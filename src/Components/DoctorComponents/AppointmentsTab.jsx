@@ -2,33 +2,28 @@ import React, { useState } from "react";
 import {
   Calendar,
   Search,
-  Filter,
-  MoreVertical,
   Eye,
   Edit3,
   Trash2,
   Phone,
-  Video,
-  MapPin,
   Clock,
   User,
-  Star,
   ChevronDown,
   ChevronUp,
   CheckCircle,
   XCircle,
   Clock as ClockIcon,
-  Mail,
   MessageSquare,
   Download,
   Share2,
   Zap
 } from "lucide-react";
 
-const AppointmentsTab = ({ searchQuery }) => {
+const AppointmentsTab = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [sortBy, setSortBy] = useState("date");
   const [expandedAppointment, setExpandedAppointment] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(""); // ✅ FIX
 
   // Sample appointments data
   const appointments = [
@@ -153,21 +148,46 @@ const AppointmentsTab = ({ searchQuery }) => {
     setExpandedAppointment(expandedAppointment === id ? null : id);
   };
 
-  const filteredAppointments = appointments.filter(appointment => {
-    const matchesSearch = searchQuery
-      ? appointment.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      appointment.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      appointment.dosha.toLowerCase().includes(searchQuery.toLowerCase())
-      : true;
+  const priorityOrder = { high: 1, medium: 2, low: 3 };
 
-    const matchesStatus = selectedStatus === "all" || appointment.status === selectedStatus;
+  const filteredAppointments = appointments
+    .filter((appointment) => {
+      const search = searchQuery.toLowerCase();
 
-    return matchesSearch && matchesStatus;
-  });
+      const matchesSearch = !searchQuery || [
+        appointment.patientName,
+        appointment.type,
+        appointment.dosha,
+        appointment.priority,
+        appointment.status,
+        appointment.notes,
+        ...(appointment.symptoms || [])
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(search);
+
+      const matchesStatus =
+        selectedStatus === "all" || appointment.status === selectedStatus;
+
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      if (sortBy === "date") {
+        return new Date(a.date) - new Date(b.date);
+      }
+      if (sortBy === "name") {
+        return a.patientName.localeCompare(b.patientName);
+      }
+      if (sortBy === "priority") {
+        return priorityOrder[a.priority] - priorityOrder[b.priority];
+      }
+      return 0;
+    });
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header Section */}
+      {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
           <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
@@ -178,42 +198,9 @@ const AppointmentsTab = ({ searchQuery }) => {
             Manage your patient appointments efficiently
           </p>
         </div>
-
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg">
-            <Calendar className="w-4 h-4" />
-            New Appointment
-          </button>
-          <button className="flex items-center gap-2 border border-emerald-200 text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-xl font-medium transition-all duration-200">
-            <Download className="w-4 h-4" />
-            Export
-          </button>
-        </div>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {statusFilters.map((filter) => (
-          <div
-            key={filter.value}
-            className={`p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer hover:scale-105 ${selectedStatus === filter.value
-              ? 'border-emerald-300 bg-emerald-50 shadow-lg'
-              : 'border-gray-100 bg-white shadow-sm'
-              }`}
-            onClick={() => setSelectedStatus(filter.value)}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold text-gray-900">{filter.count}</div>
-                <div className="text-sm text-gray-600">{filter.label}</div>
-              </div>
-              <div className={`w-3 h-3 rounded-full ${filter.color}`}></div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Filters and Search */}
+      {/* Filters */}
       <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100">
         <div className="flex items-center gap-4 flex-wrap">
           <div className="relative">
@@ -221,6 +208,8 @@ const AppointmentsTab = ({ searchQuery }) => {
             <input
               type="text"
               placeholder="Search patients, types, doshas..."
+              value={searchQuery} // ✅ bind
+              onChange={(e) => setSearchQuery(e.target.value)} // ✅ update
               className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             />
           </div>

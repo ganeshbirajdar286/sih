@@ -10,6 +10,7 @@ import Appointments from "../Components/PatientDashboard/Appointment";
 import HealthRecords from "../Components/PatientDashboard/HealthRecord";
 import Reports from "../Components/PatientDashboard/Reports";
 import PatientsTab from "../Components/PatientDashboard/PatientsTab.jsx";
+import NutritionCalculator from "../Components/PatientDashboard/NutritionCalculator.jsx";
 
 export default function PatientDashboard() {
   // 👇 default tab set to "patients"
@@ -25,6 +26,7 @@ export default function PatientDashboard() {
     appointments: <Appointments />,
     reports: <Reports />,
     records: <HealthRecords />,
+    nutrients:<NutritionCalculator/>,
   };
 
   return (

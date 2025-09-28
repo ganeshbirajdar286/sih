@@ -18,7 +18,10 @@ export default function ProfileTab() {
 
   const [activeTab, setActiveTab] = useState("personal");
   const [isEditing, setIsEditing] = useState(false);
-  const [profileImage, setProfileImage] = useState("/api/placeholder/150/150");
+  const [profileImage, setProfileImage] = useState(
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVXRMrZHp2Vv7XePQtwJZrf0FmbXoUWw53iQ&s"  // direct link
+);
+
 
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });

@@ -133,10 +133,6 @@ const EnhancedOverview = ({ currentTime, setActiveTab }) => (
         <div className="flex-shrink-0 text-right space-y-1">
           <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-white to-emerald-100 bg-clip-text text-transparent">18</div>
           <div className="text-emerald-100 text-sm">Appointments Today</div>
-          <div className="flex items-center justify-end gap-1 text-emerald-100 text-xs">
-            <Smartphone className="w-3 h-3" />
-            <span>Mobile Ready</span>
-          </div>
         </div>
       </div>
     </div>

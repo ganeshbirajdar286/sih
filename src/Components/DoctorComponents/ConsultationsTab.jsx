@@ -38,8 +38,11 @@ import {
 
 const ConsultationsTab = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("all");
-  const [expandedConsultation, setExpandedConsultation] = useState(null);
+const [selectedFilter, setSelectedFilter] = useState("all");
+const [expandedConsultation, setExpandedConsultation] = useState(null);
+const [selectedType, setSelectedType] = useState("all");   // ✅ added before
+const [selectedMonth, setSelectedMonth] = useState("all"); // ✅ fix for your error
+
 
   // Sample consultations data
   const consultations = [
@@ -223,11 +226,46 @@ const ConsultationsTab = () => {
     setExpandedConsultation(expandedConsultation === id ? null : id);
   };
 
-  const filteredConsultations = consultations.filter(consultation =>
-    consultation.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    consultation.chiefComplaint.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    consultation.dosha.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // ---- Filtering logic ----
+  const filteredConsultations = consultations
+    .filter((consultation) => {
+      // Status filter
+      if (selectedFilter !== "all") {
+        if (
+          selectedFilter === "upcoming" &&
+          !(consultation.status === "upcoming" || consultation.status === "scheduled")
+        ) return false;
+        if (consultation.status !== selectedFilter && selectedFilter !== "all") return false;
+      }
+
+      // Type filter
+      if (selectedType !== "all") {
+        if (
+          (selectedType === "video" && consultation.type !== "Video Consultation") ||
+          (selectedType === "clinic" && consultation.type !== "Clinic Visit") ||
+          (selectedType === "audio" && consultation.type !== "Audio Call")
+        ) return false;
+      }
+
+      // Month filter
+      if (selectedMonth !== "all") {
+        const consultMonth = new Date(consultation.date).getMonth(); // 0-based
+        const currentMonth = new Date().getMonth();
+        if (selectedMonth === "today") {
+          const today = new Date().toISOString().split("T")[0];
+          if (consultation.date !== today) return false;
+        } else if (selectedMonth === "thisMonth" && consultMonth !== currentMonth) {
+          return false;
+        }
+      }
+
+      // Search filter
+      return (
+        consultation.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        consultation.chiefComplaint.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        consultation.dosha.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    });
 
   return (
     <div className="p-6 grid gap-6">
@@ -294,12 +332,16 @@ const ConsultationsTab = () => {
               />
             </div>
 
-            <select className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-              <option>Today</option>
-              <option>This Week</option>
-              <option>This Month</option>
-              <option>All Time</option>
+            <select
+              className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+            >
+              <option value="all">All Time</option>
+              <option value="today">Today</option>
+              <option value="thisMonth">This Month</option>
             </select>
+
           </div>
 
           {/* Center Section - Type Filters */}
@@ -307,13 +349,20 @@ const ConsultationsTab = () => {
             {consultationTypes.map((type) => (
               <button
                 key={type.value}
-                className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-xl bg-white hover:bg-purple-50 transition-colors text-sm"
+                onClick={() => setSelectedType(type.value)}  // ✅ now works
+                className={`flex items-center gap-2 px-3 py-2 border rounded-xl text-sm transition-colors
+        ${selectedType === type.value
+                    ? "bg-purple-100 border-purple-300"
+                    : "bg-white hover:bg-purple-50 border-gray-200"
+                  }`}
               >
                 <type.icon className="w-4 h-4" />
                 <span>{type.label}</span>
               </button>
             ))}
           </div>
+
+
 
           {/* Right Section - Count */}
           <div className="flex items-center justify-end text-sm text-purple-700 font-medium">

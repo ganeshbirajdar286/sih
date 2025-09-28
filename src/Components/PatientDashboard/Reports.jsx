@@ -261,14 +261,6 @@ const Reports = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
                     </div>
-      
-                    {/* Filter */}
-                    <button
-                      className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto justify-center sm:justify-start"
-                      onClick={() => setShowFilters(!showFilters)}
-                    >
-                      <FaFilter className="text-gray-400 mr-2" /> Filter
-                    </button>
                   </div>
                 </div>
               </div>

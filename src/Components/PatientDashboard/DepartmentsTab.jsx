@@ -25,19 +25,51 @@ const departmentIcons = {
   Emergency: "🚑",
 };
 
+
 // Department colors mapping
 const departmentColors = {
-  Cardiology: "red",
-  Dermatology: "purple",
-  Orthopedics: "blue",
-  Ayurveda: "green",
-  Pediatrics: "pink",
-  Neurology: "indigo",
-  Dentistry: "teal",
-  Ophthalmology: "cyan",
-  Psychiatry: "gray",
-  Emergency: "orange",
+  Cardiology: {
+    bg: "bg-red-600",
+    text: "text-white",
+  },
+  Dermatology: {
+    bg: "bg-purple-600",
+    text: "text-white",
+  },
+  Orthopedics: {
+    bg: "bg-blue-600",
+    text: "text-white",
+  },
+  Ayurveda: {
+    bg: "bg-green-600",
+    text: "text-white",
+  },
+  Pediatrics: {
+    bg: "bg-pink-600",
+    text: "text-white",
+  },
+  Neurology: {
+    bg: "bg-indigo-600",
+    text: "text-white",
+  },
+  Dentistry: {
+    bg: "bg-teal-600",
+    text: "text-white",
+  },
+  Ophthalmology: {
+    bg: "bg-cyan-600",
+    text: "text-white",
+  },
+  Psychiatry: {
+    bg: "bg-gray-600",
+    text: "text-white",
+  },
+  Emergency: {
+    bg: "bg-orange-600",
+    text: "text-white",
+  },
 };
+
 
 // Mock data
 const departments = [
@@ -257,14 +289,15 @@ export default function DepartmentsTab() {
               <button
                 key={dept}
                 onClick={() => setSelectedDepartment(dept)}
-                className={`px-3 py-1 rounded-full text-sm ${selectedDepartment === dept
-                  ? `bg-${departmentColors[dept]}-600 text-white`
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                className={`px-3 py-1 rounded-full text-sm transition ${selectedDepartment === dept
+                    ? `${departmentColors[dept]?.bg || "bg-gray-600"} ${departmentColors[dept]?.text || "text-white"}`
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   }`}
               >
                 {dept}
               </button>
             ))}
+
           </div>
         </div>
       )}

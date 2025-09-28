@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import logo from  "../assets/logo.png"
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -84,10 +85,12 @@ const SignUp = () => {
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-green-500 rounded-t-3xl"></div>
 
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl shadow-lg mb-4 transform transition-transform duration-500 hover:scale-105 hover:rotate-3">
-            <span className="text-4xl text-white">🌿</span>
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg mb-4 transform transition-transform duration-500 hover:scale-105 hover:rotate-3 overflow-hidden rounded-full">
+            <img src={logo} alt="logo" className="w-full h-full object-cover" />
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-700 to-green-800 bg-clip-text text-transparent">AyurDietCare</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-green-800">
+            SWASTHYA
+          </h1>
           <p className="text-gray-500 text-sm mt-2 font-medium">Create an account to start your wellness journey</p>
         </div>
 

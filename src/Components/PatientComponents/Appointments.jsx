@@ -12,7 +12,7 @@ const Appointments = ({ list }) => (
             <div className="font-medium">{a.title}</div>
             <div className="text-sm text-gray-500">{a.date} • {a.time}</div>
           </div>
-          <button className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full">Details</button>
+          <button className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full cursor-pointer">Details</button>
         </li>
       ))}
     </ul>

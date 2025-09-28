@@ -12,7 +12,7 @@ const MedicalRecords = ({ records }) => (
                         <p className="font-medium text-gray-800">{record.name}</p>
                         <p className="text-sm text-gray-500">Date: {record.date}</p>
                     </div>
-                    <button className="text-blue-500 hover:text-blue-700">
+                    <button className="text-blue-500 hover:text-blue-700 cursor-pointer">
                         <FaDownload />
                     </button>
                 </li>

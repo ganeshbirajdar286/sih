@@ -11,9 +11,9 @@ export default function Header({ searchQuery, setSearchQuery }) {
           <FaBell className="text-gray-600" />
           <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
         </button>
-        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center border border-green-300 shadow-sm">
-          <FaUserMd className="text-green-700" />
-        </div>
+         <div className="w-15 h-15 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
+                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr3qBVX4XIA8zq3LpBn64zAuOt9_IZ7_H5uA&s" alt="logo" className="w-full h-full object-cover" />
+                </div>
       </div>
     </header>
   );

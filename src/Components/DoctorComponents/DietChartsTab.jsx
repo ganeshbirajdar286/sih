@@ -12,6 +12,7 @@ import {
   FileText,
   Trash2,
   Copy,
+  Send
 } from "lucide-react";
 
 const DietChartsTab = () => {
@@ -235,14 +236,11 @@ const DietChartsTab = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg">
+          <button className=" cursor-pointer flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg">
             <Plus className="w-4 h-4" />
             New Diet Chart
           </button>
-          <button className="flex items-center gap-2 border border-amber-200 text-amber-600 hover:bg-amber-50 px-4 py-2 rounded-xl font-medium transition-all duration-200">
-            <Copy className="w-4 h-4" />
-            Template
-          </button>
+
         </div>
       </div>
 
@@ -290,7 +288,7 @@ const DietChartsTab = () => {
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              className=" cursor-pointer px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             >
               <option value="recent">Sort by Recent</option>
               <option value="compliance">Sort by Compliance</option>
@@ -473,22 +471,21 @@ const DietChartsTab = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                   {/* Left actions */}
                   <div className="flex flex-wrap gap-2">
-                    <button className="flex items-center gap-2 bg-amber-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-amber-600 transition-colors w-full sm:w-auto justify-center">
+                    <button className=" cursor-pointer  flex items-center gap-2 bg-amber-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-amber-600 transition-colors w-full sm:w-auto justify-center">
                       <Edit3 className="w-4 h-4" />
                       Edit Chart
                     </button>
-                    <button className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors w-full sm:w-auto justify-center">
-                      <Download className="w-4 h-4" />
-                      Export PDF
+                    <button
+                      type="button"
+                      className="cursor-pointer flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors w-full sm:w-auto justify-center"
+                    >
+                      <Send className="w-4 h-4" />
+                      Send
                     </button>
                   </div>
 
                   {/* Right actions */}
                   <div className="flex flex-wrap gap-2 sm:justify-end">
-                    <button className="flex items-center gap-2 border border-gray-200 px-3  py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors w-full sm:w-auto justify-center">
-                      <Share2 className="w-4 h-4  " />
-                      Share
-                    </button>
                     <button className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors w-full sm:w-auto justify-center">
                       <Trash2 className="w-4 h-4 text-red-500" />
                       Delete

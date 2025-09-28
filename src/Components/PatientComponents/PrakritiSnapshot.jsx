@@ -11,7 +11,7 @@ const PrakritiSnapshot = ({ prakriti, vikriti }) => {
     { subject: 'Kapha', A: prakriti.kapha, B: vikriti.kapha, fullMark: 100 },
   ];
   return (
-    <Card title="Dosha Balance" icon={FaBalanceScale}>
+    <Card title="Dosha Balance" icon={FaBalanceScale} >
         <ResponsiveContainer width="100%" height={300}>
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
             <PolarGrid />

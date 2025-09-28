@@ -1,10 +1,11 @@
 // src/Components/Sidebar.jsx
 
 import React, { useEffect } from "react";
-import { 
-  Activity, Users, User, Building, Stethoscope, Calendar, 
-  TrendingUp, FileText, Menu, X, LogOut, Apple 
+import {
+  Activity, Users, User, Building, Stethoscope, Calendar,
+  TrendingUp, FileText, Menu, X, LogOut, Apple
 } from "lucide-react";
+import logo from "../../assets/logo.png"
 
 export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) {
   const UserMd = User;
@@ -73,9 +74,11 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
       <header className="md:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-green-800 to-green-900 shadow-lg z-40">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-2">
-            <Activity className="text-green-300" size={24} />
-            <h1 className="text-lg font-semibold text-white tracking-wide">
-              AyurDietCare
+            <div className="w-15 h-15 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
+              <img src={logo} alt="logo" className="w-full h-full object-cover" />
+            </div>
+            <h1 className="text-xl md:text-2xl font-bold text-white">
+              SWASTHYA
             </h1>
           </div>
           <button
@@ -89,11 +92,10 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
 
         {/* Mobile Dropdown Menu */}
         <div
-          className={`sidebar absolute left-0 right-0 bg-white shadow-xl border-t border-gray-200 transform transition-all duration-300 ease-in-out z-40 ${
-            sidebarOpen
-              ? "translate-y-0 opacity-100 pointer-events-auto"
-              : "-translate-y-2 opacity-0 pointer-events-none"
-          }`}
+          className={`sidebar absolute left-0 right-0 bg-white shadow-xl border-t border-gray-200 transform transition-all duration-300 ease-in-out z-40 ${sidebarOpen
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "-translate-y-2 opacity-0 pointer-events-none"
+            }`}
         >
           <nav className="flex flex-col p-2 space-y-1 max-h-96 overflow-y-auto">
             {/* Main Section */}
@@ -104,11 +106,10 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
               <button
                 key={key}
                 onClick={() => handleTabClick(key)}
-                className={`flex items-center px-3 py-3 rounded-lg text-left font-medium transition-colors ${
-                  activeTab === key
-                    ? "bg-green-50 text-green-700 border border-green-200"
-                    : "text-gray-700 hover:bg-green-50 hover:text-green-600"
-                }`}
+                className={`flex items-center px-3 py-3 rounded-lg text-left font-medium transition-colors ${activeTab === key
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "text-gray-700 hover:bg-green-50 hover:text-green-600"
+                  }`}
               >
                 <span className="mr-3">{icon}</span>
                 {label}
@@ -123,11 +124,10 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
               <button
                 key={key}
                 onClick={() => handleTabClick(key)}
-                className={`flex items-center px-3 py-3 rounded-lg text-left font-medium transition-colors ${
-                  activeTab === key
-                    ? "bg-green-50 text-green-700 border border-green-200"
-                    : "text-gray-700 hover:bg-green-50 hover:text-green-600"
-                }`}
+                className={`flex items-center px-3 py-3 rounded-lg text-left font-medium transition-colors ${activeTab === key
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "text-gray-700 hover:bg-green-50 hover:text-green-600"
+                  }`}
               >
                 <span className="mr-3">{icon}</span>
                 {label}
@@ -175,8 +175,12 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
       <aside className="sidebar hidden md:flex w-64 bg-gradient-to-b from-green-800 to-green-900 text-white flex-col shadow-xl">
         {/* Header */}
         <div className="p-5 text-xl font-bold border-b border-green-700 flex items-center">
-          <Activity className="mr-3 text-green-300" size={24} />
-          <span className="truncate">AyurDietCare</span>
+          <div className="w-15 h-15 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
+            <img src={logo} alt="logo" className="w-full h-full object-cover" />
+          </div>
+          <h1 className="text-xl md:text-2xl font-bold text-white">
+            SWASTHYA
+          </h1>
         </div>
 
         {/* Navigation */}
@@ -188,18 +192,16 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200 group ${
-                activeTab === key
-                  ? "bg-green-700 shadow-md transform scale-105"
-                  : "hover:bg-green-700 hover:bg-opacity-70 hover:translate-x-1"
-              }`}
+              className={`flex items-center cursor-pointer w-full px-4 py-3 rounded-lg transition-all duration-200 group ${activeTab === key
+                ? "bg-green-700 shadow-md transform scale-105"
+                : "hover:bg-green-700 hover:bg-opacity-70 hover:translate-x-1"
+                }`}
             >
               <span
-                className={`transition-colors ${
-                  activeTab === key
-                    ? "text-green-100"
-                    : "text-green-300 group-hover:text-green-100"
-                }`}
+                className={`transition-colors ${activeTab === key
+                  ? "text-green-100"
+                  : "text-green-300 group-hover:text-green-100"
+                  }`}
               >
                 {icon}
               </span>
@@ -214,18 +216,16 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200 group ${
-                activeTab === key
-                  ? "bg-green-700 shadow-md transform scale-105"
-                  : "hover:bg-green-700 hover:bg-opacity-70 hover:translate-x-1"
-              }`}
+              className={`flex  cursor-pointer items-center w-full px-4 py-3 rounded-lg transition-all duration-200 group ${activeTab === key
+                ? "bg-green-700 shadow-md transform scale-105"
+                : "hover:bg-green-700 hover:bg-opacity-70 hover:translate-x-1"
+                }`}
             >
               <span
-                className={`transition-colors ${
-                  activeTab === key
-                    ? "text-green-100"
-                    : "text-green-300 group-hover:text-green-100"
-                }`}
+                className={`transition-colors ${activeTab === key
+                  ? "text-green-100"
+                  : "text-green-300 group-hover:text-green-100"
+                  }`}
               >
                 {icon}
               </span>
@@ -238,15 +238,17 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
         <div className="p-4 border-t border-green-700 bg-green-900 bg-opacity-50">
           <div className="flex items-center justify-between group cursor-pointer hover:bg-green-800 hover:bg-opacity-50 rounded-lg p-2 transition-all duration-200">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-green-700 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
-                <UserMd className="text-green-200" size={20} />
-              </div>
+             
+                <div className="w-15 h-15 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
+                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr3qBVX4XIA8zq3LpBn64zAuOt9_IZ7_H5uA&s" alt="logo" className="w-full h-full object-cover" />
+                </div>
+
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate group-hover:text-green-100">
-                  Dr. Smith
+                   Smith
                 </p>
                 <p className="text-xs text-green-300 truncate">
-                  Administrator
+                 Patient
                 </p>
               </div>
             </div>

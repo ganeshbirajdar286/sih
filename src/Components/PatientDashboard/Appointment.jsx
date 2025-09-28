@@ -104,7 +104,7 @@ const Appointments = () => {
             <h1 className="text-3xl font-bold text-gray-900">My Appointments</h1>
             <p className="text-gray-600 mt-2">Manage and schedule your medical appointments</p>
           </div>
-          <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-5 rounded-lg flex items-center transition mt-4 md:mt-0 shadow-md hover:shadow-lg">
+          <button className="bg-green-600 cursor-pointer hover:bg-green-700 text-white font-semibold py-3 px-5 rounded-lg flex items-center transition mt-4 md:mt-0 shadow-md hover:shadow-lg">
             <FaPlus className="mr-2" />
             Schedule Appointment
           </button>
@@ -118,7 +118,7 @@ const Appointments = () => {
               {['upcoming', 'past'].map(tab => (
                 <button
                   key={tab}
-                  className={`pb-2 px-1 font-medium transition ${
+                  className={`pb-2 cursor-pointer px-1 font-medium transition ${
                     activeTab === tab
                       ? 'text-green-700 border-b-2 border-green-700'
                       : 'text-gray-500 hover:text-green-600'
@@ -147,7 +147,7 @@ const Appointments = () => {
               
               <div className="relative">
                 <button 
-                  className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 w-full md:w-auto"
+                  className="flex cursor-pointer items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 w-full md:w-auto"
                   onClick={() => setShowFilters(!showFilters)}
                 >
                   <FaFilter className="text-gray-400 mr-2" />
@@ -158,7 +158,7 @@ const Appointments = () => {
                 {showFilters && (
                   <div className="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-10">
                     <button
-                      className={`block px-4 py-2 text-sm w-full text-left ${sortBy === 'date' ? 'bg-green-50 text-green-700' : 'text-gray-700'}`}
+                      className={` cursor-pointer block px-4 py-2 text-sm w-full text-left ${sortBy === 'date' ? 'bg-green-50 text-green-700' : 'text-gray-700'}`}
                       onClick={() => {
                         setSortBy('date');
                         setShowFilters(false);
@@ -167,7 +167,7 @@ const Appointments = () => {
                       By Date
                     </button>
                     <button
-                      className={`block px-4 py-2 text-sm w-full text-left ${sortBy === 'doctor' ? 'bg-green-50 text-green-700' : 'text-gray-700'}`}
+                      className={` cursor-pointer block px-4 py-2 text-sm w-full text-left ${sortBy === 'doctor' ? 'bg-green-50 text-green-700' : 'text-gray-700'}`}
                       onClick={() => {
                         setSortBy('doctor');
                         setShowFilters(false);
@@ -232,15 +232,15 @@ const Appointments = () => {
                   <div className="grid grid-cols-1 gap-3 mt-4">
                     {appointment.status !== 'completed' && (
                       <>
-                        <button className="flex items-center justify-center border border-green-500 text-green-600 px-3 py-2 rounded-lg hover:bg-green-50 transition-colors text-sm sm:text-base">
+                        <button className="flex items-center justify-center border border-green-500 text-green-600 px-3 py-2 rounded-lg hover:bg-green-50 transition-colors text-sm sm:text-base cursor-pointer">
                           Reschedule
                         </button>
-                        <button className="flex items-center justify-center border border-red-300  px-3 py-2 rounded-lg hover:bg-green-50 transition-colors text-sm sm:text-base text-red-500">
+                        <button className="cursor-pointer flex items-center justify-center border border-red-300  px-3 py-2 rounded-lg hover:bg-green-50 transition-colors text-sm sm:text-base text-red-500">
                           Cancel
                         </button>
                       </>
                     )}
-                    <button className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition flex items-center justify-center">
+                    <button className=" cursor-pointer flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition flex items-center justify-center">
                       <FaPhoneAlt className="mr-2" />
                       {appointment.type === 'Telemedicine' ? 'Join Call' : 'View Details'}
                     </button>

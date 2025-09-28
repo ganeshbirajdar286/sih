@@ -41,12 +41,12 @@ export default function PatientDashboard() {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        <Header
+        {/* <Header
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
-        />
+        /> */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 transition-all duration-300">
           {contentMap[activeTab]}
         </div>

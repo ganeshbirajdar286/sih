@@ -163,16 +163,16 @@ export default function DoctorsTab() {
         
         <div className="flex items-center gap-3 w-full md:w-auto">
           <button 
-            className="flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+            className="flex items-center cursor-pointer px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
             onClick={toggleFilters}
           >
-            <FaFilter className="mr-2" /> 
+            <FaFilter className="mr-2 " /> 
             {showFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
           
           <div className="ml-auto">
             <select 
-              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="px-4 py-2 cursor-pointer rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
@@ -194,7 +194,7 @@ export default function DoctorsTab() {
                 setSelectedSpecialty("All Specialties");
                 setAvailabilityFilter("all");
               }}
-              className="text-sm text-green-600 hover:text-green-800"
+              className="text-sm text-green-600 hover:text-green-800 cursor-pointer"
             >
               Clear All
             </button>
@@ -204,12 +204,12 @@ export default function DoctorsTab() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Specialty</label>
               <select 
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 cursor-pointer py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
                 value={selectedSpecialty}
                 onChange={(e) => setSelectedSpecialty(e.target.value)}
               >
                 {specialties.map(spec => (
-                  <option key={spec} value={spec}>{spec}</option>
+                  <option key={spec}  value={spec}>{spec}</option>
                 ))}
               </select>
             </div>
@@ -217,7 +217,7 @@ export default function DoctorsTab() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Availability</label>
               <select 
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 rounded-lg border cursor-pointer border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
                 value={availabilityFilter}
                 onChange={(e) => setAvailabilityFilter(e.target.value)}
               >
@@ -291,7 +291,7 @@ export default function DoctorsTab() {
                 </div>
                 
                 <button 
-                  className={`mt-4 w-full py-2 rounded-lg font-medium transition-colors ${doc.available 
+                  className={`mt-4 w-full cursor-pointer py-2 rounded-lg font-medium transition-colors ${doc.available 
                     ? 'bg-green-600 hover:bg-green-700 text-white' 
                     : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`} 
                   disabled={!doc.available}
@@ -300,7 +300,7 @@ export default function DoctorsTab() {
                 </button>
                 
                 {doc.available && (
-                  <button className="mt-2 w-full py-2 rounded-lg border border-green-600 text-green-600 font-medium hover:bg-green-50 transition-colors">
+                  <button className="mt-2 w-full cursor-pointer py-2 rounded-lg border border-green-600 text-green-600 font-medium hover:bg-green-50 transition-colors">
                     <FaCalendarAlt className="inline mr-2" /> View Schedule
                   </button>
                 )}

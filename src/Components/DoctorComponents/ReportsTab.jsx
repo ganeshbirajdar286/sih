@@ -86,16 +86,13 @@ export default function ReportsTab() {
               <select
                 value={timeRange}
                 onChange={(e) => setTimeRange(e.target.value)}
-                className="bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="cursor-pointer  bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500"
               >
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
                 <option value="quarterly">Quarterly</option>
                 <option value="yearly">Yearly</option>
               </select>
-              <button className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors flex items-center gap-2">
-                📊 Export Report
-              </button>
             </div>
           </div>
 
@@ -131,7 +128,7 @@ export default function ReportsTab() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-6 py-4 font-medium whitespace-nowrap transition-colors ${activeTab === tab
+                className={`cursor-pointer px-6 py-4 font-medium whitespace-nowrap transition-colors ${activeTab === tab
                   ? 'text-amber-600 border-b-2 border-amber-500'
                   : 'text-slate-600 hover:text-slate-800'
                   }`}
@@ -271,11 +268,8 @@ export default function ReportsTab() {
               <p className="text-amber-100">Create comprehensive reports for analysis and presentation</p>
             </div>
             <div className="flex gap-3">
-              <button className="bg-white text-amber-600 px-6 py-2 rounded-lg font-medium hover:bg-amber-50 transition-colors">
+              <button className="cursor-pointer bg-white text-amber-600 px-6 py-2 rounded-lg font-medium hover:bg-amber-50 transition-colors">
                 📈 Generate PDF
-              </button>
-              <button className="bg-amber-800 text-white px-6 py-2 rounded-lg font-medium hover:bg-amber-900 transition-colors">
-                📊 Custom Report
               </button>
             </div>
           </div>

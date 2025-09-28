@@ -263,10 +263,10 @@ export default function DepartmentsTab() {
         </div>
         <div className="grid">
           <button
-            className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+            className="flex cursor-pointer items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
             onClick={() => setShowFilters(!showFilters)}
           >
-            <FaFilter className="mr-2" />
+            <FaFilter className="mr-2 " />
             {showFilters ? "Hide Filters" : "Show Filters"}
           </button>
         </div>
@@ -278,7 +278,7 @@ export default function DepartmentsTab() {
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2">
             <button
               onClick={() => setSelectedDepartment("All Departments")}
-              className={`px-3 py-1 rounded-full text-sm ${selectedDepartment === "All Departments"
+              className={`px-3 cursor-pointer py-1 rounded-full text-sm ${selectedDepartment === "All Departments"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
@@ -289,7 +289,7 @@ export default function DepartmentsTab() {
               <button
                 key={dept}
                 onClick={() => setSelectedDepartment(dept)}
-                className={`px-3 py-1 rounded-full text-sm transition ${selectedDepartment === dept
+                className={`px-3 py-1 cursor-pointer rounded-full text-sm transition ${selectedDepartment === dept
                     ? `${departmentColors[dept]?.bg || "bg-gray-600"} ${departmentColors[dept]?.text || "text-white"}`
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   }`}
@@ -366,7 +366,6 @@ export default function DepartmentsTab() {
                   </div>
                 </div>
 
-                {/* Services */}
                 {/* Services */}
                 <div className="grid gap-2">
                   <h4 className="text-sm font-medium text-gray-700">Key Services:</h4>

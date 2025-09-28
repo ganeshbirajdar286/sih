@@ -104,10 +104,10 @@ const MyPatients = () => {
           <h1 className="text-3xl font-bold text-gray-900">My Patients</h1>
           <p className="text-gray-600 mt-1">Manage and track your patient care journey</p>
         </div>
-        <button className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200">
+        {/* <button className=" cursor-pointer bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200">
           <Plus className="w-5 h-5" />
           Add New Patient
-        </button>
+        </button> */}
       </div>
 
       {/* Stats Cards */}

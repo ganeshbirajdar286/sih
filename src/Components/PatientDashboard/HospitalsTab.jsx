@@ -146,7 +146,7 @@ export default function HospitalsTab() {
 
         <div className="flex items-center gap-3 w-full md:w-auto">
           <button
-            className="w-full md:w-auto flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors text-sm sm:text-base"
+            className="w-full cursor-pointer md:w-auto flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors text-sm sm:text-base"
             onClick={() => setShowFilters(!showFilters)}
           >
             <FaFilter className="mr-2" />
@@ -155,7 +155,7 @@ export default function HospitalsTab() {
 
           <div className="ml-auto">
             <select
-              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+              className="px-4 cursor-pointer py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
@@ -174,7 +174,7 @@ export default function HospitalsTab() {
             <h3 className="font-semibold text-gray-700">Filter by Specialty</h3>
             <button
               onClick={() => setSelectedSpecialties([])}
-              className="text-sm text-green-600 hover:text-green-800"
+              className="text-sm cursor-pointer text-green-600 hover:text-green-800"
             >
               Clear All
             </button>
@@ -185,7 +185,7 @@ export default function HospitalsTab() {
               <button
                 key={specialty}
                 onClick={() => toggleSpecialty(specialty)}
-                className={`px-3 py-1 rounded-full text-sm ${selectedSpecialties.includes(specialty)
+                className={`px-3 cursor-pointer py-1 rounded-full text-sm ${selectedSpecialties.includes(specialty)
                     ? "bg-green-600 text-white"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   }`}
@@ -292,10 +292,10 @@ export default function HospitalsTab() {
                   >
                     <FaPhone className="mr-2" /> Call
                   </a>
-                  <button className="flex items-center justify-center text-gray-700 hover:text-gray-900 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base">
+                  <button className="flex items-center justify-center cursor-pointer text-gray-700 hover:text-gray-900 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base">
                     <FaDirections className="mr-2" /> Directions
                   </button>
-                  <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-sm sm:text-base">
+                  <button className="bg-green-600 cursor-pointer hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-sm sm:text-base">
                     View Details
                   </button>
                 </div>

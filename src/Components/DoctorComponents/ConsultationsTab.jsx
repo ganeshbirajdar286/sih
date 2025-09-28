@@ -281,15 +281,12 @@ const [selectedMonth, setSelectedMonth] = useState("all"); // ✅ fix for your e
         </div>
 
         {/* Buttons aligned right on desktop */}
-        <div className="grid grid-cols-2 gap-3 lg:justify-end">
-          <button className="flex items-center justify-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg">
+        <div className="grid grid-cols-1 gap-3 ">
+          <button className="cursor-pointer flex items-center justify-center gap-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 hover:shadow-lg">
             <Plus className="w-4 h-4" />
             New Consultation
           </button>
-          <button className="flex items-center justify-center gap-2 border border-purple-200 text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-xl font-medium transition-all duration-200">
-            <Calendar className="w-4 h-4" />
-            Schedule
-          </button>
+         
         </div>
       </div>
 
@@ -333,7 +330,7 @@ const [selectedMonth, setSelectedMonth] = useState("all"); // ✅ fix for your e
             </div>
 
             <select
-              className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="cursor-pointer px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
             >
@@ -350,7 +347,7 @@ const [selectedMonth, setSelectedMonth] = useState("all"); // ✅ fix for your e
               <button
                 key={type.value}
                 onClick={() => setSelectedType(type.value)}  // ✅ now works
-                className={`flex items-center gap-2 px-3 py-2 border rounded-xl text-sm transition-colors
+                className={` cursor-pointer flex items-center gap-2 px-3 py-2 border rounded-xl text-sm transition-colors
         ${selectedType === type.value
                     ? "bg-purple-100 border-purple-300"
                     : "bg-white hover:bg-purple-50 border-gray-200"
@@ -517,15 +514,15 @@ const [selectedMonth, setSelectedMonth] = useState("all"); // ✅ fix for your e
                       Quick Actions
                     </h4>
                     <div className="flex flex-wrap gap-2">
-                      <button className="flex items-center gap-2 bg-purple-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-purple-600 transition-colors">
+                      <button className="cursor-pointer flex items-center gap-2 bg-purple-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-purple-600 transition-colors">
                         <Edit3 className="w-4 h-4" />
                         Add Notes
                       </button>
-                      <button className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                      <button className="cursor-pointer flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
                         <FileText className="w-4 h-4" />
                         Prescription
                       </button>
-                      <button className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                      <button className="cursor-pointer flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
                         <Download className="w-4 h-4" />
                         Export
                       </button>
@@ -551,13 +548,13 @@ const [selectedMonth, setSelectedMonth] = useState("all"); // ✅ fix for your e
                     )}
 
                     {/* Complete button */}
-                    <button className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 transition-colors">
+                    <button className="cursor-pointer flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 transition-colors">
                       <CheckCircle className="w-4 h-4" />
                       Complete
                     </button>
 
                     {/* Share button */}
-                    <button className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                    <button className="cursor-pointer flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
                       <Share2 className="w-4 h-4" />
                       Share
                     </button>

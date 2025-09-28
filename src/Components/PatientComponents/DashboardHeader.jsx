@@ -27,17 +27,17 @@ const DashboardHeader = ({ patient }) => {
                     <p className="text-gray-500">{`${patient.age} years old, ${patient.gender} • Predominant Dosha: ${patient.dosha}`}</p>
                 </div>
                 <div className="flex space-x-2 mt-4 md:mt-0">
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center transition">
+                    <button className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center transition">
                         <FaPrint className="mr-2" /> Print Report
                     </button>
-                    <button className="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center transition">
+                    <button className="bg-gray-700  cursor-pointer hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center transition">
                         <FaCalendarAlt className="mr-2" /> Schedule
                     </button>
                 </div>
             </div>
             
             {/* Bottom Row: Key Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ">
                 <StatCard icon={FaWeight} label="Weight" value={patient.keyStats.weight} />
                 <StatCard icon={FaRulerVertical} label="Height" value={patient.keyStats.height} />
                 <StatCard icon={FaHeartbeat} label="BMI" value={patient.keyStats.bmi} />

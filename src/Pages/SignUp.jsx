@@ -98,7 +98,7 @@ const SignUp = () => {
               key={r}
               type="button"
               onClick={() => setFormData({ ...formData, role: r })}
-              className={`px-4 py-2 rounded-full font-medium transition-colors duration-300 ${formData.role === r ? "bg-emerald-600 text-white shadow-md" : "bg-white text-gray-700 border border-gray-300 hover:bg-emerald-50"}`}
+              className={`px-4 cursor-pointer py-2 rounded-full font-medium transition-colors duration-300 ${formData.role === r ? "bg-emerald-600 text-white shadow-md" : "bg-white text-gray-700 border border-gray-300 hover:bg-emerald-50"}`}
             >
               {r.charAt(0).toUpperCase() + r.slice(1)}
             </button>
@@ -181,15 +181,46 @@ const SignUp = () => {
           {/* Terms & Submit */}
           <div className="flex flex-col gap-2">
             <label className="flex items-center cursor-pointer text-sm">
-              <input type="checkbox" checked={termsChecked} onChange={(e) => setTermsChecked(e.target.checked)} className="mr-2 w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"/>
-              I accept the <a href="/terms" className="text-emerald-600 font-medium hover:text-emerald-700">Terms & Conditions</a>
+              <div className="relative">
+                {/* Hidden native checkbox */}
+                <input
+                  type="checkbox"
+                  checked={termsChecked}
+                  onChange={(e) => setTermsChecked(e.target.checked)}
+                  className="peer sr-only"
+                />
+                {/* Custom checkbox box */}
+                <div className="w-4 h-4 border border-gray-300 rounded flex items-center justify-center peer-checked:bg-emerald-600 peer-checked:border-emerald-600 transition-colors">
+                  {/* White tick appears only when checked */}
+                  <svg
+                    className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+
+              <span className="ml-2">
+                I accept the{" "}
+                <a href="/terms" className="text-emerald-600 font-medium hover:text-emerald-700">
+                  Terms & Conditions
+                </a>
+              </span>
             </label>
 
-            <button type="submit" disabled={isLoading} className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-green-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center disabled:opacity-75 disabled:cursor-not-allowed">
+
+
+
+
+            <button type="submit" disabled={isLoading} className="w-full cursor-pointer py-3.5 bg-gradient-to-r from-emerald-600 to-green-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center disabled:opacity-75 disabled:cursor-not-allowed">
               {isLoading ? "Signing up..." : "Sign Up"}
             </button>
 
-            <button type="button" onClick={handleDemoSignup} className="w-full py-3 border border-emerald-500 text-emerald-600 font-medium rounded-xl hover:bg-emerald-50 transition-colors duration-300">
+            <button type="button" onClick={handleDemoSignup} className="w-full cursor-pointer py-3 border border-emerald-500 text-emerald-600 font-medium rounded-xl hover:bg-emerald-50 transition-colors duration-300">
               Try Demo Account
             </button>
           </div>
@@ -203,13 +234,13 @@ const SignUp = () => {
       </div>
 
       {/* Floating animation */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
-          50% { transform: translateY(-20px) scale(1.05); opacity: 0.4; }
-        }
-        .animate-float { animation: float 8s ease-in-out infinite; }
-      `}</style>
+      <style>{`
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+    50% { transform: translateY(-20px) scale(1.05); opacity: 0.4; }
+  }
+  .animate-float { animation: float 8s ease-in-out infinite; }
+`}</style>
     </div>
   );
 };

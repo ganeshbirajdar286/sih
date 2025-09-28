@@ -1,5 +1,6 @@
 import React from "react";
 import { Stethoscope, Menu } from "lucide-react";
+import logo from "../../assets/logo.png"
 
 const Header = ({ sidebarOpen, setSidebarOpen }) => {
   return (
@@ -8,13 +9,13 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
 
         {/* Left Branding */}
         <div className="flex items-center space-x-3 flex-shrink-0">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
-            <Stethoscope className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
-          </div>
+          <div className="w-15 h-15 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
+                      <img src={logo} alt="logo" className="w-full h-full object-cover" />
+                    </div>
           <div className="hidden sm:block">
-            <h1 className="text-lg sm:text-2xl font-bold text-gray-900">
-              AyurDiet Pro
-            </h1>
+           <h1 className="text-xl md:text-2xl font-bold text-green-800">
+            SWASTHYA
+          </h1>
             <p className="text-xs sm:text-sm text-emerald-600 font-medium">
               Doctor Dashboard
             </p>
@@ -24,12 +25,12 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
 
         {/* Doctor Info */}
         <div className="flex items-center space-x-3 sm:space-x-4 pl-3 sm:pl-4 border-l border-emerald-100">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-100 to-green-100 rounded-full flex items-center justify-center shadow-sm">
-            <Stethoscope className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
-          </div>
+          <div className="w-15 h-15 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
+                      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVXRMrZHp2Vv7XePQtwJZrf0FmbXoUWw53iQ&s" alt="logo" className="w-full h-full object-cover " />
+                    </div>
           <div className="block">
             <p className="font-semibold text-gray-900 text-sm sm:text-base">
-              Dr. Ayurveda Sharma
+              Dr.  Sharma
             </p>
             <p className="text-xs sm:text-sm text-emerald-600 font-medium">
               Ayurvedic Physician

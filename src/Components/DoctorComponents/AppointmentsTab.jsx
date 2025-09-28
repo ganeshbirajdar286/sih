@@ -204,7 +204,7 @@ const AppointmentsTab = () => {
       <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100">
         <div className="flex items-center gap-4 flex-wrap">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search className=" w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search patients, types, doshas..."
@@ -217,7 +217,7 @@ const AppointmentsTab = () => {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            className="cursor-pointer px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           >
             <option value="date">Sort by Date</option>
             <option value="name">Sort by Name</option>
@@ -334,17 +334,13 @@ const AppointmentsTab = () => {
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-3">Quick Actions</h4>
                     <div className="flex flex-wrap gap-2">
-                      <button className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
-                        <Eye className="w-4 h-4" />
+                      <button className=" cursor-pointer flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                        <Eye className="w-4 h-4 " />
                         View Profile
                       </button>
-                      <button className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                      <button className=" cursor-pointer flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
                         <Edit3 className="w-4 h-4" />
                         Reschedule
-                      </button>
-                      <button className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
-                        <MessageSquare className="w-4 h-4" />
-                        Send Reminder
                       </button>
                     </div>
                   </div>
@@ -360,21 +356,9 @@ const AppointmentsTab = () => {
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     {/* Confirm */}
-                    <button className="flex items-center justify-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-emerald-600 transition-colors">
+                    <button className=" cursor-pointer flex items-center justify-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-emerald-600 transition-colors">
                       <CheckCircle className="w-4 h-4" />
                       Confirm
-                    </button>
-
-                    {/* Call */}
-                    <button className="flex items-center justify-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-amber-600 transition-colors">
-                      <Phone className="w-4 h-4" />
-                      Call
-                    </button>
-
-                    {/* Share */}
-                    <button className="flex items-center justify-center gap-2 border border-gray-200 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
-                      <Share2 className="w-4 h-4" />
-                      Share
                     </button>
 
                     {/* Cancel */}

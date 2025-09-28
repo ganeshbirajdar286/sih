@@ -3,7 +3,7 @@ import React, { useState } from "react";
 export default function ProfileTab() {
   // State for editable profile
   const [profile, setProfile] = useState({
-    name: "Dr. John Doe",
+    name: "Dr. Sharma",
     email: "johndoe@example.com",
     specialization: "Ayurveda Specialist",
     phone: "+91 9876543210",
@@ -108,7 +108,7 @@ export default function ProfileTab() {
             {/* Edit Button */}
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className={`px-6 py-3 rounded-lg font-semibold transition-all ${isEditing
+              className={`cursor-pointer px-6 py-3 rounded-lg font-semibold transition-all ${isEditing
                   ? 'bg-white text-amber-600 hover:bg-amber-50'
                   : 'bg-white/20 backdrop-blur-sm text-white hover:bg-white/30'
                 }`}

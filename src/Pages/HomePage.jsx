@@ -55,7 +55,7 @@ export default function App() {
       <nav className="flex justify-between items-center px-6 md:px-8 py-5 shadow-sm bg-white/90 backdrop-blur-sm sticky top-0 z-40">
         {/* Logo */}
         <div className="flex items-center">
-          <div className="w-15 h-15 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
+          <div className="w-10 h-10 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
             <img src={logo} alt="logo" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-xl md:text-2xl font-bold text-green-800">
@@ -266,7 +266,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-4 md:mb-0">
-              <div className="w-15 h-15 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
+              <div className="w-10 h-10 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
             <img src={logo} alt="logo" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-xl md:text-2xl font-bold text-white">

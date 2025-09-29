@@ -74,7 +74,7 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
       <header className="md:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-green-800 to-green-900 shadow-lg z-40">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-2">
-            <div className="w-15 h-15 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
+            <div className="w-10 h-10 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
               <img src={logo} alt="logo" className="w-full h-full object-cover" />
             </div>
             <h1 className="text-xl md:text-2xl font-bold text-white">
@@ -138,9 +138,9 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
             <div className="mt-4 border-t border-gray-200 pt-3 px-3">
               <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <UserMd className="text-green-600" size={20} />
-                  </div>
+                  <div className="w-10 h-10 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
+                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr3qBVX4XIA8zq3LpBn64zAuOt9_IZ7_H5uA&s" alt="logo" className="w-full h-full object-cover" />
+                </div>
                   <div>
                     <p className="font-medium text-gray-700">Dr. Smith</p>
                     <p className="text-xs text-gray-500">Administrator</p>
@@ -239,7 +239,7 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
           <div className="flex items-center justify-between group cursor-pointer hover:bg-green-800 hover:bg-opacity-50 rounded-lg p-2 transition-all duration-200">
             <div className="flex items-center space-x-3">
              
-                <div className="w-15 h-15 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
+                <div className="w-10 h-10 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
                   <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr3qBVX4XIA8zq3LpBn64zAuOt9_IZ7_H5uA&s" alt="logo" className="w-full h-full object-cover" />
                 </div>
 

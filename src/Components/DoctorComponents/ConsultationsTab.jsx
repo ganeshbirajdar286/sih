@@ -518,14 +518,14 @@ const [selectedMonth, setSelectedMonth] = useState("all"); // ✅ fix for your e
                         <Edit3 className="w-4 h-4" />
                         Add Notes
                       </button>
-                      <button className="cursor-pointer flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                      {/* <button className="cursor-pointer flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
                         <FileText className="w-4 h-4" />
                         Prescription
-                      </button>
-                      <button className="cursor-pointer flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                      </button> */}
+                      {/* <button className="cursor-pointer flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
                         <Download className="w-4 h-4" />
                         Export
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 </div>

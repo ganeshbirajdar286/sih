@@ -1,6 +1,6 @@
 {
-  "name": "Your App Name",
-  "short_name": "AppName",
+  "name": "SWASTHYA",
+  "short_name": "SWASTHYA",
   "description": "Your awesome app description",
   "start_url": "/",
   "display": "standalone",
@@ -9,13 +9,13 @@
   "theme_color": "#f97316",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
+      "src": "assets/logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "assets/logo.png",
       "sizes": "512x512", 
       "type": "image/png",
       "purpose": "any maskable"

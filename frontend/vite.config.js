@@ -20,6 +20,7 @@ export default defineConfig({
       ],
       manifest: false, // 👈 We’re using our own manifest.json in public/
       workbox: {
+         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,json,webp}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,

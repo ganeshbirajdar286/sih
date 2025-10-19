@@ -27,31 +27,40 @@ export default defineConfig({
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "CacheFirst",
-            options: {
-              cacheName: "google-fonts-stylesheets",
-            },
+            options: { cacheName: "google-fonts-stylesheets" },
           },
           {
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: "CacheFirst",
-            options: {
-              cacheName: "google-fonts-webfonts",
-            },
+            options: { cacheName: "google-fonts-webfonts" },
           },
           {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|ico)$/,
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|ico)$/i,
             handler: "CacheFirst",
             options: {
-              cacheName: "images",
+              cacheName: "local-images",
               expiration: { maxEntries: 50 },
+            },
+          },
+          // 🟢 General rule for ANY external image
+          {
+            urlPattern: /^https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg|webp|ico)$/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "external-images",
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 30 * 24 * 60 * 60,
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
             },
           },
           {
             urlPattern: ({ request }) => request.mode === "navigate",
             handler: "NetworkFirst",
-            options: {
-              cacheName: "pages",
-            },
+            options: { cacheName: "pages" },
           },
         ],
       },

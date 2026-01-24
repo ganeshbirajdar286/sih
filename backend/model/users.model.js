@@ -3,7 +3,7 @@ import  {mongoose,Schema} from "mongoose"
 const userSchema=new Schema({
     Name:{
         type:String,
-        require:true,
+        required:true,
     },
     Age: {
       type: Number,
@@ -12,31 +12,14 @@ const userSchema=new Schema({
     Image_url:{
         type:String
     },
-     Email:{
-        type:String,
-        lowercase:true,
-        unique:true,
-        validate: {
-      validator: function(value) {
-        // Basic regex for email format validation
-        return /^[^@]+@[^@]+\.[^@]+$/.test(value); 
-      },
-      message: 'Please enter a valid email address.'
-    }
-    },
     Password:{
        type:String,
-       require:true
+       required:true
     },
     Gender:{
       type:String,
       enum:["Male","Female","Other"],
-      require:true,
-    },
-     DoctorId: {
-      type: Schema.Types.ObjectId,
-      ref: "Doctor",
-      required: true, 
+      required:true,
     },
     Height: {
       type: Number,

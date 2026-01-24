@@ -12,7 +12,7 @@ const doctorSchema=new Schema({
         type:String
     },
     Rating:{
-        type:number
+        type:Number
     }
 },{timestamps:true})
 

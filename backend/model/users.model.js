@@ -12,6 +12,14 @@ const userSchema=new Schema({
     Image_url:{
         type:String
     },
+    PhoneNumber:{
+      type:Number,
+      require:true,
+    },
+    Email:{
+      type:String,
+      require:true,
+    },
     Password:{
        type:String,
        required:true

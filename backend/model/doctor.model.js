@@ -13,6 +13,20 @@ const doctorSchema=new Schema({
     },
     Rating:{
         type:Number
+    },
+    Experience:{
+        type:Number,
+        require:true,
+    },
+    Qualifications:{
+        type:String,
+        require:true,
+    },
+    Clinic_Name:{
+        type:String, 
+    },
+    Bio:{
+      type:String,  
     }
 },{timestamps:true})
 

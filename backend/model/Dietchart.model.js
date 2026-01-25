@@ -9,11 +9,14 @@ const dietChartSchema=Schema({
          type:Schema.Types.ObjectId,
         ref:"Doctor",
     },
+     Duration:{
+        type:String,
+     },
       Meals: [
       {
         MealType: {
           type: String,
-          enum: ["Breakfast", "Lunch", "Dinner", "Snack"],
+          enum: ["Breakfast", "Lunch", "Dinner"],
           required: true,
         },
 

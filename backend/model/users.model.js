@@ -14,11 +14,17 @@ const userSchema=new Schema({
     },
     PhoneNumber:{
       type:Number,
-      require:true,
     },
     Email:{
-      type:String,
-      require:true,
+        type:String,
+        lowercase:true,
+        validate: {
+      validator: function(value) {
+        // Basic regex for email format validation
+        return /^[^@]+@[^@]+\.[^@]+$/.test(value); 
+      },
+      message: 'Please enter a valid email address.'
+    }
     },
     Password:{
        type:String,
@@ -41,6 +47,10 @@ const userSchema=new Schema({
         ref: "PatientRecord",
       },
     ],
+    Doctor_id:{
+      type:Schema.Types.ObjectId,
+       ref:"Doctor"
+    }
 },{timestamps:true});
 
 const User=mongoose.model("User",userSchema);

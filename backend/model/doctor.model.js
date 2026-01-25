@@ -27,6 +27,9 @@ const doctorSchema=new Schema({
     },
     Bio:{
       type:String,  
+    },
+    Consultation:{
+        type:Number,
     }
 },{timestamps:true})
 

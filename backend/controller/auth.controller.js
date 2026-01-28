@@ -4,6 +4,7 @@ import { hash_Password } from "../config/password_hash.js";
 import { jwtToken } from "../config/jwt.js";
 import { comparePassword } from "../config/password_hash.js";
 import { uploadFileToCloudinary } from "../config/cloudinary.config.js";
+import Appointment from "../model/appointments.model.js";
 
 export const register = async (req, res) => {
   const {
@@ -260,3 +261,65 @@ export const logout = async (req, res) => {
     })
   }
 };
+
+export const patientAppointment = async (req, res) => {
+  try {
+    const { Appointment_Date, Time_slot } = req.body;
+
+    const DOCTOR = req.params.id;        
+    const Patient = req.user.userId;      
+
+    if (!Appointment_Date || !Time_slot) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+
+    const appointment = await Appointment.create({
+      Appointment_Date,
+      Time_slot,
+      Doctor_id:DOCTOR,
+      Patient_id:Patient,
+    });
+
+    return res.status(201).json({
+      message: "Appointment booked successfully",
+      appointment,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const updatePatientAppointment=async(req,res)=>{
+   try {
+    const { Appointment_Date, Time_slot } = req.body;
+
+    const appointment = req.params.id;        
+    const Patient = req.user.userId;      
+
+    if (!Appointment_Date || !Time_slot) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+    
+    const UpdatedAppointment=await Appointment.findByIdAndUpdate(appointment,{
+      Appointment_Date,Time_slot
+    },{
+      new:true
+    })      
+    return res.status(201).json({
+      message: "Appointment Updated successfully",
+      UpdatedAppointment,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+}
+
+
+
+

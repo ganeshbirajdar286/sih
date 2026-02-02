@@ -1,5 +1,5 @@
-import express from "express";
-import { DoctorUpdateProfile, login, logout, patientAppointment, PatientUpdateProfile, register, updatePatientAppointment } from "../controller/auth.controller.js";
+import express, { Router } from "express";
+import { DoctorUpdateProfile, login, logout, patientAppointment, PatientDeleteReport, patientReport, PatientUpdateProfile, register, updatePatientAppointment } from "../controller/auth.controller.js";
 import { isLogin } from "../middleware/auth.middleware.js";
 import { multerMiddleWare } from '../config/cloudinary.config.js';
 
@@ -11,5 +11,7 @@ router.post("/update/patientprofile",isLogin,multerMiddleWare,PatientUpdateProfi
 router.get("/logout",isLogin,logout)
 router.post("/appointment/patient/:id",isLogin,patientAppointment)
 router.post("/updatedappointment/patient/:id",isLogin,updatePatientAppointment)
+router.post("/report/patient",isLogin,multerMiddleWare,patientReport)
+router.delete("/patientreport/:reportId",isLogin,PatientDeleteReport)
 
 export default router;

@@ -1,24 +1,32 @@
-import {mongoose,Schema, Types} from "mongoose"
+import { mongoose, Schema, Types } from "mongoose";
 
-const patientReport=new Schema({
-    Patient_id:{
-        type:Schema.Types.ObjectId,
-        ref:"User",
+const patientReport = new Schema(
+  {
+    Patient_id: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
-    Title:{
-        type:String,
+    Title: {
+      type: String,
     },
-    Category:{
-       type:String,
-       enum:["All Reports","Lab Reports","Imaging","Diagnostic"] 
+    Category: {
+      type: String,
+      enum: ["All Reports", "Lab Reports", "Imaging", "Diagnostic"],
     },
-    File_url:{
-       type:String,
+    File_url: {
+      type: String,
     },
-    Report_date:{
-        type:date
+    Report_date: {
+      type: Date,
+      default: Date.now(),
     },
-},{timestamps:true})
+    Cloudinary_public_id: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true },
+);
 
-const PatientReport=mongoose.model("PatientReport",patientReport);
+const PatientReport = mongoose.model("PatientReport", patientReport);
 export default PatientReport;

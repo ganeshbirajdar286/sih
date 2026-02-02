@@ -5,6 +5,8 @@ import { jwtToken } from "../config/jwt.js";
 import { comparePassword } from "../config/password_hash.js";
 import { uploadFileToCloudinary } from "../config/cloudinary.config.js";
 import Appointment from "../model/appointments.model.js";
+import  PatientReport from "../model/patient_reports.model.js"
+import { cloudinary } from "../config/cloudinary.config.js";
 
 export const register = async (req, res) => {
   const {
@@ -320,6 +322,70 @@ export const updatePatientAppointment=async(req,res)=>{
   }
 }
 
+export const patientReport=async(req,res)=>{
+ try {
+    const {Title,Category}=req.body;
+  const pateintId=req.user.userId;
+  const file=req.file;
+
+  if(!file){
+     return res.status(400).json({ message: "File is required" });
+  }
+
+  if (!Title || !Category) {
+      return res.status(400).json({ message: "Title and Category are required" });
+    }
+
+
+
+  const uploadResult = await uploadFileToCloudinary(file);
+
+  
+    const report = await PatientReport.create({
+  Patient_id: pateintId,
+  Title,
+  Category,
+  File_url: uploadResult.secure_url,
+  Cloudinary_public_id: uploadResult.public_id
+});
+ return res.status(201).json({
+      message: "Report uploaded successfully",
+      report,
+    });
+ } catch (error) {
+  return res.status(500).json({ message: "Server error", error: error.message });
+ }
+
+}
+export const PatientDeleteReport = async (req, res) => {
+  try {
+    const patientId = req.user.userId;
+    const { reportId } = req.params;
+
+    const report = await PatientReport.findById(reportId);
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    if (report.Patient_id.toString() !== patientId.toString()) {
+      return res.status(403).json({ message: "You are not allowed to delete this report" });
+    }
+
+    // ✅ 1) delete from cloudinary
+    await cloudinary.uploader.destroy(report.Cloudinary_public_id, {
+  resource_type: "raw",
+});
+
+
+    // ✅ 2) delete from mongodb
+    await PatientReport.findByIdAndDelete(reportId);
+
+    return res.status(200).json({ message: "Report deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 
 
 

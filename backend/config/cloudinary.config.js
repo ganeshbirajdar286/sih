@@ -58,3 +58,5 @@ export const uploadFileToCloudinary = async (file) => {
   }
 };
 
+export { cloudinary };
+

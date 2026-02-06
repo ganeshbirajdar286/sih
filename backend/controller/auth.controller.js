@@ -20,6 +20,7 @@ export const register = async (req, res) => {
     Specialization,
     Certificates,
     Rating,
+    Dosha,
   } = req.body;
   try {
     if (!Name || !Age || !Password || !Gender) {
@@ -45,6 +46,7 @@ export const register = async (req, res) => {
       Gender,
       Height,
       Weight,
+      Dosha
     });
 
     let doctorProfile = null;
@@ -266,12 +268,12 @@ export const logout = async (req, res) => {
 
 export const patientAppointment = async (req, res) => {
   try {
-    const { Appointment_Date, Time_slot } = req.body;
+    const { Appointment_Date, Time_slot,Condition } = req.body;
 
     const DOCTOR = req.params.id;        
     const Patient = req.user.userId;      
 
-    if (!Appointment_Date || !Time_slot) {
+    if (!Appointment_Date || !Time_slot ,!Condition) {
       return res.status(400).json({ message: "All fields required" });
     }
 
@@ -280,6 +282,7 @@ export const patientAppointment = async (req, res) => {
       Time_slot,
       Doctor_id:DOCTOR,
       Patient_id:Patient,
+      Condition,
     });
 
     return res.status(201).json({
@@ -384,6 +387,35 @@ export const PatientDeleteReport = async (req, res) => {
     return res.status(200).json({ message: "Report deleted successfully" });
   } catch (error) {
     return res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const myPatient = async (req, res) => {
+  try {
+    const patient = await Appointment.find({
+      Doctor_id: req.user.doctor_id
+    }).populate(
+      "Patient_id","Name Age Image_url Email PhoneNumber Condition Dosha"
+    );
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: "No patient found for this doctor"
+      });
+    }
+      
+    return res.status(200).json({
+      success: true,
+    patient
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
   }
 };
 

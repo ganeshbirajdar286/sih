@@ -33,6 +33,10 @@ const appointment = new Schema(
         enum:["complete","incomplete",
           "Pending"
         ]
+    },
+    Condition:{
+      type:String,
+       required:true,
     }
   },
   { timestamps: true },

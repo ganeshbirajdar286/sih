@@ -50,6 +50,10 @@ const userSchema=new Schema({
     Doctor_id:{
       type:Schema.Types.ObjectId,
        ref:"Doctor"
+    },
+    Dosha:{
+      type:String,
+      default:null,
     }
 },{timestamps:true});
 

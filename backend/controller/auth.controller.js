@@ -5,8 +5,17 @@ import { jwtToken } from "../config/jwt.js";
 import { comparePassword } from "../config/password_hash.js";
 import { uploadFileToCloudinary } from "../config/cloudinary.config.js";
 import Appointment from "../model/appointments.model.js";
-import  PatientReport from "../model/patient_reports.model.js"
+import PatientReport from "../model/patient_reports.model.js";
 import { cloudinary } from "../config/cloudinary.config.js";
+import { HumanMessage } from "@langchain/core/messages";
+import {
+  MemorySaver,
+  MessagesAnnotation,
+  StateGraph,
+} from "@langchain/langgraph";
+import { ChatGroq } from "@langchain/groq";
+import { threadId } from "node:worker_threads";
+import DietChart from "../model/Dietchart.model.js";
 
 export const register = async (req, res) => {
   const {
@@ -46,7 +55,7 @@ export const register = async (req, res) => {
       Gender,
       Height,
       Weight,
-      Dosha
+      Dosha,
     });
 
     let doctorProfile = null;
@@ -72,12 +81,12 @@ export const register = async (req, res) => {
       { new: true },
     );
 
-    const token = jwtToken(user?.id,doctorProfile?._id);
-    res.cookie("token", (token,doctorProfile?._id), {
+    const token = jwtToken(user?.id, doctorProfile?._id);
+    res.cookie("token", (token, doctorProfile?._id), {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 365,
       sameSite: "none",
-       secure: false, // true when deployed
+      secure: false, // true when deployed
     });
 
     res.status(201).json({
@@ -90,7 +99,6 @@ export const register = async (req, res) => {
     });
   }
 };
-
 
 export const login = async (req, res) => {
   try {
@@ -121,7 +129,7 @@ export const login = async (req, res) => {
     const role = doctor ? "DOCTOR" : "USER";
 
     // 5) Create JWT token
-    const token = jwtToken(user?._id,user?.Doctor_id);
+    const token = jwtToken(user?._id, user?.Doctor_id);
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -143,100 +151,87 @@ export const login = async (req, res) => {
   }
 };
 
-
 export const DoctorUpdateProfile = async (req, res) => {
   try {
-   const {
-    Name,
-    Email,
-    PhoneNumber,
-    Experience,
-    Bio,
-    Specialization,
-    Qualifications,
-    Clinic_Name,
-    Consultation,
-  } = req.body;
+    const {
+      Name,
+      Email,
+      PhoneNumber,
+      Experience,
+      Bio,
+      Specialization,
+      Qualifications,
+      Clinic_Name,
+      Consultation,
+    } = req.body;
 
-     const doctor=req.user;
-    const user = await User.findOne({ Doctor_id: doctor.doctor_id  }).populate(
-      {
-        path:"Doctor_id",
-      }
-    )
+    const doctor = req.user;
+    const user = await User.findOne({ Doctor_id: doctor.doctor_id }).populate({
+      path: "Doctor_id",
+    });
 
-    const file =req.file;
+    const file = req.file;
 
-
-
-     if (!user) {
+    if (!user) {
       return res.status(404).json({ message: "doctor not found" });
     }
-     if (file) {
+    if (file) {
       const uploadResult = await uploadFileToCloudinary(file);
       user.Image_url = uploadResult?.secure_url;
     } else if (req.body.Image_url) {
-      user.Image_url= req.body.Image_url;
+      user.Image_url = req.body.Image_url;
     }
-    if(Name) user.Name=Name
-    if(Email) user.Email=Email
-    if(PhoneNumber) user.PhoneNumber=PhoneNumber
-    if(Experience) user.Doctor_id.Experience=Experience
-   if(Bio) user.Doctor_id.Bio=Bio
-    if(Specialization) user.Doctor_id.Specialization=Specialization
-   if(Qualifications) user.Doctor_id.Qualifications=Qualifications
-   if(Clinic_Name) user.Doctor_id.Clinic_Name=Clinic_Name
-   if(Consultation) user.Doctor_id.Consultation=Consultation
+    if (Name) user.Name = Name;
+    if (Email) user.Email = Email;
+    if (PhoneNumber) user.PhoneNumber = PhoneNumber;
+    if (Experience) user.Doctor_id.Experience = Experience;
+    if (Bio) user.Doctor_id.Bio = Bio;
+    if (Specialization) user.Doctor_id.Specialization = Specialization;
+    if (Qualifications) user.Doctor_id.Qualifications = Qualifications;
+    if (Clinic_Name) user.Doctor_id.Clinic_Name = Clinic_Name;
+    if (Consultation) user.Doctor_id.Consultation = Consultation;
 
-   await  user.save();
+    await user.save();
 
     return res.status(200).json({
-      message:"user profile updated succesfully",
-      user
+      message: "user profile updated succesfully",
+      user,
     });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: error.message });
   }
 };
- 
+
 export const PatientUpdateProfile = async (req, res) => {
   try {
-   const {
-    Name,
-    Email,
-    PhoneNumber,
-      Age,
-      Password,
-      Height,
-      Weight
-  } = req.body;
+    const { Name, Email, PhoneNumber, Age, Password, Height, Weight } =
+      req.body;
 
-  const file =req.file;
+    const file = req.file;
 
+    const patient = req.user;
+    const user = await User.findOne({ _id: patient?.userId });
 
-     const patient=req.user;
-    const user = await User.findOne({_id:patient?.userId })
-  
-     if (!user) {
+    if (!user) {
       return res.status(404).json({ message: "Patient  not found" });
     }
 
-     if (file) {
+    if (file) {
       const uploadResult = await uploadFileToCloudinary(file);
       user.Image_url = uploadResult?.secure_url;
     } else if (req.body.Image_url) {
-      user.Image_url= req.body.Image_url;
+      user.Image_url = req.body.Image_url;
     }
 
-    if(Name) user.Name=Name
-    if(Email) user.Email=Email
-    if(PhoneNumber) user.PhoneNumber=PhoneNumber
-    if(Age) user.Age=Age
-    if(Password) user.Password=Password
-    if(Height) user.Height=Height
-    if(Weight) user.Weight= Weight
-   await  user.save();
+    if (Name) user.Name = Name;
+    if (Email) user.Email = Email;
+    if (PhoneNumber) user.PhoneNumber = PhoneNumber;
+    if (Age) user.Age = Age;
+    if (Password) user.Password = Password;
+    if (Height) user.Height = Height;
+    if (Weight) user.Weight = Weight;
+    await user.save();
 
     return res.json({
       user,
@@ -250,38 +245,38 @@ export const PatientUpdateProfile = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     res.cookie("token", " ", {
-      expires: new Date(0), 
+      expires: new Date(0),
       httpOnly: true,
       sameSite: "none",
       secure: false,
     });
     return res.status(200).json({
-      message:"user logout successfully"
-    })
+      message: "user logout successfully",
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).json({
-      message:"Internal server error"
-    })
+      message: "Internal server error",
+    });
   }
 };
 
 export const patientAppointment = async (req, res) => {
   try {
-    const { Appointment_Date, Time_slot,Condition } = req.body;
+    const { Appointment_Date, Time_slot, Condition } = req.body;
 
-    const DOCTOR = req.params.id;        
-    const Patient = req.user.userId;      
+    const DOCTOR = req.params.id;
+    const Patient = req.user.userId;
 
-    if (!Appointment_Date || !Time_slot ,!Condition) {
+    if ((!Appointment_Date || !Time_slot, !Condition)) {
       return res.status(400).json({ message: "All fields required" });
     }
 
     const appointment = await Appointment.create({
       Appointment_Date,
       Time_slot,
-      Doctor_id:DOCTOR,
-      Patient_id:Patient,
+      Doctor_id: DOCTOR,
+      Patient_id: Patient,
       Condition,
     });
 
@@ -297,22 +292,27 @@ export const patientAppointment = async (req, res) => {
   }
 };
 
-export const updatePatientAppointment=async(req,res)=>{
-   try {
+export const updatePatientAppointment = async (req, res) => {
+  try {
     const { Appointment_Date, Time_slot } = req.body;
 
-    const appointment = req.params.id;        
-    const Patient = req.user.userId;      
+    const appointment = req.params.id;
+    const Patient = req.user.userId;
 
     if (!Appointment_Date || !Time_slot) {
       return res.status(400).json({ message: "All fields required" });
     }
-    
-    const UpdatedAppointment=await Appointment.findByIdAndUpdate(appointment,{
-      Appointment_Date,Time_slot
-    },{
-      new:true
-    })      
+
+    const UpdatedAppointment = await Appointment.findByIdAndUpdate(
+      appointment,
+      {
+        Appointment_Date,
+        Time_slot,
+      },
+      {
+        new: true,
+      },
+    );
     return res.status(201).json({
       message: "Appointment Updated successfully",
       UpdatedAppointment,
@@ -323,43 +323,43 @@ export const updatePatientAppointment=async(req,res)=>{
       message: "Internal server error",
     });
   }
-}
+};
 
-export const patientReport=async(req,res)=>{
- try {
-    const {Title,Category}=req.body;
-  const pateintId=req.user.userId;
-  const file=req.file;
+export const patientReport = async (req, res) => {
+  try {
+    const { Title, Category } = req.body;
+    const pateintId = req.user.userId;
+    const file = req.file;
 
-  if(!file){
-     return res.status(400).json({ message: "File is required" });
-  }
-
-  if (!Title || !Category) {
-      return res.status(400).json({ message: "Title and Category are required" });
+    if (!file) {
+      return res.status(400).json({ message: "File is required" });
     }
 
+    if (!Title || !Category) {
+      return res
+        .status(400)
+        .json({ message: "Title and Category are required" });
+    }
 
+    const uploadResult = await uploadFileToCloudinary(file);
 
-  const uploadResult = await uploadFileToCloudinary(file);
-
-  
     const report = await PatientReport.create({
-  Patient_id: pateintId,
-  Title,
-  Category,
-  File_url: uploadResult.secure_url,
-  Cloudinary_public_id: uploadResult.public_id
-});
- return res.status(201).json({
+      Patient_id: pateintId,
+      Title,
+      Category,
+      File_url: uploadResult.secure_url,
+      Cloudinary_public_id: uploadResult.public_id,
+    });
+    return res.status(201).json({
       message: "Report uploaded successfully",
       report,
     });
- } catch (error) {
-  return res.status(500).json({ message: "Server error", error: error.message });
- }
-
-}
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
 export const PatientDeleteReport = async (req, res) => {
   try {
     const patientId = req.user.userId;
@@ -372,52 +372,241 @@ export const PatientDeleteReport = async (req, res) => {
     }
 
     if (report.Patient_id.toString() !== patientId.toString()) {
-      return res.status(403).json({ message: "You are not allowed to delete this report" });
+      return res
+        .status(403)
+        .json({ message: "You are not allowed to delete this report" });
     }
 
     // ✅ 1) delete from cloudinary
     await cloudinary.uploader.destroy(report.Cloudinary_public_id, {
-  resource_type: "raw",
-});
-
+      resource_type: "raw",
+    });
 
     // ✅ 2) delete from mongodb
     await PatientReport.findByIdAndDelete(reportId);
 
     return res.status(200).json({ message: "Report deleted successfully" });
   } catch (error) {
-    return res.status(500).json({ message: "Server error", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
 
 export const myPatient = async (req, res) => {
   try {
     const patient = await Appointment.find({
-      Doctor_id: req.user.doctor_id
+      Doctor_id: req.user.doctor_id,
     }).populate(
-      "Patient_id","Name Age Image_url Email PhoneNumber Condition Dosha"
+      "Patient_id",
+      "Name Age Image_url Email PhoneNumber Condition Dosha",
     );
 
     if (!patient) {
       return res.status(404).json({
         success: false,
-        message: "No patient found for this doctor"
+        message: "No patient found for this doctor",
       });
     }
-      
+
     return res.status(200).json({
       success: true,
-    patient
+      patient,
     });
-
   } catch (error) {
     return res.status(500).json({
       success: false,
       message: "Server error",
-      error: error.message
+      error: error.message,
+    });
+  }
+};
+export const Doctor_selected_appointment = async (req, res) => {
+  try {
+    const appointmentid = req.params.id;
+    const { Status } = req.body;
+    if (!appointmentid) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment ID is required",
+      });
+    }
+
+    const appointment = await Appointment.findByIdAndUpdate(
+      appointmentid,
+      { Status },
+      { new: true },
+    );
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "appointment status  updated successfully",
+      appointment,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
     });
   }
 };
 
+const llm = new ChatGroq({
+  apiKey: process.env.GROQ_APT_KEY,
+  model: "openai/gpt-oss-120b",
+  temperature: 0,
+  maxRetries: 2,
+});
 
+async function generateDiet(state) {
+  console.log("Generating Diet Chart...");
+
+  const userPrompt = state.messages.at(-1).content;
+
+  const prompt = `
+You are an Ayurvedic diet expert doctor.
+
+Generate a patient diet chart in JSON format.
+
+Patient Details:
+${userPrompt}
+
+Diet Duration:90 day
+
+Rules:
+- AI must decide meals itself.
+- Diet must be healthy.
+- Balance dosha.
+- Provide Indian meals.
+
+Meals:
+- breakfast
+- lunch
+- dinner
+
+For each meal include:
+- recipe_name
+- ingredients
+- instructions
+- nutrition (calories, protein, carbs, fat, fiber)
+- ayurveda effects (vata, pitta, kapha)
+
+Lifestyle:
+-Meal_Frequency
+-Bowel_Movement
+-Water_Intake
+
+
+Return ONLY JSON.
+`;
+
+  const response = await llm.invoke([new HumanMessage(prompt)]);
+
+  return {
+    messages: [response],
+  };
+}
+
+const workflow = new StateGraph(MessagesAnnotation)
+  .addNode("dietAgent", generateDiet)
+
+  .addEdge("__start__", "dietAgent")
+  .addEdge("dietAgent", "__end__");
+
+const app = workflow.compile({});
+
+export const dietChart = async (req, res) => {
+  try {
+    const { Name, Age, Gender, Dosha } = req.body;
+    if (!Name?.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Patient name is required",
+      });
+    }
+
+    if (!Age || !Gender || !Dosha) {
+      return res.status(400).json({
+        success: false,
+        message: "All patient fields required",
+      });
+    }
+
+
+    const user = await User.findOne({ Name });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+
+    const input = {
+      messages: [
+        new HumanMessage(`
+Patient Name: ${Name}
+Age: ${Age}
+Gender: ${Gender}
+Dosha Type: ${Dosha}
+Generate 90 days Ayurvedic diet chart JSON.
+        `),
+      ],
+    };
+
+    const result = await app.invoke(input);
+    
+
+    // 🧹 Clean AI JSON
+    function cleanAIJSON(text) {
+      return text
+        .replace(/```json|```/g, "")
+        .replace(/\/\/.*$/gm, "")
+        .replace(/½/g, "0.5")
+        .replace(/¼/g, "0.25")
+        .replace(/¾/g, "0.75")
+        .trim();
+    }
+
+    const aiText = result.messages.at(-1).content;
+    const cleaned = cleanAIJSON(aiText);
+    const json = JSON.parse(cleaned);
+
+    const diet = await DietChart.create({
+      Patient_id: user._id,
+      Doctor_id: req.user.doctor_id,
+      duration_days: json.duration_days,
+
+      patient: json.patient,
+
+      lifestyle: json.lifestyle,
+
+      weekly_plan: json.weekly_plan,
+
+      note: json.note,
+    });
+
+    res.status(201).json({
+      success: true,
+      dietChart: diet,
+    });
+
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Error generating AI diet chart",
+    });
+  }
+};
 

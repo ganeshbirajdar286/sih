@@ -30,9 +30,10 @@ const appointment = new Schema(
     },
     Status:{
         type:"String",
-        enum:["complete","incomplete",
+        enum:["Accepted","Rejected",
           "Pending"
-        ]
+        ],
+        default:"Pending"
     },
     Condition:{
       type:String,

@@ -1,4 +1,5 @@
 import  {mongoose,Schema} from "mongoose"
+import { type } from "node:os";
 
 const userSchema=new Schema({
     Name:{
@@ -54,7 +55,11 @@ const userSchema=new Schema({
     Dosha:{
       type:String,
       default:null,
-    }
+    },
+    isDoctor:{
+      type:Boolean,
+      default:false,
+    },
 },{timestamps:true});
 
 const User=mongoose.model("User",userSchema);

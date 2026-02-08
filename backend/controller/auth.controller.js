@@ -27,9 +27,8 @@ export const register = async (req, res) => {
     Weight,
     isDoctor,
     Specialization,
-    Certificates,
-    Rating,
     Dosha,
+    Experience,
   } = req.body;
   try {
     if (!Name || !Age || !Password || !Gender) {
@@ -37,8 +36,10 @@ export const register = async (req, res) => {
         message: "Required fields missing",
       });
     }
+     const file=req.file;
 
     const nameExits = await User.findOne({ Name });
+
 
     if (nameExits) {
       return res.status(400).json({
@@ -46,6 +47,11 @@ export const register = async (req, res) => {
       });
     }
 
+    let certificateUrl=null;
+     if (file) {
+      const uploadResult = await uploadFileToCloudinary(file);
+        certificateUrl = uploadResult?.secure_url;
+    } 
     const hashedPassword = await hash_Password(Password);
 
     let user = await User.create({
@@ -56,22 +62,36 @@ export const register = async (req, res) => {
       Height,
       Weight,
       Dosha,
+      isDoctor,
     });
 
     let doctorProfile = null;
 
-    if (isDoctor === true) {
+    if (isDoctor === "true") {
+      console.log(Specialization);
       if (!Specialization) {
         return res.status(400).json({
           message: "Specialization required for doctor",
         });
       }
 
+       if (!Experience) {
+    return res.status(400).json({
+      message: "Experience required for doctor",
+    });
+  }
+
+  if (!certificateUrl) {
+    return res.status(400).json({
+      message: "Certificate upload required",
+    });
+  }
+
       doctorProfile = await Doctor.create({
         User_id: user?._id,
         Specialization,
-        Certificates,
-        Rating,
+        Certificates:certificateUrl,
+        Experience,
       });
     }
 
@@ -91,6 +111,7 @@ export const register = async (req, res) => {
 
     res.status(201).json({
       message: "Registration successful",
+         responseData:user
     });
   } catch (error) {
     res.status(500).json({
@@ -142,6 +163,7 @@ export const login = async (req, res) => {
     return res.status(200).json({
       message: "Login successful",
       role,
+      responseData:user
     });
   } catch (error) {
     return res.status(500).json({
@@ -471,42 +493,89 @@ async function generateDiet(state) {
 
   const userPrompt = state.messages.at(-1).content;
 
-  const prompt = `
+const prompt = `
 You are an Ayurvedic diet expert doctor.
 
-Generate a patient diet chart in JSON format.
+Generate a STRICT JSON Ayurvedic diet chart.
 
 Patient Details:
 ${userPrompt}
 
-Diet Duration:90 day
+Diet Duration: 90 days
 
-Rules:
-- AI must decide meals itself.
-- Diet must be healthy.
-- Balance dosha.
-- Provide Indian meals.
+Diet Planning Rule:
+- Create ONLY ONE WEEK diet plan (7 days).
+- This weekly diet will be followed repeatedly for 90 days.
+- Do NOT generate 90 separate days.
+- Provide Indian Ayurvedic meals.
+- Balance patient's dosha.
 
-Meals:
+Meals per day:
 - breakfast
 - lunch
 - dinner
 
-For each meal include:
+For EACH meal include:
 - recipe_name
-- ingredients
-- instructions
-- nutrition (calories, protein, carbs, fat, fiber)
-- ayurveda effects (vata, pitta, kapha)
+- ingredients (array)
+- instructions (string)
+- nutrition:
+    - calories
+    - protein_g
+    - carbs_g
+    - fat_g
+    - fiber_g
+- ayurveda_effects:
+    - vata
+    - pitta
+    - kapha
 
-Lifestyle:
--Meal_Frequency
--Bowel_Movement
--Water_Intake
+Lifestyle (common for full 90 days):
+- Meal_Frequency
+- Bowel_Movement
+- Water_Intake
 
+Return JSON in this EXACT structure:
 
-Return ONLY JSON.
+{
+  "duration_days": 90,
+
+  "patient": {
+    "name": "",
+    "age": 0,
+    "gender": "",
+    "dosha": ""
+  },
+
+  "lifestyle": {
+    "Meal_Frequency": "",
+    "Bowel_Movement": "",
+    "Water_Intake": ""
+  },
+
+  "weekly_plan": [
+    {
+      "day": 1,
+      "breakfast": {},
+      "lunch": {},
+      "dinner": {}
+    }
+  ],
+
+  "note": ""
+}
+
+Rules:
+- weekly_plan must contain EXACTLY 7 days.
+- day must be 1 → 7.
+- No extra text.
+- No markdown.
+- No comments.
+- No trailing commas.
+
+Return ONLY valid JSON.
 `;
+
 
   const response = await llm.invoke([new HumanMessage(prompt)]);
 
@@ -517,7 +586,7 @@ Return ONLY JSON.
 
 const workflow = new StateGraph(MessagesAnnotation)
   .addNode("dietAgent", generateDiet)
-
+  
   .addEdge("__start__", "dietAgent")
   .addEdge("dietAgent", "__end__");
 

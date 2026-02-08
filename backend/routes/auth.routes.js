@@ -4,7 +4,7 @@ import { isLogin } from "../middleware/auth.middleware.js";
 import { multerMiddleWare } from '../config/cloudinary.config.js';
 
 const router=express.Router();
-router.post("/register",register);
+router.post("/register",multerMiddleWare,register);
 router.post("/login",login);
 router.post("/update/doctorprofile",isLogin,multerMiddleWare,DoctorUpdateProfile)
 router.post("/update/patientprofile",isLogin,multerMiddleWare,PatientUpdateProfile)

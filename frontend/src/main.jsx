@@ -4,6 +4,8 @@ import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import { registerSW } from 'virtual:pwa-register'
+import { store } from "./store/data.store.js";
+import { Provider } from 'react-redux'
 
 registerSW({
   onNeedRefresh() {
@@ -18,8 +20,10 @@ registerSW({
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
+      <Provider store={store}>
     <BrowserRouter>
       <App />
     </BrowserRouter>
+      </Provider>
   </React.StrictMode>
 );

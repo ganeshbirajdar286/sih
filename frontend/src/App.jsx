@@ -4,6 +4,7 @@ import SignIn from "./Pages/SignIn.jsx";
 import SignUp from "./Pages/SignUp.jsx";
 import AyurvedicDashboard from "./Pages/DoctorDashboard"; 
 import PatientDashboard from "./Pages/PatientDashboard"; 
+import {Toaster} from "react-hot-toast";
 
 import "./index.css";
 
@@ -12,6 +13,8 @@ function App() {
   const role = "patient"; // or "doctor"
 
   return (
+
+    <>
     <Routes>
       {/* Homepage */}
       <Route path="/" element={<HomePage />} />
@@ -38,6 +41,15 @@ function App() {
       {/* fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+
+    
+    <Toaster
+        position="top-center"
+        reverseOrder={false}
+      />
+    </>
+    
+    
   );
 }
 

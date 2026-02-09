@@ -68,17 +68,33 @@ export const registerThunk = createAsyncThunk(
 );
 
 
-   export const logoutThunk = createAsyncThunk(
-    'users/logout',
-    async (_,{rejectWithValue}) => {
-     try {
-      const response =await axiosInstance.get("/user/logout")
-         toast.success('logout Successfully!');
-     return true
-    } catch (error) {
-      console.error(error.message)
-      toast.error( error.response?.data?.message||"logout failed " )
-      return rejectWithValue(error)
-     }
-    },
-  )
+  //  export const logoutThunk = createAsyncThunk(
+  //   'users/logout',
+  //   async (_,{rejectWithValue}) => {
+  //    try {
+  //     const response =await axiosInstance.post("/logout")
+  //        localStorage.removeItem("user");
+  //        toast.success('logout Successfully!!!!!');
+  //    return true
+  //   } catch (error) {
+  //     console.error(error.message)
+  //     toast.error( error.response?.data?.message||"logout failed " )
+  //     return rejectWithValue(error)
+  //    }
+  //   },
+  // )
+
+
+  export const logoutThunk = createAsyncThunk(
+  "users/logout",
+  async () => {
+    await axiosInstance.post("/logout");
+
+    localStorage.removeItem("user");
+
+    toast.dismiss(); // remove old toasts
+    toast.success("Logout successfully");
+
+    return true;
+  }
+);

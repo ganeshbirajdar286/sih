@@ -1,14 +1,19 @@
-// src/Components/Sidebar.jsx
-
 import React, { useEffect } from "react";
 import {
   Activity, Users, User, Building, Stethoscope, Calendar,
   TrendingUp, FileText, Menu, X, LogOut, Apple
 } from "lucide-react";
 import logo from "../../assets/logo.png"
+import { useDispatch, useSelector } from "react-redux";
+import { logoutThunk } from "../../feature/User/user.thunk";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) {
   const UserMd = User;
+
+ const navigate = useNavigate();
 
   const mainTabs = [
     { key: "patients", label: "Patients", icon: <Users className="text-lg" /> },
@@ -23,6 +28,7 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
     { key: "records", label: "Health Records", icon: <FileText className="text-lg" /> },
     { key: "nutrients", label: "Nutrients Calculator", icon: <Apple className="text-lg" /> },
   ];
+  const dispatch= useDispatch();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -58,15 +64,24 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
     return () => document.removeEventListener("keydown", handleEscape);
   }, [sidebarOpen, setSidebarOpen]);
 
-  const handleTabClick = (key) => {
-    if (key === "logout") {
-      console.log("Logout clicked");
-      // Add logout logic here
-    } else {
-      setActiveTab(key);
+const handleTabClick = async (key) => {
+
+  if (key === "logout") {
+
+    // ⏳ Wait logout to finish
+    const res = await dispatch(logoutThunk());
+
+    if (logoutThunk.fulfilled.match(res)) {
+      toast.success("Logout successfully");
+      navigate("/", { replace: true });
     }
-    setSidebarOpen(false);
-  };
+
+  } else {
+    setActiveTab(key);
+  }
+
+  setSidebarOpen(false);
+};
 
   return (
     <>
@@ -135,7 +150,8 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
             ))}
 
             {/* User Profile with Logout (Mobile) */}
-            <div className="mt-4 border-t border-gray-200 pt-3 px-3">
+            <button onClick={() => handleTabClick("logout")}>
+            <div className="mt-4 border-t border-gray-200 pt-3 px-3" >
               <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
@@ -155,6 +171,7 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
                 </button>
               </div>
             </div>
+            </button>
           </nav>
         </div>
       </header>
@@ -235,6 +252,7 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
         </nav>
 
         {/* User Profile with Logout (Desktop) */}
+         <button onClick={() => handleTabClick("logout")}>
         <div className="p-4 border-t border-green-700 bg-green-900 bg-opacity-50">
           <div className="flex items-center justify-between group cursor-pointer hover:bg-green-800 hover:bg-opacity-50 rounded-lg p-2 transition-all duration-200">
             <div className="flex items-center space-x-3">
@@ -261,6 +279,7 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
             </button>
           </div>
         </div>
+        </button>
       </aside>
     </>
   );

@@ -1,55 +1,112 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+
 import HomePage from "./Pages/HomePage.jsx";
 import SignIn from "./Pages/SignIn.jsx";
 import SignUp from "./Pages/SignUp.jsx";
-import AyurvedicDashboard from "./Pages/DoctorDashboard"; 
-import PatientDashboard from "./Pages/PatientDashboard"; 
-import {Toaster} from "react-hot-toast";
+import DoctorDashboard from "./Pages/DoctorDashboard";
+import PatientDashboard from "./Pages/PatientDashboard";
 
+import ProtectedRoute from "./Components/ProtectedRoute.jsx";
+import PublicRoute from "./Components/PublicRoute.jsx";
+
+import { Toaster } from "react-hot-toast";
 import "./index.css";
 
 function App() {
-  // Example: role hardcoded (later you can use Context/Redux/Auth)
-  const role = "patient"; // or "doctor"
+
+  const { isAuthenticated, isDoctor } =
+    useSelector((state) => state.user);
 
   return (
-
     <>
-    <Routes>
-      {/* Homepage */}
-      <Route path="/" element={<HomePage />} />
+      <Routes>
 
-      <Route path="/signin" element={<SignIn />} />
-      <Route path="/signup" element={<SignUp />} />
+        {/* ================= PUBLIC ================= */}
 
-      {/* Dashboards */}
-      <Route path="/patient-dashboard" element={<PatientDashboard />} />
-      <Route path="/doctor-dashboard" element={<AyurvedicDashboard />} />
+        <Route path="/" element={<HomePage />} />
 
-      {/* Agar login ke baad role ke basis pe redirect karna ho */}
-      <Route
-        path="/dashboard"
-        element={
-          role === "patient" ? (
-            <Navigate to="/patient-dashboard" replace />
-          ) : (
-            <Navigate to="/doctor-dashboard" replace />
-          )
-        }
-      />
+        <Route
+          path="/signin"
+          element={
+            <PublicRoute>
+              <SignIn />
+            </PublicRoute>
+          }
+        />
 
-      {/* fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <SignUp />
+            </PublicRoute>
+          }
+        />
 
-    
-    <Toaster
+
+        {/* ================= DOCTOR ================= */}
+
+        <Route
+          path="/doctor-dashboard"
+          element={
+            <ProtectedRoute doctorOnly>
+              <DoctorDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+
+        {/* ================= PATIENT ================= */}
+
+        <Route
+          path="/patient-dashboard"
+          element={
+            <ProtectedRoute>
+              <PatientDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+
+        {/* ================= ROLE REDIRECT ================= */}
+
+        <Route
+          path="/dashboard"
+          element={
+            !isAuthenticated ? (
+              <Navigate to="/signin" replace />
+            ) : isDoctor ? (
+              <Navigate
+                to="/doctor-dashboard"
+                replace
+              />
+            ) : (
+              <Navigate
+                to="/patient-dashboard"
+                replace
+              />
+            )
+          }
+        />
+
+
+        {/* ================= FALLBACK ================= */}
+
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
+
+      </Routes>
+
+
+      {/* Toast Notifications */}
+      <Toaster
         position="top-center"
         reverseOrder={false}
       />
     </>
-    
-    
   );
 }
 

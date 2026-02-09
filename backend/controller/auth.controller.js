@@ -102,12 +102,13 @@ export const register = async (req, res) => {
     );
 
     const token = jwtToken(user?.id, doctorProfile?._id);
-    res.cookie("token", (token, doctorProfile?._id), {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 365,
-      sameSite: "none",
-      secure: false, // true when deployed
-    });
+   res.cookie("token", token, {
+  httpOnly: true,
+  secure: false,     // localhost
+  sameSite: "lax",   // localhost
+  maxAge: 1000 * 60 * 60 * 24 * 365,
+});
+
 
     res.status(201).json({
       message: "Registration successful",
@@ -152,12 +153,13 @@ export const login = async (req, res) => {
     // 5) Create JWT token
     const token = jwtToken(user?._id, user?.Doctor_id);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 365,
-      sameSite: "none",
-      secure: false, // true when deployed
-    });
+ res.cookie("token", token, {
+  httpOnly: true,
+  secure: false,     // localhost
+  sameSite: "lax",   // localhost
+  maxAge: 1000 * 60 * 60 * 24 * 365,
+});
+
 
     // 6) Send response
     return res.status(200).json({
@@ -266,22 +268,26 @@ export const PatientUpdateProfile = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res.cookie("token", " ", {
-      expires: new Date(0),
+  
+    res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "none",
-      secure: false,
+      sameSite: "lax",
+      secure: false, // localhost
     });
+
     return res.status(200).json({
-      message: "user logout successfully",
+      message: "User logout successfully",
     });
   } catch (error) {
     console.log(error);
-    return res.status(400).json({
+
+    return res.status(500).json({
       message: "Internal server error",
     });
   }
 };
+
+
 
 export const patientAppointment = async (req, res) => {
   try {

@@ -8,7 +8,7 @@ router.post("/register",multerMiddleWare,register);
 router.post("/login",login);
 router.post("/update/doctorprofile",isLogin,multerMiddleWare,DoctorUpdateProfile)
 router.post("/update/patientprofile",isLogin,multerMiddleWare,PatientUpdateProfile)
-router.get("/logout",isLogin,logout)
+router.post("/logout",isLogin,logout)
 router.post("/appointment/patient/:id",isLogin,patientAppointment)
 router.post("/updatedappointment/patient/:id",isLogin,updatePatientAppointment)
 router.post("/report/patient",isLogin,multerMiddleWare,patientReport)

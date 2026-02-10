@@ -22,9 +22,17 @@ function App() {
     <>
       <Routes>
 
-        {/* ================= PUBLIC ================= */}
 
-        <Route path="/" element={<HomePage />} />
+
+        <Route
+  path="/"
+  element={
+    <PublicRoute>
+      <HomePage />
+    </PublicRoute>
+  }
+/>
+
 
         <Route
           path="/signin"
@@ -45,8 +53,7 @@ function App() {
         />
 
 
-        {/* ================= DOCTOR ================= */}
-
+      
         <Route
           path="/doctor-dashboard"
           element={
@@ -57,7 +64,7 @@ function App() {
         />
 
 
-        {/* ================= PATIENT ================= */}
+      
 
         <Route
           path="/patient-dashboard"
@@ -69,7 +76,7 @@ function App() {
         />
 
 
-        {/* ================= ROLE REDIRECT ================= */}
+       
 
         <Route
           path="/dashboard"
@@ -91,7 +98,7 @@ function App() {
         />
 
 
-        {/* ================= FALLBACK ================= */}
+     
 
         <Route
           path="*"
@@ -100,8 +107,6 @@ function App() {
 
       </Routes>
 
-
-      {/* Toast Notifications */}
       <Toaster
         position="top-center"
         reverseOrder={false}

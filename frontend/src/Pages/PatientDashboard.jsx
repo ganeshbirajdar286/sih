@@ -4,13 +4,10 @@ import React, { useState } from "react";
 import Sidebar from "../Components/PatientDashboard/Sidebar";
 import Header from "../Components/PatientDashboard/Header";
 import DoctorsTab from "../Components/PatientComponents/DoctorsTab";
-import HospitalsTab from "../Components/PatientDashboard/HospitalsTab";
-import DepartmentsTab from "../Components/PatientDashboard/DepartmentsTab";
 import Appointments from "../Components/PatientDashboard/Appointment";
-import HealthRecords from "../Components/PatientDashboard/HealthRecord";
 import Reports from "../Components/PatientDashboard/Reports";
 import PatientsTab from "../Components/PatientDashboard/PatientsTab.jsx";
-import NutritionCalculator from "../Components/PatientDashboard/NutritionCalculator.jsx";
+
 
 export default function PatientDashboard() {
   // 👇 default tab set to "patients"
@@ -21,12 +18,8 @@ export default function PatientDashboard() {
   const contentMap = {
     patients: <PatientsTab searchQuery={searchQuery} />,
     doctors: <DoctorsTab searchQuery={searchQuery} />,
-    hospitals: <HospitalsTab searchQuery={searchQuery} />,
-    departments: <DepartmentsTab searchQuery={searchQuery} />,
     appointments: <Appointments />,
     reports: <Reports />,
-    records: <HealthRecords />,
-    nutrients:<NutritionCalculator/>,
   };
 
   return (

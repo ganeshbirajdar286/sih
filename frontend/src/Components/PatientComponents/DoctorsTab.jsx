@@ -1,318 +1,296 @@
-import React, { useState, useMemo } from "react";
-import { 
-  FaUserMd, 
-  FaHospital, 
-  FaChartLine, 
-  FaStar, 
-  FaSearch, 
-  FaFilter, 
-  FaTimes,
+import React, { useState, useMemo, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  FaUserMd,
+  FaHospital,
+  FaChartLine,
+  FaStar,
+  FaSearch,
+  FaFilter,
+  FaCertificate,
   FaCalendarAlt,
-  FaClock
+  FaClock,
+  FaSpinner,
+  FaTimes,
 } from "react-icons/fa";
+import { doctor } from "../../feature/Patient/patient.thunk";
+import { useNavigate } from "react-router-dom";
 
-// Mock data for doctors with more details
-const doctors = [
-  { 
-    id: 1, 
-    name: "Dr. Priya Sharma", 
-    specialty: "Cardiology", 
-    rating: 4.8, 
-    reviews: 142,
-    experience: "12 years", 
-    hospital: "City Hospital", 
-    available: true,
-    nextAvailable: "Today, 3:00 PM",
-    image: "https://randomuser.me/api/portraits/women/65.jpg"
-  },
-  { 
-    id: 2, 
-    name: "Dr. Raj Mehta", 
-    specialty: "Dermatology", 
-    rating: 4.5, 
-    reviews: 89,
-    experience: "8 years", 
-    hospital: "Skin Care Center", 
-    available: true,
-    nextAvailable: "Today, 5:30 PM",
-    image: "https://randomuser.me/api/portraits/men/32.jpg"
-  },
-  { 
-    id: 3, 
-    name: "Dr. Anil Reddy", 
-    specialty: "Orthopedic", 
-    rating: 4.7, 
-    reviews: 216,
-    experience: "15 years", 
-    hospital: "Bone & Joint Clinic", 
-    available: false,
-    nextAvailable: "Tomorrow, 10:00 AM",
-    image: "https://randomuser.me/api/portraits/men/65.jpg"
-  },
-  { 
-    id: 4, 
-    name: "Dr. Sunita Kapoor", 
-    specialty: "Ayurveda", 
-    rating: 4.9, 
-    reviews: 304,
-    experience: "20 years", 
-    hospital: "Ayurvedic Wellness Center", 
-    available: true,
-    nextAvailable: "Today, 4:15 PM",
-    image: "https://randomuser.me/api/portraits/women/45.jpg"
-  },
-  { 
-    id: 5, 
-    name: "Dr. Amit Patel", 
-    specialty: "Pediatrics", 
-    rating: 4.6, 
-    reviews: 178,
-    experience: "10 years", 
-    hospital: "Children's Hospital", 
-    available: true,
-    nextAvailable: "Today, 6:00 PM",
-    image: "https://randomuser.me/api/portraits/men/22.jpg"
-  },
-  { 
-    id: 6, 
-    name: "Dr. Neha Singh", 
-    specialty: "Neurology", 
-    rating: 4.8, 
-    reviews: 231,
-    experience: "14 years", 
-    hospital: "Neuro Care Institute", 
-    available: true,
-    nextAvailable: "Today, 2:45 PM",
-    image: "https://randomuser.me/api/portraits/women/32.jpg"
-  },
-];
-
-// Specialty options for filtering
+// Specialty options for filtering - updated to match your API data
 const specialties = [
   "All Specialties",
-  "Cardiology",
-  "Dermatology",
-  "Orthopedic",
-  "Ayurveda",
-  "Pediatrics",
-  "Neurology"
+  "Oncologist",
+  "Cardiologist",
+  "Endocrinologist",
+  "Gastroenterologist",
+  "Neurologist",
+  "Obstetrics and Gynaecology",
+  "Ophthalmologist",
+  "Family doctor",
+  "Psychiatrist",
+  "Pediatrician",
+  "Allergist",
+  "Geriatrician",
+  "Internal medicine",
+  "Nephrologist",
+  "Orthopedics",
+  "Anesthesiologist",
+  "Dermatologist",
 ];
 
 export default function DoctorsTab() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const {
+    doctor: doctors,
+    loading,
+    error,
+  } = useSelector((state) => state.patient);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedSpecialty, setSelectedSpecialty] = useState("All Specialties");
-  const [availabilityFilter, setAvailabilityFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("rating");
+  const [sortBy, setSortBy] = useState("experience");
+
+  useEffect(() => {
+    dispatch(doctor());
+  }, [dispatch]);
 
   const filteredDoctors = useMemo(() => {
+    if (!doctors || doctors.length === 0) return [];
+
     let result = [...doctors];
-    
-    // Apply search filter
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(doc => 
-        doc.name.toLowerCase().includes(query) || 
-        doc.specialty.toLowerCase().includes(query) ||
-        doc.hospital.toLowerCase().includes(query)
+      result = result.filter(
+        (doc) =>
+          doc.User_id?.Name?.toLowerCase().includes(query) ||
+          doc.Specialization?.toLowerCase().includes(query),
       );
     }
-    
-    // Apply specialty filter
+
     if (selectedSpecialty !== "All Specialties") {
-      result = result.filter(doc => doc.specialty === selectedSpecialty);
+      result = result.filter((doc) => doc.Specialization === selectedSpecialty);
     }
-    
-    // Apply availability filter
-    if (availabilityFilter === "available") {
-      result = result.filter(doc => doc.available);
-    } else if (availabilityFilter === "not-available") {
-      result = result.filter(doc => !doc.available);
-    }
-    
-    // Apply sorting
-    if (sortBy === "rating") {
-      result.sort((a, b) => b.rating - a.rating);
-    } else if (sortBy === "experience") {
-      result.sort((a, b) => parseInt(b.experience) - parseInt(a.experience));
+
+    if (sortBy === "experience") {
+      result.sort((a, b) => b.Experience - a.Experience);
     } else if (sortBy === "name") {
-      result.sort((a, b) => a.name.localeCompare(b.name));
+      result.sort(
+        (a, b) => a.User_id?.Name?.localeCompare(b.User_id?.Name || "") || 0,
+      );
+    } else if (sortBy === "specialization") {
+      result.sort(
+        (a, b) => a.Specialization?.localeCompare(b.Specialization || "") || 0,
+      );
     }
-    
+
     return result;
-  }, [searchQuery, selectedSpecialty, availabilityFilter, sortBy]);
+  }, [doctors, searchQuery, selectedSpecialty, sortBy]);
 
   const toggleFilters = () => setShowFilters(!showFilters);
 
+  if (loading) {
+    return (
+      <div className="p-4 sm:p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <FaSpinner className="animate-spin text-green-600 text-4xl sm:text-5xl mx-auto mb-4" />
+          <p className="text-gray-600 text-base sm:text-lg">
+            Loading doctors...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 sm:p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-red-200 mx-4">
+          <div className="text-red-500 text-4xl sm:text-5xl mb-4">⚠️</div>
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">
+            Error Loading Doctors
+          </h3>
+          <p className="text-sm sm:text-base text-gray-500 mb-4">{error}</p>
+          <button
+            onClick={() => dispatch(doctor())}
+            className="px-4 sm:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer text-sm sm:text-base"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Find Your Doctor</h2>
-      
-      {/* Search and Filter Bar */}
-      <div className="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="relative w-full md:w-96">
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-800">
+        Find Your Doctor
+      </h2>
+
+      <div className="mb-4 sm:mb-6 space-y-3">
+        {/* Search Bar */}
+        <div className="relative w-full">
+          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
           <input
             type="text"
-            placeholder="Search by name, specialty, or hospital..."
-            className="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            placeholder="Search by name or specialty..."
+            className="pl-10 pr-4 py-2.5 sm:py-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm sm:text-base"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <button 
-            className="flex items-center cursor-pointer px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+
+        <div className="flex items-center gap-2 sm:gap-3 w-full">
+          <button
+            className="flex items-center justify-center cursor-pointer px-3 sm:px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors flex-1 sm:flex-none text-sm sm:text-base"
             onClick={toggleFilters}
           >
-            <FaFilter className="mr-2 " /> 
-            {showFilters ? 'Hide Filters' : 'Show Filters'}
+            <FaFilter className="mr-2 text-sm" />
+            <span className="hidden xs:inline">
+              {showFilters ? "Hide" : "Filters"}
+            </span>
+            <span className="xs:hidden">Filter</span>
           </button>
-          
-          <div className="ml-auto">
-            <select 
-              className="px-4 py-2 cursor-pointer rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-            >
-              <option value="rating">Sort by Rating</option>
-              <option value="experience">Sort by Experience</option>
-              <option value="name">Sort by Name</option>
-            </select>
-          </div>
+
+          <select
+            className="px-3 sm:px-4 py-2 cursor-pointer rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 flex-1 sm:flex-none text-sm sm:text-base"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="experience">Experience</option>
+            <option value="name">Name</option>
+            <option value="specialization">Specialty</option>
+          </select>
         </div>
       </div>
-      
-      {/* Filter Panel */}
+
       {showFilters && (
-        <div className="mb-6 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-700">Filters</h3>
-            <button 
+        <div className="mb-4 sm:mb-6 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 className="font-semibold text-gray-700 text-sm sm:text-base">
+              Filters
+            </h3>
+            <button
               onClick={() => {
                 setSelectedSpecialty("All Specialties");
-                setAvailabilityFilter("all");
               }}
-              className="text-sm text-green-600 hover:text-green-800 cursor-pointer"
+              className="text-xs sm:text-sm text-green-600 hover:text-green-800 cursor-pointer font-medium"
             >
               Clear All
             </button>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Specialty</label>
-              <select 
-                className="w-full px-3 cursor-pointer py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-                value={selectedSpecialty}
-                onChange={(e) => setSelectedSpecialty(e.target.value)}
-              >
-                {specialties.map(spec => (
-                  <option key={spec}  value={spec}>{spec}</option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Availability</label>
-              <select 
-                className="w-full px-3 py-2 rounded-lg border cursor-pointer border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-                value={availabilityFilter}
-                onChange={(e) => setAvailabilityFilter(e.target.value)}
-              >
-                <option value="all">All Availability</option>
-                <option value="available">Available Today</option>
-                <option value="not-available">Not Available</option>
-              </select>
-            </div>
+
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
+              Specialty
+            </label>
+            <select
+              className="w-full px-3 cursor-pointer py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base max-h-48 overflow-y-auto"
+              value={selectedSpecialty}
+              onChange={(e) => setSelectedSpecialty(e.target.value)}
+              size="1"
+            >
+              {specialties.map((spec) => (
+                <option key={spec} value={spec} className="py-2">
+                  {spec}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       )}
-      
-      {/* Results Count */}
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-gray-600">
-          {filteredDoctors.length} doctor{filteredDoctors.length !== 1 ? 's' : ''} found
+
+      <div className="mb-3 sm:mb-4 flex items-center justify-between">
+        <p className="text-gray-600 text-sm sm:text-base">
+          {filteredDoctors.length} doctor
+          {filteredDoctors.length !== 1 ? "s" : ""} found
         </p>
       </div>
-      
-      {/* Doctors Grid */}
+
       {filteredDoctors.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredDoctors.map(doc => (
-            <div key={doc.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
-              <div className="p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {filteredDoctors.map((doc) => (
+            <div
+              key={doc._id}
+              className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300"
+            >
+              <div className="p-4 sm:p-6">
                 <div className="flex items-start">
-                  <div className="w-16 h-16 rounded-full overflow-hidden mr-4 flex-shrink-0">
-                    <img 
-                      src={doc.image} 
-                      alt={doc.name}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xl sm:text-2xl font-bold mr-3 sm:mr-4 flex-shrink-0">
+                    {doc.User_id?.Name?.charAt(0).toUpperCase() || "D"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-lg truncate">{doc.name}</h3>
-                    <p className="text-green-600 font-medium">{doc.specialty}</p>
-                    <div className="flex items-center mt-1">
-                      {[...Array(5)].map((_, i) => (
-                        <FaStar 
-                          key={i} 
-                          className={i < Math.floor(doc.rating) ? "text-yellow-400" : "text-gray-300"} 
-                          size={14}
-                        />
-                      ))}
-                      <span className="ml-2 text-gray-500 text-sm">
-                        {doc.rating} ({doc.reviews} reviews)
-                      </span>
-                    </div>
+                    <h3 className="font-semibold text-base sm:text-lg truncate">
+                      Dr. {doc.User_id?.Name || "Unknown"}
+                    </h3>
+                    <p className="text-green-600 font-medium text-xs sm:text-sm truncate">
+                      {doc.Specialization}
+                    </p>
                   </div>
                 </div>
-                
-                <div className="mt-4 space-y-2 text-sm text-gray-600">
+
+                <div className="mt-3 sm:mt-4 space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
                   <p className="flex items-center">
-                    <FaHospital className="mr-2 text-green-500" /> 
-                    <span className="truncate">{doc.hospital}</span>
+                    <FaChartLine className="mr-2 text-green-500 flex-shrink-0 text-sm" />
+                    <span>
+                      {doc.Experience} year{doc.Experience !== 1 ? "s" : ""}{" "}
+                      experience
+                    </span>
                   </p>
-                  <p className="flex items-center">
-                    <FaChartLine className="mr-2 text-green-500" /> 
-                    {doc.experience} experience
-                  </p>
-                  {doc.available && (
+
+                  {doc.Certificates && (
                     <p className="flex items-center">
-                      <FaClock className="mr-2 text-green-500" /> 
-                      Next: {doc.nextAvailable}
+                      <FaCertificate className="mr-2 text-green-500 flex-shrink-0 text-sm" />
+                      <a
+                        href={doc.Certificates}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-green-600 hover:underline truncate"
+                      >
+                        View Certificate
+                      </a>
                     </p>
                   )}
+
+                  <p className="flex items-center text-xs text-gray-400">
+                    <FaClock className="mr-2 flex-shrink-0" />
+                    <span>
+                      Joined: {new Date(doc.createdAt).toLocaleDateString()}
+                    </span>
+                  </p>
                 </div>
-                
-                <div className={`mt-4 text-sm font-medium ${doc.available ? 'text-green-600' : 'text-red-600'}`}>
-                  {doc.available ? 'Available Today' : 'Not Available'}
-                </div>
-                
-                <button 
-                  className={`mt-4 w-full cursor-pointer py-2 rounded-lg font-medium transition-colors ${doc.available 
-                    ? 'bg-green-600 hover:bg-green-700 text-white' 
-                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`} 
-                  disabled={!doc.available}
+
+                <button
+                  onClick={() => navigate(`/book-appointment/${doc._id}`)}
+                  className="mt-6 w-full py-3 bg-green-600 text-white rounded-lg"
                 >
-                  {doc.available ? 'Book Appointment' : 'Check Availability'}
+                  Book Appointment
                 </button>
-                
-                {doc.available && (
-                  <button className="mt-2 w-full cursor-pointer py-2 rounded-lg border border-green-600 text-green-600 font-medium hover:bg-green-50 transition-colors">
-                    <FaCalendarAlt className="inline mr-2" /> View Schedule
-                  </button>
-                )}
+
+                <button
+                  onClick={() => navigate(`/doctor/${doc._id}`)}
+                  className="mt-2 w-full cursor-pointer py-2 rounded-lg border border-green-600 text-green-600 font-medium hover:bg-green-50 transition-colors text-sm sm:text-base"
+                >
+                  <FaCalendarAlt className="inline mr-2 text-sm" /> View Profile
+                </button>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
-          <FaUserMd className="mx-auto text-gray-400 text-4xl mb-4" />
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No doctors found</h3>
-          <p className="text-gray-500">Try adjusting your search or filters to find what you're looking for.</p>
+        <div className="text-center py-8 sm:py-12 bg-white rounded-xl shadow-sm border border-gray-100 mx-4">
+          <FaUserMd className="mx-auto text-gray-400 text-3xl sm:text-4xl mb-3 sm:mb-4" />
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">
+            No doctors found
+          </h3>
+          <p className="text-sm sm:text-base text-gray-500 px-4">
+            Try adjusting your search or filters to find what you're looking
+            for.
+          </p>
         </div>
       )}
     </div>

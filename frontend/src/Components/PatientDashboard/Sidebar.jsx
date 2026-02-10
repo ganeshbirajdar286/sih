@@ -18,15 +18,11 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
   const mainTabs = [
     { key: "patients", label: "Patients", icon: <Users className="text-lg" /> },
     { key: "doctors", label: "Doctors", icon: <UserMd className="text-lg" /> },
-    { key: "hospitals", label: "Hospitals", icon: <Building className="text-lg" /> },
-    { key: "departments", label: "Departments", icon: <Stethoscope className="text-lg" /> },
   ];
 
   const otherTabs = [
     { key: "appointments", label: "Appointments", icon: <Calendar className="text-lg" /> },
     { key: "reports", label: "Reports", icon: <TrendingUp className="text-lg" /> },
-    { key: "records", label: "Health Records", icon: <FileText className="text-lg" /> },
-    { key: "nutrients", label: "Nutrients Calculator", icon: <Apple className="text-lg" /> },
   ];
   const dispatch= useDispatch();
 

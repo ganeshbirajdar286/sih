@@ -23,14 +23,9 @@ function App() {
       <Routes>
 
 
-
-        <Route
+<Route
   path="/"
-  element={
-    <PublicRoute>
-      <HomePage />
-    </PublicRoute>
-  }
+  element={<HomePage />}  
 />
 
 

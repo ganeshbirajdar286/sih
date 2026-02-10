@@ -104,8 +104,8 @@ export const register = async (req, res) => {
     const token = jwtToken(user?.id, doctorProfile?._id);
    res.cookie("token", token, {
   httpOnly: true,
-  secure: false,     // localhost
-  sameSite: "lax",   // localhost
+  secure: false,     
+  sameSite: "lax",   
   maxAge: 1000 * 60 * 60 * 24 * 365,
 });
 
@@ -150,7 +150,6 @@ export const login = async (req, res) => {
 
     const role = doctor ? "DOCTOR" : "USER";
 
-    // 5) Create JWT token
     const token = jwtToken(user?._id, user?.Doctor_id);
 
  res.cookie("token", token, {
@@ -288,6 +287,46 @@ export const logout = async (req, res) => {
 };
 
 
+export const alldoctor = async (req, res) => {
+  try {
+    const doctors = await Doctor.find().populate("User_id","Name Image_url");
+    res.status(200).json({
+      success: true,
+      count: doctors.length,
+      data: doctors,
+    });
+
+  } catch (error) {
+    console.error("Doctor fetch error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch doctors",
+      error: error.message,
+    });
+  }
+};
+
+
+export const getSingleDoctor = async (req, res) => {
+  try {
+    const doctor = await Doctor.findById(req.params.id)
+      .populate("User_id");
+
+    if (!doctor) {
+      return res.status(404).json({
+        message: "Doctor not found",
+      });
+    }
+
+    res.status(200).json(doctor);
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
 
 export const patientAppointment = async (req, res) => {
   try {
@@ -296,10 +335,11 @@ export const patientAppointment = async (req, res) => {
     const DOCTOR = req.params.id;
     const Patient = req.user.userId;
 
-    if ((!Appointment_Date || !Time_slot, !Condition)) {
-      return res.status(400).json({ message: "All fields required" });
+      if (!Appointment_Date || !Time_slot || !Condition) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
     }
-
     const appointment = await Appointment.create({
       Appointment_Date,
       Time_slot,
@@ -681,6 +721,37 @@ Generate 90 days Ayurvedic diet chart JSON.
     res.status(500).json({
       success: false,
       message: "Error generating AI diet chart",
+    });
+  }
+};
+
+
+export const getDoctorBookedSlots = async (req, res) => {
+  try {
+    const doctor=req.params.id;
+    const patient = await Appointment.find({
+      Doctor_id: doctor,
+    }).populate(
+      "Patient_id",
+      "Name Age Image_url Email PhoneNumber Condition Dosha",
+    );
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: "No patient found for this doctor",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      patient,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
     });
   }
 };

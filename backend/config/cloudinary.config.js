@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
 export const multerMiddleWare = multer({
   storage,
   limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB
-}).single("media");
+}).any()
 
 
 export const uploadFileToCloudinary = async (file) => {
@@ -42,8 +42,17 @@ export const uploadFileToCloudinary = async (file) => {
     // Upload from disk
     const result = await cloudinary.uploader.upload(file.path);
 
+    
+
     // Delete local file after successful upload
-    fs.unlinkSync(file.path);
+   fs.unlink(file.path, (err) => {
+  if (err) {
+    console.error("Delete error:", err);
+  } else {
+    console.log("Deleted:", file.path);
+  }
+});
+
 
     return result;
   } catch (error) {

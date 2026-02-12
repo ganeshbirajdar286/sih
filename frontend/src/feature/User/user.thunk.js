@@ -17,72 +17,52 @@ export const loginThunk=createAsyncThunk("users/login",async({Name,Password},{re
 })
 
 
+// user.thunk.js
 export const registerThunk = createAsyncThunk(
-  "users/register",
-  async (data, { rejectWithValue }) => {
+  "user/register",
+  async (userData, { rejectWithValue }) => {
     try {
       const formData = new FormData();
-
-      formData.append("Name", data.Name);
-      formData.append("Password", data.Password);
-      formData.append("Age", data.Age);
-      formData.append("Height", data.Height);
-      formData.append("Weight", data.Weight);
-      formData.append("Gender", data.Gender);
-      formData.append("Dosha", data.Dosha);
-      formData.append("isDoctor", data.isDoctor);
-      formData.append("Specialization", data.Specialization);
-
-      // ✅ ADD THIS
-      formData.append("Experience", data.Experience);
-
-      // File
-      formData.append("media", data.media);
-
-      const response = await axiosInstance.post(
-        "/register",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      
+      formData.append("Name", userData.Name);
+      formData.append("Password", userData.Password);
+      formData.append("Age", userData.Age);
+      formData.append("Height", userData.Height);
+      formData.append("Weight", userData.Weight);
+      formData.append("Gender", userData.Gender);
+      formData.append("Dosha", userData.Dosha);
+      formData.append("isDoctor", userData.isDoctor);
+      
+      // Append profile image if exists
+      if (userData.profileImage) {
+        formData.append("profileImage", userData.profileImage);
+      }
+      
+      // Append doctor-specific fields if doctor
+      if (userData.isDoctor) {
+        formData.append("Specialization", userData.Specialization);
+        formData.append("Experience", userData.Experience);
+        
+        if (userData.certificate) {
+          formData.append("certificate", userData.certificate);
         }
-      );
+      }
 
-      toast.success("Account created successfully!");
+      const response = await axiosInstance.post("/register", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       return response.data;
-
     } catch (error) {
-      console.error(error);
-
-      toast.error(
-        error?.response?.data?.message ||
-        "User already exists"
-      );
-
       return rejectWithValue(
-        error?.response?.data || error.message
+        error.response?.data?.message || error.message
       );
     }
   }
 );
 
-
-  //  export const logoutThunk = createAsyncThunk(
-  //   'users/logout',
-  //   async (_,{rejectWithValue}) => {
-  //    try {
-  //     const response =await axiosInstance.post("/logout")
-  //        localStorage.removeItem("user");
-  //        toast.success('logout Successfully!!!!!');
-  //    return true
-  //   } catch (error) {
-  //     console.error(error.message)
-  //     toast.error( error.response?.data?.message||"logout failed " )
-  //     return rejectWithValue(error)
-  //    }
-  //   },
-  // )
 
 
   export const logoutThunk = createAsyncThunk(

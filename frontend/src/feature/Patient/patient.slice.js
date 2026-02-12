@@ -4,6 +4,9 @@ import {
   doctor,
   getDoctorBookedSlots,
   getSingleDoctor,
+  getappointmentschedule,
+  RescheduleAppointment,
+  Cancel_appointments,
 } from "./patient.thunk";
 
 const initialState = {
@@ -13,6 +16,10 @@ const initialState = {
   loading: false,
   error: null,
   bookedSlot: [],
+  getappointmentschedules: [],
+  RescheduleAppointment: null,
+  cancel: Boolean,
+  cancelAppointments: null,
 };
 
 const PatientSlice = createSlice({
@@ -83,6 +90,70 @@ const PatientSlice = createSlice({
       state.loading = false;
       state.error = action.payload?.message || "Error fetching doctors";
     });
+
+    //getappointmentschedule
+    builder.addCase(getappointmentschedule.fulfilled, (state, action) => {
+      console.log("fulfilled");
+      state.loading = false;
+      state.getappointmentschedules = action.payload.appointment || [];
+    });
+    builder.addCase(getappointmentschedule.pending, (state, action) => {
+      console.log("pending");
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(getappointmentschedule.rejected, (state, action) => {
+      console.log("rejected");
+      state.loading = false;
+      state.error = action.payload?.message || "appointment not found ";
+    });
+
+    //RescheduleAppointment
+    builder
+      .addCase(RescheduleAppointment.pending, (state) => {
+        console.log("pending");
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(RescheduleAppointment.fulfilled, (state, action) => {
+        console.log("fulfilled");
+        state.loading = false;
+
+        const updated = action.payload.UpdatedAppointment;
+
+        state.RescheduleAppointment = updated;
+
+        // Update the appointment in the getappointmentschedules array
+        state.getappointmentschedules = state.getappointmentschedules.map(
+          (appt) => (appt._id === updated._id ? updated : appt),
+        );
+      })
+      .addCase(RescheduleAppointment.rejected, (state, action) => {
+        console.log("rejected");
+        state.loading = false;
+        state.error = action.payload || "Appointment not found";
+      });
+
+    // Cancel_appointments
+    builder.addCase(Cancel_appointments.fulfilled, (state, action) => {
+      console.log("fulfilled");
+      state.loading = false;
+      state.cancel = action.payload.success;
+      state.cancelAppointments = action.payload.data;
+
+      // FIX: Remove the deleted appointment from the UI list immediately
+      const deletedId = action.payload.data._id;
+      state.getappointmentschedules = state.getappointmentschedules.filter(
+        (appt) => appt._id !== deletedId,
+      );
+    })
+    builder.addCase(Cancel_appointments.pending, (state) => {
+        state.loading = true;
+      })
+    builder.addCase(Cancel_appointments.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   FaUserMd,
@@ -11,6 +11,7 @@ import {
 import { getSingleDoctor } from "../../feature/Patient/patient.thunk";
 
 export default function DoctorProfile() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const dispatch = useDispatch();
 
@@ -83,7 +84,7 @@ export default function DoctorProfile() {
 
         <button
           onClick={() => navigate(`/book-appointment/${doc._id}`)}
-          className="mt-6 w-full py-3 bg-green-600 text-white rounded-lg"
+          className="mt-6 w-full py-3 bg-green-600 text-white rounded-lg cursor-pointer"
         >
           Book Appointment
         </button>

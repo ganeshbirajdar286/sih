@@ -4,6 +4,7 @@ import logo from "../assets/logo.png";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { registerThunk } from "../feature/User/user.thunk";
+import { FaCamera, FaUser } from "react-icons/fa";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -20,8 +21,11 @@ const SignUp = () => {
     isDoctor: false,
     specialization: "",
     experience: "",
-    media: null,
+    profileImage: null,
+    certificate: null,
   });
+
+  const [profileImagePreview, setProfileImagePreview] = useState(null);
 
   const [isFocused, setIsFocused] = useState({
     name: false,
@@ -85,6 +89,39 @@ const SignUp = () => {
   const handleChange = (field, value) =>
     setFormData({ ...formData, [field]: value });
 
+
+  const handleProfileImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please upload an image file');
+        return;
+      }
+      
+      
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+
+      setFormData({ ...formData, profileImage: file });
+      
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Remove profile image
+  const removeProfileImage = () => {
+    setFormData({ ...formData, profileImage: null });
+    setProfileImagePreview(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -98,7 +135,7 @@ const SignUp = () => {
       return;
     }
 
-    if (formData.isDoctor && !formData.media) {
+    if (formData.isDoctor && !formData.certificate) {
       toast.error("Please upload certificate");
       return;
     }
@@ -118,7 +155,8 @@ const SignUp = () => {
           isDoctor: formData.isDoctor,
           Specialization: formData.specialization,
           Experience: formData.experience,
-          media: formData.media,
+          profileImage: formData.profileImage,
+          certificate: formData.certificate,
         }),
       ).unwrap();
 
@@ -137,7 +175,6 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50/70 via-amber-50/50 to-white px-3 sm:px-4 md:px-6 lg:px-8 relative overflow-hidden py-6 sm:py-8 md:py-10">
-      {/* Background */}
       <div className="absolute top-[10%] left-[5%] w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-emerald-200 rounded-full blur-3xl opacity-30 animate-float"></div>
       <div
         className="absolute top-[60%] left-[70%] w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-amber-200 rounded-full blur-3xl opacity-30 animate-float"
@@ -185,6 +222,54 @@ const SignUp = () => {
           onSubmit={handleSubmit}
           className="space-y-4 sm:space-y-5 md:space-y-6"
         >
+          {/* Profile Picture Upload */}
+          <div className="flex flex-col items-center mb-6">
+            <div className="relative group">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-emerald-500 shadow-lg bg-gray-100">
+                {profileImagePreview ? (
+                  <img
+                    src={profileImagePreview}
+                    alt="Profile Preview"
+                    className="w-full h-full object-cover object-center"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-100 to-green-100">
+                    <FaUser className="text-4xl sm:text-5xl text-emerald-600" />
+                  </div>
+                )}
+              </div>
+              
+              {/* Camera Icon Button */}
+              <label
+                htmlFor="profileImage"
+                className="absolute bottom-0 right-0 w-10 h-10 sm:w-12 sm:h-12 bg-emerald-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-emerald-700 transition-all duration-200 border-4 border-white group-hover:scale-110"
+              >
+                <FaCamera className="text-white text-sm sm:text-base" />
+                <input
+                  id="profileImage"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleProfileImageChange}
+                />
+              </label>
+
+              {/* Remove button */}
+              {profileImagePreview && (
+                <button
+                  type="button"
+                  onClick={removeProfileImage}
+                  className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center cursor-pointer shadow-md hover:bg-red-600 transition-all duration-200 text-white text-xs font-bold"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            <p className="text-xs sm:text-sm text-gray-500 mt-3 text-center">
+              {profileImagePreview ? 'Click camera icon to change' : 'Click camera icon to upload profile picture'}
+            </p>
+          </div>
+
           {/* Name */}
           <div className="relative">
             <label
@@ -418,40 +503,38 @@ const SignUp = () => {
                 />
               </div>
 
-              {/* Media Upload */}
+              {/* Certificate Upload */}
               <div>
-                {/* Label */}
                 <label className="block text-gray-700 font-medium mb-2 text-xs sm:text-sm">
                   Upload Certificate/Document
                 </label>
 
-                {/* Custom Upload Button */}
-                <label className="flex items-center justify-center w-full sm:w-fit px-4 py-2 bg-green-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition text-xs sm:text-sm">
+                <label className="flex items-center justify-center w-full sm:w-fit px-4 py-2 bg-green-600 text-white rounded-lg cursor-pointer hover:bg-green-700 transition text-xs sm:text-sm">
                   Choose File
                   <input
                     type="file"
                     className="hidden"
+                    accept="image/*,.pdf"
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        media: e.target.files[0],
+                        certificate: e.target.files[0],
                       })
                     }
                   />
                 </label>
 
-                {/* File Preview */}
-                {formData.media && (
+                {formData.certificate && (
                   <div className="mt-2 p-2 bg-gray-50 rounded-md border">
                     <div className="flex justify-between items-center text-xs sm:text-sm gap-2">
                       <span className="truncate text-neutral-950">
-                        {formData.media.name}
+                        {formData.certificate.name}
                       </span>
 
                       <button
                         type="button"
                         onClick={() =>
-                          setFormData({ ...formData, media: null })
+                          setFormData({ ...formData, certificate: null })
                         }
                         className="text-red-500 hover:text-red-700 font-medium"
                       >
@@ -464,55 +547,60 @@ const SignUp = () => {
             </div>
           )}
 
-          {/* Terms & Submit */}
-          <div className="flex flex-col gap-2 sm:gap-3 mt-6 sm:mt-8">
-            <label className="flex items-center cursor-pointer text-xs sm:text-sm">
-              <div className="relative">
-                <input
-                  type="checkbox"
-                  checked={termsChecked}
-                  onChange={(e) => setTermsChecked(e.target.checked)}
-                  className="peer sr-only"
-                />
-                <div className="w-4 h-4 border border-gray-300 rounded flex items-center justify-center peer-checked:bg-emerald-600 peer-checked:border-emerald-600 transition-colors">
-                  <svg
-                    className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-              </div>
+         {/* Terms & Submit */}
+<div className="flex flex-col gap-2 sm:gap-3 mt-6 sm:mt-8">
 
-              <span className="ml-2">
-                I accept the{" "}
-                <a
-                  href="/terms"
-                  className="text-emerald-600 font-medium hover:text-emerald-700"
-                >
-                  Terms & Conditions
-                </a>
-              </span>
-            </label>
+  <label className="flex items-center cursor-pointer text-xs sm:text-sm">
+    <div className="relative">
+      <input
+        type="checkbox"
+        checked={termsChecked}
+        onChange={(e) => setTermsChecked(e.target.checked)}
+        className="peer sr-only"
+      />
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full cursor-pointer py-2.5 sm:py-3 md:py-3.5 bg-gradient-to-r from-emerald-600 to-green-700 text-white font-semibold rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center disabled:opacity-75 disabled:cursor-not-allowed text-sm sm:text-base"
-            >
-              {isLoading ? "Signing up..." : "Sign Up"}
-            </button>
-          </div>
+      <div className="w-4 h-4 border border-gray-300 rounded flex items-center justify-center peer-checked:bg-emerald-600 peer-checked:border-emerald-600 transition-colors">
+        <svg
+          className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth="3"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+      </div>
+    </div>
+
+    <span className="ml-2">
+      I accept the{" "}
+      <a
+        href="/terms"
+        className="text-emerald-600 font-medium hover:text-emerald-700"
+      >
+        Terms & Conditions
+      </a>
+    </span>
+  </label>   {/* ✅ LABEL CLOSED */}
+
+  {/* SUBMIT BUTTON */}
+  <button
+    type="submit"
+    disabled={isLoading}
+    className="w-full cursor-pointer py-2.5 sm:py-3 md:py-3.5 bg-gradient-to-r from-emerald-600 to-green-700 text-white font-semibold rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center disabled:opacity-75 disabled:cursor-not-allowed text-sm sm:text-base"
+  >
+    {isLoading ? "Signing up..." : "Sign Up"}
+  </button>
+
+</div>
+
         </form>
 
-        {/* Extra Links */}
+         {/* Extra Links */}
         <p className="text-center text-xs sm:text-sm text-gray-600 mt-4 sm:mt-6">
           Already have an account?{" "}
           <a
@@ -522,7 +610,8 @@ const SignUp = () => {
             Sign In
           </a>
         </p>
-      </div>
+
+      </div>   {/* ✅ CLOSE CARD DIV */}
 
       {/* Floating animation */}
       <style>{`
@@ -530,9 +619,12 @@ const SignUp = () => {
           0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
           50% { transform: translateY(-20px) scale(1.05); opacity: 0.4; }
         }
-        .animate-float { animation: float 8s ease-in-out infinite; }
+        .animate-float {
+          animation: float 8s ease-in-out infinite;
+        }
       `}</style>
-    </div>
+
+    </div>  
   );
 };
 

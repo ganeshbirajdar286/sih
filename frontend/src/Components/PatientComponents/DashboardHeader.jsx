@@ -5,13 +5,13 @@ import { FaPrint, FaCalendarAlt, FaWeight, FaRulerVertical, FaHeartbeat } from '
 const StatCard = ({ icon, label, value }) => {
     const Icon = icon;
     return (
-        <div className="bg-white rounded-lg p-4 flex items-center shadow-sm">
-            <div className="p-3 bg-green-100 text-green-600 rounded-full mr-4">
-                <Icon size={20} />
+        <div className="bg-white rounded-lg p-4 sm:p-5 flex items-center shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
+            <div className="p-3 bg-green-100 text-green-600 rounded-full mr-3 sm:mr-4 flex-shrink-0">
+                <Icon size={20} className="sm:w-6 sm:h-6" />
             </div>
-            <div>
-                <p className="text-sm text-gray-500">{label}</p>
-                <p className="text-lg font-bold text-gray-800">{value}</p>
+            <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-gray-500 mb-0.5">{label}</p>
+                <p className="text-lg sm:text-xl font-bold text-gray-800 truncate">{value}</p>
             </div>
         </div>
     );
@@ -19,25 +19,32 @@ const StatCard = ({ icon, label, value }) => {
 
 const DashboardHeader = ({ patient }) => {
     return (
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8 animate-fadeIn">
             {/* Top Row: Title and Actions */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-800">{patient.name}</h1>
-                    <p className="text-gray-500">{`${patient.age} years old, ${patient.gender} • Predominant Dosha: ${patient.dosha}`}</p>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 sm:mb-6 gap-4">
+                <div className="w-full md:w-auto">
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-1 sm:mb-2">
+                        {patient.name}
+                    </h1>
+                    <p className="text-sm sm:text-base text-gray-500">
+                        {`${patient.age} years old, ${patient.gender} • Predominant Dosha: `}
+                        <span className="font-semibold text-green-600">{patient.dosha}</span>
+                    </p>
                 </div>
-                <div className="flex space-x-2 mt-4 md:mt-0">
-                    <button className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center transition">
-                        <FaPrint className="mr-2" /> Print Report
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full md:w-auto">
+                    <button className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg shadow-md flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:scale-105">
+                        <FaPrint className="mr-2" /> 
+                        <span className="text-sm sm:text-base">Print Report</span>
                     </button>
-                    <button className="bg-gray-700  cursor-pointer hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md flex items-center transition">
-                        <FaCalendarAlt className="mr-2" /> Schedule
+                    <button className="bg-gray-700 cursor-pointer hover:bg-gray-800 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg shadow-md flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:scale-105">
+                        <FaCalendarAlt className="mr-2" /> 
+                        <span className="text-sm sm:text-base">Schedule</span>
                     </button>
                 </div>
             </div>
             
             {/* Bottom Row: Key Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 <StatCard icon={FaWeight} label="Weight" value={patient.keyStats.weight} />
                 <StatCard icon={FaRulerVertical} label="Height" value={patient.keyStats.height} />
                 <StatCard icon={FaHeartbeat} label="BMI" value={patient.keyStats.bmi} />

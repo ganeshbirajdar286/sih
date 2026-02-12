@@ -116,6 +116,67 @@ export const getDoctorBookedSlots = createAsyncThunk(
   }
 );
 
+export const getappointmentschedule =createAsyncThunk(
+  "patient/getappointmentschedule",async(_,{rejectWithValue})=>{
+   try {
+     const response=await  axiosInstance.get("/patient/schedule");
+    return response.data
+    
+   } catch (error) {
+     console.error(error);
 
+      return rejectWithValue(
+        error.response?.data?.message ||
+        error.message
+      );
+   }
+  }
+)
+
+export const RescheduleAppointment = createAsyncThunk(
+  "/patient/RescheduleAppointment",
+  async (
+    { id, Appointment_Date, Time_slot },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axiosInstance.post(
+        `/updatedappointment/patient/${id}`,
+        {
+          Appointment_Date,
+          Time_slot,
+        }
+      );
+
+      return response.data;
+
+    } catch (error) {
+      console.error(error);
+
+      return rejectWithValue(
+        error.response?.data?.message ||
+        error.message
+      );
+    }
+  }
+);
+
+export const Cancel_appointments=createAsyncThunk(
+  "patient/cancel_appoinments",async(id,{rejectWithValue})=>{
+    try {
+
+      const response=await axiosInstance.delete(`/patient/deleteappointment/${id}`);
+      return response.data;
+      
+    } catch (error) {
+       console.error(error);
+
+      return rejectWithValue(
+        error.response?.data?.message ||
+        error.message
+      );
+    }
+  }
+)
 
 

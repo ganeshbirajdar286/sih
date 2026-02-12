@@ -14,6 +14,9 @@ import BookAppointment from "./Components/PatientComponents/BookAppointment.jsx"
 
 import { Toaster } from "react-hot-toast";
 import "./index.css";
+import DoctorsTab from "./Components/PatientComponents/DoctorsTab.jsx";
+import RescheduleAppointment from "./Components/PatientComponents/RescheduleAppointment.jsx";
+import Appointments from "./Components/PatientDashboard/Appointment.jsx";
 
 function App() {
   const { isAuthenticated, isDoctor } = useSelector((state) => state.user);
@@ -58,6 +61,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+     <Route
+     path="/doctor"
+     element={
+      <ProtectedRoute>
+        <DoctorsTab/>
+      </ProtectedRoute>
+     }
+     />
 
         <Route
   path="/book-appointment/:id"
@@ -74,6 +85,24 @@ function App() {
           element={
             <ProtectedRoute>
               <PatientDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+<Route
+path="/appointments"
+element={
+
+  <ProtectedRoute>
+    <Appointments/>
+  </ProtectedRoute>
+}
+/>
+        <Route
+          path="/RescheduleAppointment/:id"
+          element={
+            <ProtectedRoute>
+              <RescheduleAppointment />
             </ProtectedRoute>
           }
         />

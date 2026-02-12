@@ -31,7 +31,7 @@ const appointment = new Schema(
     Status:{
         type:"String",
         enum:["Accepted","Rejected",
-          "Pending"
+          "Pending","completed"
         ],
         default:"Pending"
     },

@@ -30,29 +30,54 @@ export const register = async (req, res) => {
     Dosha,
     Experience,
   } = req.body;
+
   try {
     if (!Name || !Age || !Password || !Gender) {
       return res.status(400).json({
         message: "Required fields missing",
       });
     }
-     const file=req.file;
+
+    const files = req.files || [];
+
+    const profileImageFile = files.find(
+      (file) => file.fieldname === "profileImage"
+    );
+
+    const certificateFile = files.find(
+      (file) => file.fieldname === "certificate"
+    );
+
 
     const nameExits = await User.findOne({ Name });
 
-
     if (nameExits) {
       return res.status(400).json({
-        message: "User already exits ",
+        message: "User already exists",
       });
     }
 
-    let certificateUrl=null;
-     if (file) {
-      const uploadResult = await uploadFileToCloudinary(file);
-        certificateUrl = uploadResult?.secure_url;
-    } 
-    const hashedPassword = await hash_Password(Password);
+    let profileImageUrl = null;
+
+    if (profileImageFile) {
+      const uploadResult =
+        await uploadFileToCloudinary(profileImageFile);
+
+      profileImageUrl = uploadResult?.secure_url;
+    }
+
+    let certificateUrl = null;
+
+    if (certificateFile) {
+      const uploadResult =
+        await uploadFileToCloudinary(certificateFile);
+
+      certificateUrl = uploadResult?.secure_url;
+    }
+
+    const hashedPassword =
+      await hash_Password(Password);
+
 
     let user = await User.create({
       Name,
@@ -63,57 +88,56 @@ export const register = async (req, res) => {
       Weight,
       Dosha,
       isDoctor,
+     Image_url: profileImageUrl, 
     });
 
     let doctorProfile = null;
 
     if (isDoctor === "true") {
-      console.log(Specialization);
-      if (!Specialization) {
+      if (!Specialization || !Experience) {
         return res.status(400).json({
-          message: "Specialization required for doctor",
+          message:
+            "Specialization & Experience required",
         });
       }
 
-       if (!Experience) {
-    return res.status(400).json({
-      message: "Experience required for doctor",
-    });
-  }
-
-  if (!certificateUrl) {
-    return res.status(400).json({
-      message: "Certificate upload required",
-    });
-  }
+      if (!certificateUrl) {
+        return res.status(400).json({
+          message: "Certificate required",
+        });
+      }
 
       doctorProfile = await Doctor.create({
-        User_id: user?._id,
+        User_id: user._id,
         Specialization,
-        Certificates:certificateUrl,
+        Certificates: certificateUrl,
         Experience,
       });
     }
 
+
     user = await User.findByIdAndUpdate(
-      user?._id,
+      user._id,
       { Doctor_id: doctorProfile?._id },
-      { new: true },
+      { new: true }
+    );
+    const token = jwtToken(
+      user?.id,
+      doctorProfile?._id
     );
 
-    const token = jwtToken(user?.id, doctorProfile?._id);
-   res.cookie("token", token, {
-  httpOnly: true,
-  secure: false,     
-  sameSite: "lax",   
-  maxAge: 1000 * 60 * 60 * 24 * 365,
-});
-
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 365,
+    });
 
     res.status(201).json({
       message: "Registration successful",
-         responseData:user
+      responseData: user,
     });
+
   } catch (error) {
     res.status(500).json({
       message: "Server error",
@@ -121,6 +145,7 @@ export const register = async (req, res) => {
     });
   }
 };
+
 
 export const login = async (req, res) => {
   try {
@@ -189,42 +214,76 @@ export const DoctorUpdateProfile = async (req, res) => {
     } = req.body;
 
     const doctor = req.user;
-    const user = await User.findOne({ Doctor_id: doctor.doctor_id }).populate({
+
+    const user = await User.findOne({
+      Doctor_id: doctor.doctor_id,
+    }).populate({
       path: "Doctor_id",
     });
 
-    const file = req.file;
-
     if (!user) {
-      return res.status(404).json({ message: "doctor not found" });
+      return res.status(404).json({
+        message: "Doctor not found",
+      });
     }
-    if (file) {
-      const uploadResult = await uploadFileToCloudinary(file);
+
+
+    const files = req.files || [];
+
+    const profileImageFile = files.find(
+      (file) => file.fieldname === "profileImage"
+    );
+
+    if (profileImageFile) {
+      const uploadResult =
+        await uploadFileToCloudinary(profileImageFile);
+
       user.Image_url = uploadResult?.secure_url;
     } else if (req.body.Image_url) {
       user.Image_url = req.body.Image_url;
     }
+
+
     if (Name) user.Name = Name;
     if (Email) user.Email = Email;
     if (PhoneNumber) user.PhoneNumber = PhoneNumber;
-    if (Experience) user.Doctor_id.Experience = Experience;
+
+    if (Experience)
+      user.Doctor_id.Experience = Experience;
+
     if (Bio) user.Doctor_id.Bio = Bio;
-    if (Specialization) user.Doctor_id.Specialization = Specialization;
-    if (Qualifications) user.Doctor_id.Qualifications = Qualifications;
-    if (Clinic_Name) user.Doctor_id.Clinic_Name = Clinic_Name;
-    if (Consultation) user.Doctor_id.Consultation = Consultation;
+
+    if (Specialization)
+      user.Doctor_id.Specialization =
+        Specialization;
+
+    if (Qualifications)
+      user.Doctor_id.Qualifications =
+        Qualifications;
+
+    if (Clinic_Name)
+      user.Doctor_id.Clinic_Name = Clinic_Name;
+
+    if (Consultation)
+      user.Doctor_id.Consultation =
+        Consultation;
 
     await user.save();
+    await user.Doctor_id.save(); 
 
     return res.status(200).json({
-      message: "user profile updated succesfully",
+      message: "User profile updated successfully",
       user,
     });
+
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({
+      message: error.message,
+    });
   }
 };
+
 
 export const PatientUpdateProfile = async (req, res) => {
   try {
@@ -381,6 +440,9 @@ export const updatePatientAppointment = async (req, res) => {
         new: true,
       },
     );
+
+
+
     return res.status(201).json({
       message: "Appointment Updated successfully",
       UpdatedAppointment,
@@ -752,6 +814,64 @@ export const getDoctorBookedSlots = async (req, res) => {
       success: false,
       message: "Server error",
       error: error.message,
+    });
+  }
+};
+
+export const  patient_appoinment_detail=async(req,res)=>{
+  try {
+   const patientId = req.user.userId;
+   if(!patientId){
+    return res.status(404).json({
+      message:"patient not found "
+    })
+   }
+
+   const appointment =await Appointment.find({Patient_id:patientId}).populate({
+  path: "Doctor_id",       
+  populate: {
+    path: "User_id",      
+  },
+});
+   return res.status(200).json({
+    success:true,
+     count: appointment.length,
+    appointment,
+   })
+  } catch (error) {
+     return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+}
+
+
+export const delete_appointment = async (req, res) => {
+ const id = req.params.id;
+
+  try {
+    const deletedAppointment = await Appointment.findByIdAndDelete(id);
+
+    if (!deletedAppointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found."
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Appointment deleted successfully.",
+      data: deletedAppointment
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while deleting the appointment.",
+      error: error.message
     });
   }
 };

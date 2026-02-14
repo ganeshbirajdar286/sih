@@ -1,10 +1,14 @@
 import { mongoose, Schema, Types } from "mongoose";
 
-const patientReport = new Schema(
+const Report = new Schema(
   {
     Patient_id: {
       type: Schema.Types.ObjectId,
       ref: "User",
+    },
+    Doctor_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Doctor",
     },
     Title: {
       type: String,
@@ -28,5 +32,5 @@ const patientReport = new Schema(
   { timestamps: true },
 );
 
-const PatientReport = mongoose.model("PatientReport", patientReport);
-export default PatientReport;
+const Reports = mongoose.model("Report", Report);
+export default Reports;

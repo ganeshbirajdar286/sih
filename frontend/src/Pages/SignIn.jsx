@@ -2,14 +2,18 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
-import { loginThunk } from "../feature/User/user.thunk";
+import { loginThunk,getDoshaStatusThunk } from "../feature/User/user.thunk";
 import toast from "react-hot-toast";
 
 const SignIn = () => {
-  const [Name, setName] = useState("");
+  const [Email, setEmail] = useState("");
   const [Password, setPassword] = useState("");
   const [role, setRole] = useState("patient");
-  const [isFocused, setIsFocused] = useState({ Name: false, password: false });
+  const [isFocused, setIsFocused] = useState({
+    email: false,
+    password: false,
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -23,41 +27,49 @@ const SignIn = () => {
   const handleBlur = (field) => setIsFocused({ ...isFocused, [field]: false });
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // ✅ Block submit if Remember Me not checked
-    if (!acceptTerms) {
+  if (!acceptTerms) {
     toast.error("Please accept Terms & Conditions");
     return;
   }
 
-    try {
-      const response = await dispatch(
-        loginThunk({
-          Name: Name,
-          Password: Password,
-        }),
-      ).unwrap(); // ✅ get real payload
+  try {
+    setIsLoading(true);
 
-      console.log("Login response:", response);
+    const response = await dispatch(
+      loginThunk({
+        Email,
+        Password,
+      })
+    ).unwrap();
 
-      // ⏳ Optional loading delay
-      setTimeout(() => {
-        if (response.responseData.isDoctor) {
-          navigate("/doctor-dashboard");
-        } else {
-          navigate("/patient-dashboard");
-        }
-      }, 1000);
-    } catch (error) {
-      toast.error("login failed")
-      console.error("Login failed:", error);
+    const isDoctor =
+      response.responseData.isDoctor;
+
+    if (isDoctor) {
+      navigate("/doctor-dashboard");
+      return;
     }
-  };
+
+    const status = await dispatch(
+      getDoshaStatusThunk()
+    ).unwrap();
+
+    if (status.mustFill) {
+      navigate("/dosha-assessment");
+    } else {
+      navigate("/patient-dashboard");
+    }
+  } catch (error) {
+    toast.error("Login failed");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50/70 via-amber-50/50 to-white px-4 relative overflow-hidden">
-      {/* Animated Background Elements */}
       <div className="absolute top-[10%] left-[5%] w-24 h-24 bg-emerald-200 rounded-full blur-3xl opacity-30 animate-float"></div>
       <div
         className="absolute top-[60%] left-[70%] w-32 h-32 bg-amber-200 rounded-full blur-3xl opacity-30 animate-float"
@@ -67,13 +79,8 @@ const SignIn = () => {
         className="absolute top-[20%] left-[80%] w-20 h-20 bg-green-200 rounded-full blur-3xl opacity-20 animate-float"
         style={{ animationDelay: "4s" }}
       ></div>
-
-      {/* Main Card */}
       <div className="relative w-full max-w-md bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
-        {/* Decorative top border */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-green-500 rounded-t-3xl"></div>
-
-        {/* Logo and Title */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg mb-4 transform transition-transform duration-500 hover:scale-105 hover:rotate-3 overflow-hidden rounded-full">
             <img src={logo} alt="logo" className="w-full h-full object-cover" />
@@ -85,42 +92,36 @@ const SignIn = () => {
             Sign in to continue your wellness journey
           </p>
         </div>
-
-        
-
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Username Field */}
           <div className="relative">
             <label
-              htmlFor="username"
+              htmlFor="email"
               className={`absolute left-4 transition-all duration-300 pointer-events-none ${
-                isFocused.Name || Name
+                isFocused.email || Email
                   ? "top-1 text-xs text-emerald-600 font-medium"
                   : "top-3 text-gray-500 text-sm"
               }`}
             >
-              Username
+              Email Address
             </label>
 
             <input
-              id="username"
-              type="text"
-              value={Name}
-              onFocus={() => handleFocus("username")}
-              onBlur={() => handleBlur("username")}
-              onChange={(e) => setName(e.target.value)}
+              id="email"
+              type="email"
+              value={Email}
+              onFocus={() => handleFocus("email")}
+              onBlur={() => handleBlur("email")}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full pt-6 pb-2 px-4 border-0 border-b-2 border-gray-200 focus:border-emerald-500 focus:ring-0 outline-none transition-all duration-300 bg-white/90 text-gray-800 rounded-none"
               required
             />
           </div>
 
-          {/* Password Field */}
           <div className="relative">
             <label
               htmlFor="password"
               className={`absolute left-4 transition-all duration-300 pointer-events-none ${
-                isFocused.Password||Password
+                isFocused.Password || Password
                   ? "top-1 text-xs text-emerald-600 font-medium"
                   : "top-3 text-gray-500 text-sm"
               }`}
@@ -182,47 +183,45 @@ const SignIn = () => {
           </div>
 
           <div className="flex justify-between items-center text-sm">
-  <label className="flex items-center cursor-pointer">
-    <div className="relative">
-      <input
-        type="checkbox"
-        className="sr-only peer"
-        id="accept-terms"
-        checked={acceptTerms}
-        onChange={(e) => setAcceptTerms(e.target.checked)}
-      />
+            <label className="flex items-center cursor-pointer">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  id="accept-terms"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                />
 
-      <div className="w-4 h-4 border border-gray-300 rounded-sm bg-white flex items-center justify-center peer-checked:bg-emerald-600 peer-checked:border-emerald-600">
-        <svg
-          className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-      </div>
-    </div>
+                <div className="w-4 h-4 border border-gray-300 rounded-sm bg-white flex items-center justify-center peer-checked:bg-emerald-600 peer-checked:border-emerald-600">
+                  <svg
+                    className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+              </div>
 
-    <span className="ml-2 text-gray-600 select-none">
-      I accept all{" "}
-      <a
-        href="/terms"
-        className="text-emerald-600 font-medium underline"
-      >
-        Terms & Conditions
-      </a>
-    </span>
-  </label>
-</div>
+              <span className="ml-2 text-gray-600 select-none">
+                I accept all{" "}
+                <a
+                  href="/terms"
+                  className="text-emerald-600 font-medium underline"
+                >
+                  Terms & Conditions
+                </a>
+              </span>
+            </label>
+          </div>
 
-
-          {/* Submit & Demo Buttons */}
           <button
             type="submit"
             disabled={isLoading}
@@ -256,17 +255,14 @@ const SignIn = () => {
               "Sign In"
             )}
           </button>
-
         </form>
 
-        {/* Divider */}
         <div className="flex items-center my-6">
           <div className="flex-grow border-t border-gray-200"></div>
           <span className="mx-4 text-gray-400 text-sm">or continue with</span>
           <div className="flex-grow border-t border-gray-200"></div>
         </div>
 
-        {/* Social Sign-in */}
         <button className="w-full cursor-pointer py-3 flex justify-center items-center bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors font-medium text-gray-700">
           <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
             <path
@@ -288,8 +284,6 @@ const SignIn = () => {
           </svg>
           Continue with Google
         </button>
-
-        {/* Extra Links */}
         <p className="text-center text-sm text-gray-600 mt-6">
           Don't have an account?{" "}
           <a
@@ -301,7 +295,6 @@ const SignIn = () => {
         </p>
       </div>
 
-      {/* Animation Styles */}
       <style jsx>{`
         @keyframes float {
           0%,

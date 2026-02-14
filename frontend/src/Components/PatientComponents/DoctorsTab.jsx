@@ -16,7 +16,6 @@ import {
 import { doctor } from "../../feature/Patient/patient.thunk";
 import { useNavigate } from "react-router-dom";
 
-// Specialty options for filtering - updated to match your API data
 const specialties = [
   "All Specialties",
   "Oncologist",
@@ -221,7 +220,8 @@ export default function DoctorsTab() {
               <div className="p-4 sm:p-6">
                 <div className="flex items-start">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xl sm:text-2xl font-bold mr-3 sm:mr-4 flex-shrink-0">
-                    {doc.User_id?.Name?.charAt(0).toUpperCase() || "D"}
+                    {doc.User_id?.Image_url!==null?(<img src={doc.User_id?.Image_url} alt="profile"
+    className="w-full h-full object-cover rounded-2xl"/>):(doc.User_id?.Name?.charAt(0).toUpperCase() || "D")}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-base sm:text-lg truncate">

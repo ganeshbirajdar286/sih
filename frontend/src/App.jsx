@@ -17,6 +17,7 @@ import "./index.css";
 import DoctorsTab from "./Components/PatientComponents/DoctorsTab.jsx";
 import RescheduleAppointment from "./Components/PatientComponents/RescheduleAppointment.jsx";
 import Appointments from "./Components/PatientDashboard/Appointment.jsx";
+import PrakritiVikritiForm from "./Components/PatientDashboard/DoshaPatientForm.jsx";
 
 function App() {
   const { isAuthenticated, isDoctor } = useSelector((state) => state.user);
@@ -60,6 +61,15 @@ function App() {
               <DoctorProfile />
             </ProtectedRoute>
           }
+        />
+        <Route
+          path="/dosha-assessment"
+          element={
+            <ProtectedRoute>
+              < PrakritiVikritiForm/>
+            </ProtectedRoute>
+          }
+        
         />
      <Route
      path="/doctor"

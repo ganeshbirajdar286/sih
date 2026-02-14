@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { type } from "node:os";
 
 const mealSchema = new Schema(
   {
@@ -22,19 +23,9 @@ const mealSchema = new Schema(
       kapha: String,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
-const weeklyPlanSchema = new Schema(
-  {
-    day: Number,
-
-    breakfast: mealSchema,
-    lunch: mealSchema,
-    dinner: mealSchema,
-  },
-  { _id: false }
-);
 
 const dietChartSchema = new Schema(
   {
@@ -49,34 +40,23 @@ const dietChartSchema = new Schema(
       ref: "Doctor",
       required: true,
     },
-
-    // 🧾 Duration
     duration_days: Number,
-
-    // 👤 Patient Snapshot
-    patient: {
-      name: String,
-      age: Number,
-      gender: String,
-      dosha: String,
-    },
-
-    // 🧘 Lifestyle
     lifestyle: {
       Meal_Frequency: String,
       Bowel_Movement: String,
       Water_Intake: String,
     },
 
-    // 📅 Weekly Plan
-    weekly_plan: [weeklyPlanSchema],
-
-    // 📝 Doctor / AI Note
+    daily_plan: {
+      breakfast: mealSchema,
+      lunch: mealSchema,
+      dinner: mealSchema,
+    },
     note: String,
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const DietChart = mongoose.model("DietChart", dietChartSchema);

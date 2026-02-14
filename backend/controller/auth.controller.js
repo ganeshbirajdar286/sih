@@ -601,85 +601,65 @@ async function generateDiet(state) {
 
   const userPrompt = state.messages.at(-1).content;
 
-  const prompt = `
+ const prompt = `
 You are an Ayurvedic diet expert doctor.
 
-Generate a STRICT JSON Ayurvedic diet chart.
+Generate STRICT and MINIMAL JSON diet chart.
 
 Patient Details:
 ${userPrompt}
 
-Diet Duration: 90 days
+Rules:
+- Create ONLY ONE daily_plan.
+- This same plan will be followed for 90 days.
+- Keep everything concise.
+- Use short phrases only.
+- No long explanations.
+- Ingredients max 5.
+- Instructions max 12 words.
+- Keep nutrition values realistic numbers.
+- Keep ayurveda_effects one-word or two-word only.
 
-Diet Planning Rule:
-- Create ONLY ONE WEEK diet plan (7 days).
-- This weekly diet will be followed repeatedly for 90 days.
-- Do NOT generate 90 separate days.
-- Provide Indian Ayurvedic meals.
-- Balance patient's dosha.
-
-Meals per day:
-- breakfast
-- lunch
-- dinner
-
-For EACH meal include:
-- recipe_name
-- ingredients (array)
-- instructions (string)
-- nutrition:
-    - calories
-    - protein_g
-    - carbs_g
-    - fat_g
-    - fiber_g
-- ayurveda_effects:
-    - vata
-    - pitta
-    - kapha
-
-Lifestyle (common for full 90 days):
-- Meal_Frequency
-- Bowel_Movement
-- Water_Intake
-
-Return JSON in this EXACT structure:
+Return JSON in EXACT structure:
 
 {
   "duration_days": 90,
-
-  "patient": {
-    "name": "",
-    "age": 0,
-    "gender": "",
-    "dosha": ""
-  },
-
   "lifestyle": {
     "Meal_Frequency": "",
     "Bowel_Movement": "",
     "Water_Intake": ""
   },
-
-  "weekly_plan": [
-    {
-      "day": 1,
-      "breakfast": {},
-      "lunch": {},
-      "dinner": {}
-    }
-  ],
-
+  "daily_plan": {
+    "breakfast": {
+      "recipe_name": "",
+      "ingredients": [],
+      "instructions": "",
+      "nutrition": {
+        "calories": 0,
+        "protein_g": 0,
+        "carbs_g": 0,
+        "fat_g": 0,
+        "fiber_g": 0
+      },
+      "ayurveda_effects": {
+        "vata": "",
+        "pitta": "",
+        "kapha": ""
+      }
+    },
+    "lunch": {},
+    "dinner": {}
+  },
   "note": ""
 }
 
-Rules:
-- weekly_plan must contain EXACTLY 7 days.
-- day must be 1 → 7.
-- No extra text.
+Important:
 - No markdown.
 - No comments.
+- No extra text.
 - No trailing commas.
+- Keep response under 1000 words.
+- Ensure JSON is complete and closed.
 
 Return ONLY valid JSON.
 `;
@@ -763,7 +743,8 @@ Generate 90 days Ayurvedic diet chart JSON.
 
       lifestyle: json.lifestyle,
 
-      weekly_plan: json.weekly_plan,
+      daily_plan: json.daily_plan,
+
 
       note: json.note,
     });
@@ -1007,4 +988,25 @@ export const getdosha=async(req,res)=>{
   }
 }
 
+export const patient=async(req,res)=>{
+  try {
+    const user= req.user.userId;
+    if(!user){
+      return res.status(400).json({
+        message:"Patient not found"
+      })
+    }
+    const patient=await User.find({_id:user});
+
+    return res.status(200).json({
+      success:true,
+      patient
+    })
+
+  } catch (error) {
+    res.status(500).json({
+      error: err.message,
+    });
+  }
+}
 

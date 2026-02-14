@@ -20,7 +20,8 @@ import {
   updatePatientAppointment,
   getDoshaStatus,
    submitDosha,
-   getdosha
+   getdosha,
+   patient
 } from "../controller/auth.controller.js";
 import { isLogin } from "../middleware/auth.middleware.js";
 import { multerMiddleWare } from "../config/cloudinary.config.js";
@@ -43,6 +44,7 @@ router.post(
 router.get("/patient/doctor", isLogin, alldoctor);
 router.get("/patient/singledoctor/:id", isLogin, getSingleDoctor);
 router.get("/patient/appointments/:id", isLogin, getDoctorBookedSlots);
+router.get("/patient",isLogin,patient);
 router.get("/patient/schedule", isLogin, patient_appoinment_detail);
 router.get("/patient/getreport",isLogin,getReport)
 router.get("/patient/getdosha",isLogin,getdosha)

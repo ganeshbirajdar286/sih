@@ -45,21 +45,25 @@ const userSchema=new Schema({
      Medical_records: [
       {
         type: Schema.Types.ObjectId,
-        ref: "PatientRecord",
+        ref: "Report",
       },
     ],
     Doctor_id:{
       type:Schema.Types.ObjectId,
        ref:"Doctor"
     },
-    Dosha:{
-      type:String,
-      default:null,
-    },
     isDoctor:{
       type:Boolean,
       default:false,
     },
+    lastFilledAt: {
+      type: Date,
+      default: null,
+    },
+    Dosha:{
+       type:Schema.Types.ObjectId,
+       ref:"Dosha"
+    }
 },{timestamps:true});
 
 const User=mongoose.model("User",userSchema);

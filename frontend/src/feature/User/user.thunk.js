@@ -2,10 +2,10 @@ import { axiosInstance } from "../../axios/url.axios";
 import { createAsyncThunk,  } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 
-export const loginThunk=createAsyncThunk("users/login",async({Name,Password},{rejectWithValue})=>{
+export const loginThunk=createAsyncThunk("users/login",async({ Email,Password},{rejectWithValue})=>{
     try {
         const response=await axiosInstance.post("/login",{
-            Name,Password
+            Email,Password
         })
           toast.success('Successfully login!');
      return response.data
@@ -26,19 +26,15 @@ export const registerThunk = createAsyncThunk(
       
       formData.append("Name", userData.Name);
       formData.append("Password", userData.Password);
+      formData.append("Email",userData.Email);
       formData.append("Age", userData.Age);
       formData.append("Height", userData.Height);
       formData.append("Weight", userData.Weight);
       formData.append("Gender", userData.Gender);
-      formData.append("Dosha", userData.Dosha);
       formData.append("isDoctor", userData.isDoctor);
-      
-      // Append profile image if exists
       if (userData.profileImage) {
         formData.append("profileImage", userData.profileImage);
       }
-      
-      // Append doctor-specific fields if doctor
       if (userData.isDoctor) {
         formData.append("Specialization", userData.Specialization);
         formData.append("Experience", userData.Experience);
@@ -78,3 +74,31 @@ export const registerThunk = createAsyncThunk(
     return true;
   }
 );
+
+export const getDoshaStatusThunk=createAsyncThunk(
+  "user/getDoshaStatusThunk",async(_,{rejectWithValue})=>{
+    try {
+      const response=await axiosInstance.get("/status");
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(
+        error.response?.data?.message || error.message
+      );
+    }
+  }
+)
+
+export const submitDoshaThunk=createAsyncThunk(
+  "user/submitDoshaThunk",async(payload,{rejectWithValue})=>{
+    try {
+      const response=await axiosInstance.post("/submit",payload);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(
+        error.response?.data?.message || error.message
+      );
+    }
+  }
+)

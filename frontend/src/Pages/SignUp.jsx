@@ -12,12 +12,12 @@ const SignUp = () => {
   const [formData, setFormData] = useState({
     name: "",
     age: "",
+    email: "",
     password: "",
     confirmPassword: "",
     gender: "",
     height: "",
     weight: "",
-    dosha: "",
     isDoctor: false,
     specialization: "",
     experience: "",
@@ -30,13 +30,13 @@ const SignUp = () => {
   const [isFocused, setIsFocused] = useState({
     name: false,
     age: false,
+    email: false,
     password: false,
     confirmPassword: false,
     gender: false,
     height: false,
     weight: false,
-    dosha: false,
-    experience: false,
+   experience: false,
   });
 
   const [showPassword, setShowPassword] = useState({
@@ -74,14 +74,7 @@ const SignUp = () => {
     "Colorectal surgeon",
   ];
 
-  const doshaOptions = [
-    "Vata",
-    "Pitta",
-    "Kapha",
-    "Vata-Pitta",
-    "Pitta-Kapha",
-    "Vata-Kapha",
-  ];
+
   const genderOptions = ["Male", "Female", "Other"];
 
   const handleFocus = (field) => setIsFocused({ ...isFocused, [field]: true });
@@ -89,25 +82,21 @@ const SignUp = () => {
   const handleChange = (field, value) =>
     setFormData({ ...formData, [field]: value });
 
-
   const handleProfileImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please upload an image file');
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please upload an image file");
         return;
       }
-      
-      
+
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size should be less than 5MB');
+        toast.error("Image size should be less than 5MB");
         return;
       }
 
       setFormData({ ...formData, profileImage: file });
-      
-      
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileImagePreview(reader.result);
@@ -151,12 +140,12 @@ const SignUp = () => {
           Height: formData.height,
           Weight: formData.weight,
           Gender: formData.gender,
-          Dosha: formData.dosha,
           isDoctor: formData.isDoctor,
           Specialization: formData.specialization,
           Experience: formData.experience,
           profileImage: formData.profileImage,
           certificate: formData.certificate,
+          Email:formData.email
         }),
       ).unwrap();
 
@@ -184,7 +173,6 @@ const SignUp = () => {
         className="absolute top-[20%] left-[80%] w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-green-200 rounded-full blur-3xl opacity-20 animate-float"
         style={{ animationDelay: "4s" }}
       ></div>
-
       {/* Card */}
       <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl bg-white/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 border border-white/20">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-green-500 rounded-t-2xl sm:rounded-t-3xl"></div>
@@ -238,7 +226,7 @@ const SignUp = () => {
                   </div>
                 )}
               </div>
-              
+
               {/* Camera Icon Button */}
               <label
                 htmlFor="profileImage"
@@ -266,7 +254,9 @@ const SignUp = () => {
               )}
             </div>
             <p className="text-xs sm:text-sm text-gray-500 mt-3 text-center">
-              {profileImagePreview ? 'Click camera icon to change' : 'Click camera icon to upload profile picture'}
+              {profileImagePreview
+                ? "Click camera icon to change"
+                : "Click camera icon to upload profile picture"}
             </p>
           </div>
 
@@ -283,6 +273,28 @@ const SignUp = () => {
               onFocus={() => handleFocus("name")}
               onBlur={() => handleBlur("name")}
               onChange={(e) => handleChange("name", e.target.value)}
+              className="w-full pt-5 sm:pt-6 pb-1.5 sm:pb-2 px-3 sm:px-4 border-0 border-b-2 border-gray-200 focus:border-emerald-500 outline-none bg-white/90 text-gray-800 text-sm sm:text-base rounded-none"
+              required
+            />
+          </div>
+          {/* Email */}
+          <div className="relative">
+            <label
+              className={`absolute left-3 sm:left-4 transition-all duration-300 pointer-events-none ${
+                isFocused.email || formData.email
+                  ? "top-0.5 sm:top-1 text-[10px] sm:text-xs text-emerald-600 font-medium"
+                  : "top-2.5 sm:top-3 text-gray-500 text-xs sm:text-sm"
+              }`}
+            >
+              Email Address
+            </label>
+
+            <input
+              type="email"
+              value={formData.email}
+              onFocus={() => handleFocus("email")}
+              onBlur={() => handleBlur("email")}
+              onChange={(e) => handleChange("email", e.target.value)}
               className="w-full pt-5 sm:pt-6 pb-1.5 sm:pb-2 px-3 sm:px-4 border-0 border-b-2 border-gray-200 focus:border-emerald-500 outline-none bg-white/90 text-gray-800 text-sm sm:text-base rounded-none"
               required
             />
@@ -428,31 +440,7 @@ const SignUp = () => {
             />
           </div>
 
-          {/* Dosha */}
-          <div className="relative">
-            <label
-              htmlFor="dosha"
-              className="absolute left-3 sm:left-4 transition-all duration-300 pointer-events-none top-0.5 sm:top-1 text-[10px] sm:text-xs text-emerald-600 font-medium"
-            >
-              Dosha
-            </label>
-            <select
-              id="dosha"
-              value={formData.dosha}
-              onChange={(e) => handleChange("dosha", e.target.value)}
-              className="w-full pt-5 sm:pt-6 pb-1.5 sm:pb-2 px-3 sm:px-4 border-0 border-b-2 border-gray-200 focus:border-emerald-500 outline-none bg-white/90 text-gray-800 text-sm sm:text-base rounded-none"
-              required
-            >
-              <option value="" disabled>
-                Select your dosha
-              </option>
-              {doshaOptions.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-          </div>
+    
 
           {/* Doctor-only Fields */}
           {formData.isDoctor && (
@@ -547,60 +535,57 @@ const SignUp = () => {
             </div>
           )}
 
-         {/* Terms & Submit */}
-<div className="flex flex-col gap-2 sm:gap-3 mt-6 sm:mt-8">
+          {/* Terms & Submit */}
+          <div className="flex flex-col gap-2 sm:gap-3 mt-6 sm:mt-8">
+            <label className="flex items-center cursor-pointer text-xs sm:text-sm">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  checked={termsChecked}
+                  onChange={(e) => setTermsChecked(e.target.checked)}
+                  className="peer sr-only"
+                />
 
-  <label className="flex items-center cursor-pointer text-xs sm:text-sm">
-    <div className="relative">
-      <input
-        type="checkbox"
-        checked={termsChecked}
-        onChange={(e) => setTermsChecked(e.target.checked)}
-        className="peer sr-only"
-      />
+                <div className="w-4 h-4 border border-gray-300 rounded flex items-center justify-center peer-checked:bg-emerald-600 peer-checked:border-emerald-600 transition-colors">
+                  <svg
+                    className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+              </div>
 
-      <div className="w-4 h-4 border border-gray-300 rounded flex items-center justify-center peer-checked:bg-emerald-600 peer-checked:border-emerald-600 transition-colors">
-        <svg
-          className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="3"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-      </div>
-    </div>
-
-    <span className="ml-2">
-      I accept the{" "}
-      <a
-        href="/terms"
-        className="text-emerald-600 font-medium hover:text-emerald-700"
-      >
-        Terms & Conditions
-      </a>
-    </span>
-  </label>   {/* ✅ LABEL CLOSED */}
-
-  {/* SUBMIT BUTTON */}
-  <button
-    type="submit"
-    disabled={isLoading}
-    className="w-full cursor-pointer py-2.5 sm:py-3 md:py-3.5 bg-gradient-to-r from-emerald-600 to-green-700 text-white font-semibold rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center disabled:opacity-75 disabled:cursor-not-allowed text-sm sm:text-base"
-  >
-    {isLoading ? "Signing up..." : "Sign Up"}
-  </button>
-
-</div>
-
+              <span className="ml-2">
+                I accept the{" "}
+                <a
+                  href="/terms"
+                  className="text-emerald-600 font-medium hover:text-emerald-700"
+                >
+                  Terms & Conditions
+                </a>
+              </span>
+            </label>{" "}
+            {/* ✅ LABEL CLOSED */}
+            {/* SUBMIT BUTTON */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full cursor-pointer py-2.5 sm:py-3 md:py-3.5 bg-gradient-to-r from-emerald-600 to-green-700 text-white font-semibold rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center disabled:opacity-75 disabled:cursor-not-allowed text-sm sm:text-base"
+            >
+              {isLoading ? "Signing up..." : "Sign Up"}
+            </button>
+          </div>
         </form>
 
-         {/* Extra Links */}
+        {/* Extra Links */}
         <p className="text-center text-xs sm:text-sm text-gray-600 mt-4 sm:mt-6">
           Already have an account?{" "}
           <a
@@ -610,9 +595,8 @@ const SignUp = () => {
             Sign In
           </a>
         </p>
-
-      </div>   {/* ✅ CLOSE CARD DIV */}
-
+      </div>{" "}
+      {/* ✅ CLOSE CARD DIV */}
       {/* Floating animation */}
       <style>{`
         @keyframes float {
@@ -623,8 +607,7 @@ const SignUp = () => {
           animation: float 8s ease-in-out infinite;
         }
       `}</style>
-
-    </div>  
+    </div>
   );
 };
 

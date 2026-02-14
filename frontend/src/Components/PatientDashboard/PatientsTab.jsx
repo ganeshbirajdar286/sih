@@ -33,10 +33,7 @@ export default function PatientsTab() {
         
         {/* LEFT */}
         <div className="flex flex-col gap-6">
-          <PrakritiSnapshot
-            prakriti={patientData.prakriti}
-            vikriti={patientData.vikriti}
-          />
+          <PrakritiSnapshot/>
           <Alerts alerts={patientData.alerts} />
           <LifestyleLog log={patientData.lifestyleLog} />
         </div>

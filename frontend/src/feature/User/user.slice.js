@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { loginThunk, logoutThunk, registerThunk } from "./user.thunk";
+import { loginThunk, logoutThunk, registerThunk,getDoshaStatusThunk,submitDoshaThunk  } from "./user.thunk";
 
 const userFromStorage = localStorage.getItem("user");
 
@@ -7,8 +7,9 @@ const initialState = {
   isAuthenticated: !!userFromStorage,
   userProfile: userFromStorage ? JSON.parse(userFromStorage) : null,
   isDoctor: userFromStorage ? JSON.parse(userFromStorage).isDoctor : null,
-
+  mustFill:false,
   ButtonLoading: false,
+   doshaData: null, 
 };
 
 const userSlice = createSlice({
@@ -76,6 +77,36 @@ const userSlice = createSlice({
       state.ButtonLoading = true;
     });
     builder.addCase(logoutThunk.rejected, (state, action) => {
+      console.log("rejected");
+      state.ButtonLoading = false;
+    });
+
+//getDoshaStatusThunk
+     builder.addCase(getDoshaStatusThunk.fulfilled, (state, action) => {
+      console.log("fulfilled");
+      state.ButtonLoading = false;
+      state.mustFill=action.payload.mustFill;
+    });
+    builder.addCase(getDoshaStatusThunk.pending, (state, action) => {
+      console.log("pending");
+      state.ButtonLoading = true;
+    });
+    builder.addCase(getDoshaStatusThunk.rejected, (state, action) => {
+      console.log("rejected");
+      state.ButtonLoading = false;
+    });
+
+    //submitDoshaThunk
+     builder.addCase(submitDoshaThunk.fulfilled, (state, action) => {
+      console.log("fulfilled");
+      state.ButtonLoading = false;
+      state.doshaData=action.payload.data;
+    });
+    builder.addCase(submitDoshaThunk.pending, (state, action) => {
+      console.log("pending");
+      state.ButtonLoading = true;
+    });
+    builder.addCase(submitDoshaThunk.rejected, (state, action) => {
       console.log("rejected");
       state.ButtonLoading = false;
     });

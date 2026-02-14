@@ -33,21 +33,21 @@ export const doctor = createAsyncThunk(
   },
 );
 
-export const delete_report = createAsyncThunk(
-  "patient/delete_report",
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.delete(`/patientreport/${id}`);
-      toast.success("report deleted successfully!!");
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(
-        toast.error("report not found "),
-        error.response?.data || error.message,
-      );
-    }
-  },
-);
+// export const delete_report = createAsyncThunk(
+//   "patient/delete_report",
+//   async (id, { rejectWithValue }) => {
+//     try {
+//       const response = await axiosInstance.delete(`/patientreport/${id}`);
+//       toast.success("report deleted successfully!!");
+//       return response.data;
+//     } catch (error) {
+//       return rejectWithValue(
+//         toast.error("report not found "),
+//         error.response?.data || error.message,
+//       );
+//     }
+//   },
+// );
 
 
 export const getSingleDoctor = createAsyncThunk(
@@ -179,4 +179,35 @@ export const Cancel_appointments=createAsyncThunk(
   }
 )
 
+export const getReport=createAsyncThunk(
+  "patient/getreport",async(_,{rejectWithValue})=>{
+    try {
+      const report =await axiosInstance.get("/patient/getreport");
+      return report.data;
+    } catch (error) {
+       console.error(error);
+
+      return rejectWithValue(
+        error.response?.data?.message ||
+        error.message
+      );
+    }
+  }
+)
+
+export const getDosha =createAsyncThunk(
+  "patient/getDosha",async(_,{rejectWithValue})=>{
+    try {
+      const response=await axiosInstance.get("/patient/getdosha");
+      return response.data
+    } catch (error) {
+       console.error(error);
+
+      return rejectWithValue(
+        error.response?.data?.message ||
+        error.message
+      );
+    }
+  }
+)
 

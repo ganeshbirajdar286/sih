@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaFilePdf,
   FaFileMedical,
@@ -12,92 +12,46 @@ import {
   FaPrint,
 } from "react-icons/fa";
 
+import { useDispatch, useSelector } from "react-redux";
+import { getReport } from "../../feature/Patient/patient.thunk";
+
 const Reports = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [selectedReport, setSelectedReport] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const medicalReports = [
-    {
-      id: 1,
-      type: "Lab Report",
-      title: "Complete Blood Count (CBC)",
-      date: "2023-06-15",
-      doctor: "Dr. Sarah Johnson",
+  const dispatch = useDispatch();
+
+  const { medicalreport, loading } = useSelector((state) => state.patient);
+
+  useEffect(() => {
+    dispatch(getReport());
+  }, [dispatch]);
+
+  const medicalReports =
+    medicalreport?.[0]?.Medical_records?.map((rep) => ({
+      id: rep._id,
+      type: rep.Category,
+      title: rep.Title,
+      date: rep.Report_date,
+
+      // ✅ FIXED DOCTOR NAME
+      doctor:
+        rep.Doctor_id?.User_id?.Name ||
+        rep.Doctor_id?.Specialization ||
+        "Doctor",
+
+      doctorImage: rep.Doctor_id?.User_id?.Image_url,
+
       status: "completed",
-      description: "Complete blood count with differential",
-      tags: ["Lab", "Blood Work", "Routine"],
+      description: rep.Title,
+      tags: [rep.Category],
       fileType: "pdf",
-      fileSize: "2.4 MB",
+      fileSize: "Report File",
       previewAvailable: true,
-    },
-    {
-      id: 2,
-      type: "Imaging Report",
-      title: "Chest X-Ray Results",
-      date: "2023-06-10",
-      doctor: "Dr. Michael Chen",
-      status: "completed",
-      description: "X-ray of chest PA and lateral views",
-      tags: ["X-Ray", "Radiology"],
-      fileType: "pdf",
-      fileSize: "3.1 MB",
-      previewAvailable: true,
-    },
-    {
-      id: 3,
-      type: "Pathology Report",
-      title: "Biopsy Results - Skin Lesion",
-      date: "2023-05-28",
-      doctor: "Dr. Emily Rodriguez",
-      status: "completed",
-      description: "Pathology report for skin lesion biopsy",
-      tags: ["Biopsy", "Dermatology"],
-      fileType: "pdf",
-      fileSize: "1.8 MB",
-      previewAvailable: true,
-    },
-    {
-      id: 4,
-      type: "Diagnostic Report",
-      title: "ECG Interpretation",
-      date: "2023-05-20",
-      doctor: "Dr. James Wilson",
-      status: "completed",
-      description: "Electrocardiogram report and analysis",
-      tags: ["Cardiology", "ECG"],
-      fileType: "pdf",
-      fileSize: "1.2 MB",
-      previewAvailable: false,
-    },
-    {
-      id: 5,
-      type: "Annual Physical",
-      title: "Annual Health Checkup Summary",
-      date: "2023-05-05",
-      doctor: "Dr. Robert Brown",
-      status: "completed",
-      description: "Comprehensive annual physical exam results",
-      tags: ["Preventive", "Checkup"],
-      fileType: "pdf",
-      fileSize: "4.2 MB",
-      previewAvailable: true,
-    },
-    {
-      id: 6,
-      type: "Specialist Report",
-      title: "Orthopedic Consultation",
-      date: "2023-04-22",
-      doctor: "Dr. Lisa Anderson",
-      status: "completed",
-      description: "Orthopedic evaluation for knee pain",
-      tags: ["Orthopedics", "Consultation"],
-      fileType: "pdf",
-      fileSize: "2.7 MB",
-      previewAvailable: true,
-    },
-  ];
+      fileUrl: rep.File_url,
+    })) || [];
 
   const reportTypes = [
     {
@@ -110,30 +64,36 @@ const Reports = () => {
       id: "lab",
       name: "Lab Reports",
       icon: <FaFileMedical />,
-      count: medicalReports.filter((r) => r.type === "Lab Report").length,
+      count: medicalReports.filter((r) => r.type?.toLowerCase().includes("lab"))
+        .length,
     },
     {
       id: "imaging",
       name: "Imaging",
       icon: <FaFileMedical />,
-      count: medicalReports.filter((r) => r.type === "Imaging Report").length,
+      count: medicalReports.filter((r) =>
+        r.type?.toLowerCase().includes("imaging"),
+      ).length,
     },
     {
       id: "diagnostic",
       name: "Diagnostic",
       icon: <FaChartLine />,
-      count: medicalReports.filter((r) => r.type === "Diagnostic Report")
-        .length,
+      count: medicalReports.filter((r) =>
+        r.type?.toLowerCase().includes("diagnostic"),
+      ).length,
     },
   ];
 
   const filteredReports = medicalReports
     .filter((report) => {
       if (activeTab === "all") return true;
-      if (activeTab === "lab") return report.type === "Lab Report";
-      if (activeTab === "imaging") return report.type === "Imaging Report";
+      if (activeTab === "lab")
+        return report.type?.toLowerCase().includes("lab");
+      if (activeTab === "imaging")
+        return report.type?.toLowerCase().includes("imaging");
       if (activeTab === "diagnostic")
-        return report.type === "Diagnostic Report";
+        return report.type?.toLowerCase().includes("diagnostic");
       return true;
     })
     .filter(
@@ -142,24 +102,18 @@ const Reports = () => {
         report.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         report.doctor.toLowerCase().includes(searchTerm.toLowerCase()) ||
         report.tags.some((tag) =>
-          tag.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+          tag.toLowerCase().includes(searchTerm.toLowerCase()),
+        ),
     );
 
   const getTypeIcon = (type) => {
     switch (type) {
-      case "Lab Report":
+      case "Lab Reports":
         return <FaFileMedical className="text-blue-500" />;
-      case "Imaging Report":
+      case "Imaging":
         return <FaFileMedical className="text-purple-500" />;
-      case "Pathology Report":
-        return <FaFileMedical className="text-red-500" />;
-      case "Diagnostic Report":
+      case "Diagnostic":
         return <FaChartLine className="text-yellow-500" />;
-      case "Annual Physical":
-        return <FaFileMedical className="text-green-500" />;
-      case "Specialist Report":
-        return <FaFileMedical className="text-indigo-500" />;
       default:
         return <FaFileMedical className="text-gray-500" />;
     }
@@ -186,10 +140,19 @@ const Reports = () => {
   const viewReport = (report) => setSelectedReport(report);
   const closeModal = () => setSelectedReport(null);
 
+
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading reports...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -199,12 +162,8 @@ const Reports = () => {
               Access and manage your medical test results and reports
             </p>
           </div>
-          <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 sm:py-3 px-3 sm:px-5 rounded-lg flex items-center justify-center sm:justify-start transition shadow-md hover:shadow-lg w-full sm:w-auto">
-            <FaFileMedical className="mr-2" /> Request Report
-          </button>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mb-8">
           {reportTypes.map((type) => (
             <div
@@ -227,46 +186,70 @@ const Reports = () => {
           ))}
         </div>
 
-        {/* Controls */}
-       <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                  {/* Tabs */}
-                  <div className="flex space-x-4 overflow-x-auto pb-2 whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                    {reportTypes.map((type) => (
-                      <button
-                        key={type.id}
-                        className={` cursor-pointer whitespace-nowrap pb-2 px-1 font-medium transition ${activeTab === type.id
-                            ? "text-green-700 border-b-2 border-green-700"
-                            : "text-gray-500 hover:text-green-600"
-                          }`}
-                        onClick={() => setActiveTab(type.id)}
-                      >
-                        {type.name}
-                      </button>
-                    ))}
-                  </div>
-      
-                  {/* Search and Filter */}
-                  <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 w-full">
-                    {/* Search */}
-                    <div className="relative w-full">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FaSearch className="text-gray-400" />
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="Search reports..."
-                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 w-full"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-      
+        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="flex space-x-6 overflow-x-auto pb-2 whitespace-nowrap">
+              <button
+                className={`pb-2 px-1 font-medium transition ${
+                  activeTab === "all"
+                    ? "text-green-700 border-b-2 border-green-700"
+                    : "text-gray-500 hover:text-green-600"
+                }`}
+                onClick={() => setActiveTab("all")}
+              >
+                All Reports
+              </button>
 
-        {/* Reports List */}
+              <button
+                className={`pb-2 px-1 font-medium transition ${
+                  activeTab === "lab"
+                    ? "text-green-700 border-b-2 border-green-700"
+                    : "text-gray-500 hover:text-green-600"
+                }`}
+                onClick={() => setActiveTab("lab")}
+              >
+                Lab Reports
+              </button>
+
+              <button
+                className={`pb-2 px-1 font-medium transition ${
+                  activeTab === "imaging"
+                    ? "text-green-700 border-b-2 border-green-700"
+                    : "text-gray-500 hover:text-green-600"
+                }`}
+                onClick={() => setActiveTab("imaging")}
+              >
+                Imaging
+              </button>
+
+              <button
+                className={`pb-2 px-1 font-medium transition ${
+                  activeTab === "diagnostic"
+                    ? "text-green-700 border-b-2 border-green-700"
+                    : "text-gray-500 hover:text-green-600"
+                }`}
+                onClick={() => setActiveTab("diagnostic")}
+              >
+                Diagnostic
+              </button>
+            </div>
+
+            <div className="relative w-full">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch className="text-gray-400" />
+              </div>
+
+              <input
+                type="text"
+                placeholder="Search reports..."
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 w-full"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 gap-6">
           {filteredReports.length > 0 ? (
             filteredReports.map((report) => (
@@ -274,23 +257,40 @@ const Reports = () => {
                 key={report.id}
                 className="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden"
               >
-                <div className="p-4 sm:p-6 flex flex-col sm:flex-row justify-between">
+                <div className="p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-start gap-4">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 bg-green-100 p-3 rounded-lg">
                       <div className="text-xl">{getTypeIcon(report.type)}</div>
                     </div>
+
                     <div>
                       <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
                         {report.title}
                       </h3>
-                      <p className="text-gray-600 text-sm sm:text-base">
-                        {report.type} • {report.doctor}
+
+                      <div className="flex items-center text-gray-600 text-sm sm:text-base gap-2 mt-1">
+                        <span>{report.type}</span>
+
+                        <span>•</span>
+
+                        <img
+                          src={
+                            report.doctorImage ||
+                            "https://ui-avatars.com/api/?name=Doctor"
+                          }
+                          alt="doctor"
+                          className="w-6 h-6 rounded-full object-cover"
+                        />
+
+                        <span>{report.doctor}</span>
+                      </div>
+
+                      <p className="text-gray-700 mt-1 text-sm">
+                        context:{report.description}
                       </p>
-                      <p className="text-gray-700 mt-2 text-xs sm:text-sm">
-                        {report.description}
-                      </p>
+
                       <div className="flex flex-wrap gap-2 mt-2">
-                        {report.tags.map((tag) => (
+                        {report.tags?.map((tag) => (
                           <span
                             key={tag}
                             className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
@@ -302,34 +302,33 @@ const Reports = () => {
                     </div>
                   </div>
 
-                  <div className="mt-4 sm:mt-0 flex flex-col justify-between items-end gap-2 sm:gap-4">
-                    <span
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                        report.status
-                      )}`}
-                    >
-                      {report.status.charAt(0).toUpperCase() +
-                        report.status.slice(1)}
+                  <div className="flex flex-col items-end gap-4 w-full sm:w-auto">
+                    <span className="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-medium capitalize">
+                      {report.status}
                     </span>
-                    <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
-                      <div className="flex items-center text-sm text-gray-500">
-                        <FaCalendarAlt className="mr-2" />{" "}
+
+                    <div className="flex items-center text-sm text-gray-500 gap-4 flex-wrap justify-end">
+                      <div className="flex items-center">
+                        <FaCalendarAlt className="mr-2 text-gray-400" />
                         {formatDate(report.date)}
-                        <span className="mx-2">•</span>
-                        <FaFilePdf className="mr-1 text-red-500" />{" "}
-                        {report.fileSize}
                       </div>
-                      <div className="flex space-x-2">
-                        <button
-                          className=" cursor-pointer p-2 text-gray-500 hover:text-green-600 rounded-lg hover:bg-green-50 transition"
-                          onClick={() => viewReport(report)}
-                        >
-                          <FaEye />
-                        </button>
-                        <button className=" cursor-pointer p-2 text-gray-500 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition">
-                          <FaDownload />
-                        </button>
-                      </div>
+
+                      <button
+                        onClick={() => viewReport(report)}
+                        className="hover:text-green-600 transition cursor-pointer"
+                      >
+                        <FaEye />
+                      </button>
+
+                      <a
+                        href={report.fileUrl.replace(
+                          "/upload/",
+                          "/upload/fl_attachment/",
+                        )}
+                        className="hover:text-blue-600 transition"
+                      >
+                        <FaDownload />
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -337,134 +336,142 @@ const Reports = () => {
             ))
           ) : (
             <div className="col-span-2 text-center py-12 bg-white rounded-xl shadow-sm">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                <FaFileMedical className="text-3xl text-green-600" />
-              </div>
-              <h3 className="text-xl font-medium text-gray-600">
-                No reports found
-              </h3>
-              <p className="text-gray-500 mt-2">
-                No reports match your current filters.
-              </p>
-              <button
-                className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition"
-                onClick={() => {
-                  setActiveTab("all");
-                  setSearchTerm("");
-                }}
-              >
-                View All Reports
-              </button>
+              No reports found
             </div>
           )}
         </div>
+
+       {selectedReport && (
+  <div className="fixed inset-0 bg-black/40 flex items-start sm:items-center justify-center p-4 z-50 overflow-y-auto">
+
+    <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl max-h-full overflow-y-auto border border-green-100">
+
+      {/* Header */}
+      <div className="p-4 sm:p-6 border-b border-green-100 sticky top-0 bg-white z-10 flex justify-between items-center">
+        <h2 className="text-xl sm:text-2xl font-bold text-green-700">
+          {selectedReport.title}
+        </h2>
+
+        <button
+          className="text-gray-500 hover:text-green-600 text-2xl"
+          onClick={closeModal}
+        >
+          &times;
+        </button>
       </div>
 
-      {/* Report Modal */}
-      {selectedReport && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl max-h-full overflow-y-auto">
-            {/* Sticky Header */}
-            <div className="p-4 sm:p-6 border-b border-gray-200 sticky top-0 bg-white z-10 flex justify-between items-center">
-              <h2 className="text-xl sm:text-2xl font-bold">
-                {selectedReport.title}
-              </h2>
-              <button
-                className="text-gray-500 hover:text-gray-700 text-2xl"
-                onClick={closeModal}
-              >
-                &times;
-              </button>
-            </div>
+      {/* Body */}
+      <div className="p-4 sm:p-6 space-y-6">
 
-            <div className="p-4 sm:p-6 space-y-4">
-              <p className="text-gray-600 text-sm sm:text-base">
-                {selectedReport.type} • {selectedReport.doctor}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {selectedReport.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
+        {/* Top Info */}
+        <div>
+          <p className="text-gray-600 text-sm sm:text-base">
+            {selectedReport.type} • {selectedReport.doctor}
+          </p>
 
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-900 mb-2">
-                  Report Details
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm sm:text-base">
-                  <div>
-                    <span className="text-gray-600">Date:</span>{" "}
-                    <span className="ml-2">
-                      {formatDate(selectedReport.date)}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">File Type:</span>{" "}
-                    <span className="ml-2">
-                      {selectedReport.fileType.toUpperCase()}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">File Size:</span>{" "}
-                    <span className="ml-2">{selectedReport.fileSize}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Status:</span>{" "}
-                    <span
-                      className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                        selectedReport.status
-                      )}`}
-                    >
-                      {selectedReport.status}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-900 mb-2">
-                  Report Description
-                </h3>
-                <p className="text-gray-700">{selectedReport.description}</p>
-              </div>
-
-              <div className="bg-gray-800 text-white p-4 rounded-lg text-center">
-                <div className="flex flex-col sm:flex-row justify-center items-center mb-4 gap-4">
-                  <FaFilePdf className="text-4xl text-red-500" />
-                  <div>
-                    <p className="font-medium">
-                      This is a preview of your report
-                    </p>
-                    <p className="text-sm text-gray-300">
-                      The full report is available for download
-                    </p>
-                  </div>
-                </div>
-                <button className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center">
-                  <FaDownload className="mr-2" /> Download Full Report
-                </button>
-              </div>
-            </div>
-
-            <div className="p-4 sm:p-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
-              <button
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                onClick={closeModal}
-              >
-                Close
-              </button>
-              <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 inline-flex items-center">
-                <FaDownload className="mr-2" /> Download
-              </button>
-            </div>
+          <div className="flex items-center text-sm text-gray-500 mt-2">
+            <FaCalendarAlt className="mr-2 text-green-600" />
+            {formatDate(selectedReport.date)}
           </div>
         </div>
-      )}
+
+        {/* Report Details */}
+        <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+          <h3 className="font-medium text-green-800 mb-3">
+            Report Details
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm sm:text-base">
+
+            <div>
+              <span className="text-gray-600">File Type:</span>
+              <span className="ml-2 font-medium text-green-700">
+                PDF
+              </span>
+            </div>
+
+            <div>
+              <span className="text-gray-600">Status:</span>
+              <span className="ml-2 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Completed
+              </span>
+            </div>
+
+            <div>
+              <span className="text-gray-600">Category:</span>
+              <span className="ml-2 font-medium text-green-700">
+                {selectedReport.type}
+              </span>
+            </div>
+
+            <div>
+              <span className="text-gray-600">Doctor:</span>
+              <span className="ml-2 font-medium text-green-700">
+                {selectedReport.doctor}
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Preview Section */}
+        <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-6 rounded-lg text-center shadow-md">
+
+          <div className="flex flex-col sm:flex-row justify-center items-center mb-4 gap-4">
+            <FaFilePdf className="text-5xl text-white" />
+
+            <div>
+              <p className="font-medium text-lg">
+                Report Preview
+              </p>
+              <p className="text-sm text-green-100">
+                Click view to open full report
+              </p>
+            </div>
+          </div>
+
+          <a
+            href={selectedReport.fileUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="bg-white text-green-700 hover:bg-green-50 font-medium py-2 px-5 rounded-lg inline-flex items-center transition"
+          >
+            <FaEye className="mr-2" />
+            View Report
+          </a>
+
+        </div>
+
+      </div>
+
+      {/* Footer */}
+      <div className="p-4 sm:p-6 border-t border-green-100 flex flex-col sm:flex-row justify-end gap-3">
+
+        <button
+          className="px-4 py-2 border border-green-200 text-green-700 rounded-lg hover:bg-green-50 transition"
+          onClick={closeModal}
+        >
+          Close
+        </button>
+
+        <a
+          href={selectedReport.fileUrl.replace(
+            "/upload/",
+            "/upload/fl_attachment/"
+          )}
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 inline-flex items-center transition"
+        >
+          <FaDownload className="mr-2" />
+          Download
+        </a>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
+      </div>
     </div>
   );
 };

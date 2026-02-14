@@ -8,7 +8,8 @@ import {
   RescheduleAppointment,
   Cancel_appointments,
   getReport,
-  getDosha
+  getDosha,
+  Patient
 } from "./patient.thunk";
 
 const initialState = {
@@ -20,10 +21,11 @@ const initialState = {
   bookedSlot: [],
   getappointmentschedules: [],
   RescheduleAppointment: null,
-  cancel: Boolean,
+    cancel: false, 
   cancelAppointments: null,
   medicalreport:[],
-  dosha:null
+  dosha:null,
+  patient:null,
 };
 
 const PatientSlice = createSlice({
@@ -183,6 +185,20 @@ const PatientSlice = createSlice({
         state.loading = true;
       })
     builder.addCase(getDosha.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+        //Patient
+      builder.addCase(Patient.fulfilled, (state, action) => {
+      console.log("fulfilled");
+      state.loading = false;
+      state.patient=action.payload.patient[0];
+    })
+    builder.addCase(Patient.pending, (state) => {
+        state.loading = true;
+      })
+    builder.addCase(Patient.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

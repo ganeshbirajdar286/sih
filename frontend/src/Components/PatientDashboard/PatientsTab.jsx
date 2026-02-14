@@ -9,14 +9,22 @@ import ActiveDietPlan from "../PatientComponents/ActiveDietPlan";
 import MedicalRecords from "../PatientComponents/MedicalRecords";
 import Appointments from "../PatientComponents/Appointments";
 import { patientData } from "../data/mockData";
+import { getappointmentschedule } from "../../feature/Patient/patient.thunk";
+import { useEffect } from "react";
+import {useDispatch} from "react-redux"
 
 export default function PatientsTab() {
+  const dispatch=useDispatch()
+
+  useEffect(() => {
+    dispatch(getappointmentschedule());
+  }, [dispatch]);
   return (
     <div className="w-full p-4 md:p-6 lg:p-8 bg-gray-50 min-h-screen font-sans">
       
       {/* Header */}
       <div className="mb-6">
-        <DashboardHeader patient={patientData} />
+        <DashboardHeader  />
       </div>
 
       {/* Full Width Grid */}
@@ -40,7 +48,7 @@ export default function PatientsTab() {
 
         {/* CENTER */}
         <div className="flex flex-col gap-6 md:col-span-2 xl:col-span-2">
-          <WeightTrend data={patientData.weightTrend} />
+          <WeightTrend  />
           <DietaryTracker analysis={patientData.dietaryAnalysis} />
           <ActiveDietPlan plan={patientData.activeDietPlan} />
         </div>

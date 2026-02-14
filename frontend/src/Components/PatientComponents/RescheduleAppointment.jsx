@@ -194,7 +194,7 @@ const RescheduleAppointment = () => {
       ).unwrap();
 
       toast.success('Appointment rescheduled successfully!');
-      navigate('/appointments');
+      navigate("/patient-dashboard");
     } catch (error) {
       console.error("Reschedule error:", error);
       toast.error(error?.message || 'Failed to reschedule appointment');
@@ -256,7 +256,7 @@ const RescheduleAppointment = () => {
           className="flex items-center gap-2 text-gray-600 hover:text-green-600 mb-6 transition-colors group  cursor-pointer"
         >
           <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" />
-          <span className="font-medium">Back to dashboard</span>
+          <span className="font-medium cursor-pointer">Back to dashboard</span>
         </button>
 
         {/* Main Card */}

@@ -21,7 +21,8 @@ import {
   getDoshaStatus,
    submitDosha,
    getdosha,
-   patient
+   patient,
+   patient_diet_chart
 } from "../controller/auth.controller.js";
 import { isLogin } from "../middleware/auth.middleware.js";
 import { multerMiddleWare } from "../config/cloudinary.config.js";
@@ -48,6 +49,7 @@ router.get("/patient",isLogin,patient);
 router.get("/patient/schedule", isLogin, patient_appoinment_detail);
 router.get("/patient/getreport",isLogin,getReport)
 router.get("/patient/getdosha",isLogin,getdosha)
+router.get("/patient/dietchart",isLogin,patient_diet_chart)
 router.post("/appointment/patient/:id", isLogin, patientAppointment);
 router.post(
   "/updatedappointment/patient/:id",

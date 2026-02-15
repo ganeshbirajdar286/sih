@@ -115,7 +115,9 @@ export const register = async (req, res) => {
       { Doctor_id: doctorProfile?._id },
       { new: true },
     );
-    const token = jwtToken(user?.id, doctorProfile?._id);
+
+   if(doctorProfile){
+     const token = jwtToken(user?.id, doctorProfile?._id);
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -123,10 +125,12 @@ export const register = async (req, res) => {
       sameSite: "lax",
       maxAge: 1000 * 60 * 60 * 24 * 365,
     });
+   }
 
     res.status(201).json({
       message: "Registration successful",
       responseData: user,
+      autoLogin: isDoctor === "true",
     });
   } catch (error) {
     res.status(500).json({
@@ -261,10 +265,15 @@ export const DoctorUpdateProfile = async (req, res) => {
 
 export const PatientUpdateProfile = async (req, res) => {
   try {
-    const { Name, Email, PhoneNumber, Age, Password, Height, Weight } =
+    const { Name,PhoneNumber, Age, Height, Weight } =
       req.body;
 
-    const file = req.file;
+    const files = req.files|| [];
+  
+     const profileImageFile = files.find(
+      (file) => file.fieldname === "profileImage",
+    );
+
 
     const patient = req.user;
     const user = await User.findOne({ _id: patient?.userId });
@@ -273,20 +282,18 @@ export const PatientUpdateProfile = async (req, res) => {
       return res.status(404).json({ message: "Patient  not found" });
     }
 
-    if (file) {
-      const uploadResult = await uploadFileToCloudinary(file);
-      user.Image_url = uploadResult?.secure_url;
-    } else if (req.body.Image_url) {
-      user.Image_url = req.body.Image_url;
+    if (profileImageFile) {
+      const uploadResult = await uploadFileToCloudinary(profileImageFile);
+      user.Image_url  = uploadResult?.secure_url;
     }
 
     if (Name) user.Name = Name;
-    if (Email) user.Email = Email;
     if (PhoneNumber) user.PhoneNumber = PhoneNumber;
     if (Age) user.Age = Age;
-    if (Password) user.Password = Password;
     if (Height) user.Height = Height;
     if (Weight) user.Weight = Weight;
+    
+
     await user.save();
 
     return res.json({
@@ -681,13 +688,8 @@ const app = workflow.compile({});
 
 export const dietChart = async (req, res) => {
   try {
-    const { Name, Age, Gender, Dosha } = req.body;
-    if (!Name?.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Patient name is required",
-      });
-    }
+    const { Email, Age, Gender, Dosha } = req.body;
+  
 
     if (!Age || !Gender || !Dosha) {
       return res.status(400).json({
@@ -696,7 +698,7 @@ export const dietChart = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ Name });
+    const user = await User.findOne({ Email });
 
     if (!user) {
       return res.status(404).json({
@@ -708,7 +710,7 @@ export const dietChart = async (req, res) => {
     const input = {
       messages: [
         new HumanMessage(`
-Patient Name: ${Name}
+Patient Email: ${Email}
 Age: ${Age}
 Gender: ${Gender}
 Dosha Type: ${Dosha}
@@ -943,10 +945,11 @@ export const submitDosha = async (req, res) => {
       },
     });
 
+    
     const user = await User.findByIdAndUpdate(
   req.user.userId,
   {
-    DoshaCalculate: data._id,   
+    Dosha: data._id,   
     lastFilledAt: new Date(),  
   },
   { new: true }             
@@ -1010,3 +1013,32 @@ export const patient=async(req,res)=>{
   }
 }
 
+export const patient_diet_chart = async (req, res) => {
+  try {
+    const patientId = req.user.userId;
+    
+
+    if (!patientId) {
+      return res.status(400).json({
+        message: "Patient not found",
+      });
+    }
+
+    const latestDietChart = await DietChart
+      .findOne({
+        Patient_id:patientId,
+      })
+      .sort({ createdAt: -1 })   // Latest first
+
+    res.status(200).json({
+      success: true,
+      dietChart: latestDietChart,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};

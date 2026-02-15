@@ -43,18 +43,29 @@ const userSlice = createSlice({
       console.log("rejected");
       state.ButtonLoading = false;
     });
+
     // register
     builder.addCase(registerThunk.fulfilled, (state, action) => {
-      console.log("fulfilled");
-      const user = action.payload?.responseData;
+  console.log("Register fulfilled");
 
-      state.ButtonLoading = false;
-      state.isAuthenticated = true;
-      state.userProfile = user;
-      state.isDoctor = user?.isDoctor;
+  const user = action.payload?.responseData;
+  const autoLogin = action.payload?.autoLogin;
 
-      localStorage.setItem("user", JSON.stringify(user));
-    });
+  state.ButtonLoading = false;
+
+  if (autoLogin) {
+    state.isAuthenticated = true;
+    state.userProfile = user;
+    state.isDoctor = user?.isDoctor;
+
+    localStorage.setItem("user", JSON.stringify(user));
+  } else {
+    state.isAuthenticated = false;
+    state.userProfile = null;
+    state.isDoctor = null;
+  }
+});
+
     builder.addCase(registerThunk.pending, (state, action) => {
       console.log("pending");
       state.ButtonLoading = true;

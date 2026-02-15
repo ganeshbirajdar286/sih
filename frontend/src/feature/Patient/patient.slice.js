@@ -9,7 +9,9 @@ import {
   Cancel_appointments,
   getReport,
   getDosha,
-  Patient
+  Patient,
+  DietChart,
+  updateProfile
 } from "./patient.thunk";
 
 const initialState = {
@@ -26,6 +28,8 @@ const initialState = {
   medicalreport:[],
   dosha:null,
   patient:null,
+  dietchart:null,
+  profile:null
 };
 
 const PatientSlice = createSlice({
@@ -199,6 +203,36 @@ const PatientSlice = createSlice({
         state.loading = true;
       })
     builder.addCase(Patient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+        //diet chart
+      builder.addCase(DietChart.fulfilled, (state, action) => {
+      console.log("fulfilled");
+      state.loading = false;
+      state.dietchart=action.payload.dietChart;
+    })
+    builder.addCase(DietChart.pending, (state) => {
+        state.loading = true;
+      })
+    builder.addCase(DietChart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+         //profile
+      builder.addCase(updateProfile.fulfilled, (state, action) => {
+  console.log("fulfilled");
+  state.loading = false;
+  state.profile = action.payload.user;   
+  
+});
+
+    builder.addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+      })
+    builder.addCase(updateProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

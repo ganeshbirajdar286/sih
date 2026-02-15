@@ -50,7 +50,7 @@ export default function PatientsTab() {
         <div className="flex flex-col gap-6 md:col-span-2 xl:col-span-2">
           <WeightTrend  />
           <DietaryTracker analysis={patientData.dietaryAnalysis} />
-          <ActiveDietPlan plan={patientData.activeDietPlan} />
+          <ActiveDietPlan  />
         </div>
 
       </div>

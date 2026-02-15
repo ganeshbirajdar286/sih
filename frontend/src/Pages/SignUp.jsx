@@ -153,7 +153,7 @@ const SignUp = () => {
 
       toast.success("Registration successful");
 
-      navigate(formData.isDoctor ? "/doctor-dashboard" : "/patient-dashboard");
+      navigate(formData.isDoctor ? "/doctor-dashboard" : "/signin");
     } catch (error) {
       console.error(error);
       toast.error(error?.message || "Registration failed");

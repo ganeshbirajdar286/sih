@@ -49,26 +49,19 @@ export const doctor = createAsyncThunk(
 //   },
 // );
 
-
 export const getSingleDoctor = createAsyncThunk(
   "patient/getSingleDoctor",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(
-        `/patient/singledoctor/${id}`  
-      );
+      const response = await axiosInstance.get(`/patient/singledoctor/${id}`);
 
       return response.data;
-
     } catch (error) {
       toast.error("Failed to load doctor profile ❌");
 
-      return rejectWithValue(
-        error.response?.data?.message ||
-        error.message
-      );
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
 export const BookingAppointments = createAsyncThunk(
@@ -77,153 +70,150 @@ export const BookingAppointments = createAsyncThunk(
     try {
       const response = await axiosInstance.post(
         `/appointment/patient/${id}`,
-        data
+        data,
       );
 
       toast.success("Appointment booked successfully ✅");
 
       return response.data;
-
     } catch (error) {
       toast.error("Booking appointment failed ❌");
 
-      return rejectWithValue(
-        error.response?.data?.message ||
-        error.message
-      );
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
 export const getDoctorBookedSlots = createAsyncThunk(
   "patient/getDoctorBookedSlots",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(
-        `/patient/appointments/${id}`
-      );
+      const response = await axiosInstance.get(`/patient/appointments/${id}`);
 
       return response.data;
-
     } catch (error) {
       console.error(error);
 
-      return rejectWithValue(
-        error.response?.data?.message ||
-        error.message
-      );
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
-export const getappointmentschedule =createAsyncThunk(
-  "patient/getappointmentschedule",async(_,{rejectWithValue})=>{
-   try {
-     const response=await  axiosInstance.get("/patient/schedule");
-    return response.data
-    
-   } catch (error) {
-     console.error(error);
+export const getappointmentschedule = createAsyncThunk(
+  "patient/getappointmentschedule",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/patient/schedule");
+      return response.data;
+    } catch (error) {
+      console.error(error);
 
-      return rejectWithValue(
-        error.response?.data?.message ||
-        error.message
-      );
-   }
-  }
-)
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  },
+);
 
 export const RescheduleAppointment = createAsyncThunk(
   "/patient/RescheduleAppointment",
-  async (
-    { id, Appointment_Date, Time_slot },
-    { rejectWithValue }
-  ) => {
+  async ({ id, Appointment_Date, Time_slot }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
         `/updatedappointment/patient/${id}`,
         {
           Appointment_Date,
           Time_slot,
-        }
+        },
       );
 
       return response.data;
-
     } catch (error) {
       console.error(error);
 
-      return rejectWithValue(
-        error.response?.data?.message ||
-        error.message
-      );
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
-export const Cancel_appointments=createAsyncThunk(
-  "patient/cancel_appoinments",async(id,{rejectWithValue})=>{
+export const Cancel_appointments = createAsyncThunk(
+  "patient/cancel_appoinments",
+  async (id, { rejectWithValue }) => {
     try {
-
-      const response=await axiosInstance.delete(`/patient/deleteappointment/${id}`);
-      return response.data;
-      
-    } catch (error) {
-       console.error(error);
-
-      return rejectWithValue(
-        error.response?.data?.message ||
-        error.message
+      const response = await axiosInstance.delete(
+        `/patient/deleteappointment/${id}`,
       );
-    }
-  }
-)
+      return response.data;
+    } catch (error) {
+      console.error(error);
 
-export const getReport=createAsyncThunk(
-  "patient/getreport",async(_,{rejectWithValue})=>{
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  },
+);
+
+export const getReport = createAsyncThunk(
+  "patient/getreport",
+  async (_, { rejectWithValue }) => {
     try {
-      const report =await axiosInstance.get("/patient/getreport");
+      const report = await axiosInstance.get("/patient/getreport");
       return report.data;
     } catch (error) {
-       console.error(error);
+      console.error(error);
 
-      return rejectWithValue(
-        error.response?.data?.message ||
-        error.message
-      );
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
-)
+  },
+);
 
-export const getDosha =createAsyncThunk(
-  "patient/getDosha",async(_,{rejectWithValue})=>{
+export const getDosha = createAsyncThunk(
+  "patient/getDosha",
+  async (_, { rejectWithValue }) => {
     try {
-      const response=await axiosInstance.get("/patient/getdosha");
-      return response.data
+      const response = await axiosInstance.get("/patient/getdosha");
+      return response.data;
     } catch (error) {
-       console.error(error);
+      console.error(error);
 
-      return rejectWithValue(
-        error.response?.data?.message ||
-        error.message
-      );
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
-)
+  },
+);
 
-export const Patient =createAsyncThunk(
-  "patient/Patient",async(_,{rejectWithValue})=>{
+export const Patient = createAsyncThunk(
+  "patient/Patient",
+  async (_, { rejectWithValue }) => {
     try {
-      const response=await axiosInstance.get("/patient");
-      return response.data
+      const response = await axiosInstance.get("/patient");
+      return response.data;
     } catch (error) {
-       console.error(error);
+      console.error(error);
 
-      return rejectWithValue(
-        error.response?.data?.message ||
-        error.message
-      );
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
-)
+  },
+);
 
+export const DietChart = createAsyncThunk(
+  "patient/Dietchart",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/patient/dietchart");
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  },
+);
+
+export const updateProfile = createAsyncThunk(
+  "patient/updateprofile",
+  async (form,{rejectWithValue}) => {
+    try {
+      const response = await axiosInstance.post("/update/patientprofile",form);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  },
+);

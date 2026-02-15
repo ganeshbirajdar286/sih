@@ -23,6 +23,7 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
   const otherTabs = [
     { key: "appointments", label: "Appointments", icon: <Calendar className="text-lg" /> },
     { key: "reports", label: "Reports", icon: <TrendingUp className="text-lg" /> },
+{ key: "profile", label: "Profile", icon: <User className="text-lg" /> },
   ];
   const dispatch= useDispatch();
 

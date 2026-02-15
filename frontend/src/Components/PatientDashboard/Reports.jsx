@@ -194,7 +194,7 @@ const Reports = () => {
                   activeTab === "all"
                     ? "text-green-700 border-b-2 border-green-700"
                     : "text-gray-500 hover:text-green-600"
-                }`}
+                } cursor-pointer`}
                 onClick={() => setActiveTab("all")}
               >
                 All Reports
@@ -205,7 +205,7 @@ const Reports = () => {
                   activeTab === "lab"
                     ? "text-green-700 border-b-2 border-green-700"
                     : "text-gray-500 hover:text-green-600"
-                }`}
+                } cursor-pointer`}
                 onClick={() => setActiveTab("lab")}
               >
                 Lab Reports
@@ -216,7 +216,7 @@ const Reports = () => {
                   activeTab === "imaging"
                     ? "text-green-700 border-b-2 border-green-700"
                     : "text-gray-500 hover:text-green-600"
-                }`}
+                } cursor-pointer`}
                 onClick={() => setActiveTab("imaging")}
               >
                 Imaging
@@ -227,7 +227,7 @@ const Reports = () => {
                   activeTab === "diagnostic"
                     ? "text-green-700 border-b-2 border-green-700"
                     : "text-gray-500 hover:text-green-600"
-                }`}
+                } cursor-pointer`}
                 onClick={() => setActiveTab("diagnostic")}
               >
                 Diagnostic

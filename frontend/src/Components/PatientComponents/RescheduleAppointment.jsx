@@ -11,7 +11,7 @@ import {
   FaArrowLeft,
   FaMapMarkerAlt
 } from 'react-icons/fa';
-// Added Cancel_appointments to the import list below
+
 import { RescheduleAppointment as RescheduleThunk, getappointmentschedule, Cancel_appointments } from '../../feature/Patient/patient.thunk';
 import toast from 'react-hot-toast';
 
@@ -21,7 +21,7 @@ const RescheduleAppointment = () => {
   const dispatch = useDispatch();
   const { getappointmentschedules, loading } = useSelector((state) => state.patient);
 
-  // Debug logging
+
   console.log("URL Parameter ID:", id);
   console.log("All params:", useParams());
 
@@ -30,14 +30,13 @@ const RescheduleAppointment = () => {
   const [reason, setReason] = useState('');
   const [appointment, setAppointment] = useState(null);
 
-  // Fetch appointments if not loaded
   useEffect(() => {
     if (!getappointmentschedules || getappointmentschedules.length === 0) {
       dispatch(getappointmentschedule());
     }
   }, [dispatch, getappointmentschedules]);
 
-  // Find the specific appointment
+
   useEffect(() => {
     console.log("=== FINDING APPOINTMENT ===");
     console.log("ID to find:", id);
@@ -68,7 +67,6 @@ const RescheduleAppointment = () => {
     }
   }, [getappointmentschedules, id]);
 
-  // Generate available dates (next 30 days, excluding Sundays)
   const getAvailableDates = () => {
     const dates = [];
     const today = new Date();
@@ -77,7 +75,6 @@ const RescheduleAppointment = () => {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
       
-      // Skip Sundays (0 = Sunday)
       if (date.getDay() !== 0) {
         dates.push({
           value: date.toISOString().split('T')[0],
@@ -95,7 +92,6 @@ const RescheduleAppointment = () => {
     return dates;
   };
 
-  // Generate time slots with specific predefined time ranges
   const getTimeSlots = () => {
     const predefinedSlots = [
       "09:00-10:00",
@@ -120,7 +116,6 @@ const RescheduleAppointment = () => {
       const displayStartHour = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour;
       const displayEndHour = endHour > 12 ? endHour - 12 : endHour === 0 ? 12 : endHour;
       
-      // Format: "9:00-10:00 AM" or "11:30-12:30 PM"
       const displayTime = startPeriod === endPeriod 
         ? `${displayStartHour}:${startMinute.toString().padStart(2, '0')}-${displayEndHour}:${endMinute.toString().padStart(2, '0')} ${endPeriod}`
         : `${displayStartHour}:${startMinute.toString().padStart(2, '0')} ${startPeriod}-${displayEndHour}:${endMinute.toString().padStart(2, '0')} ${endPeriod}`;
@@ -135,7 +130,7 @@ const RescheduleAppointment = () => {
   const availableDates = getAvailableDates();
   const timeSlots = getTimeSlots();
 
-  // Added handleCancelAppointment logic
+
   const handleCancelAppointment = async () => {
     if (!id) {
       toast.error('Appointment ID is missing');
@@ -211,7 +206,7 @@ const RescheduleAppointment = () => {
     });
   };
 
-  // Loading state
+
   if (loading && !appointment) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50/30 to-gray-50 flex items-center justify-center p-4">
@@ -226,7 +221,7 @@ const RescheduleAppointment = () => {
     );
   }
 
-  // Not found state
+
   if (!appointment && !loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50/30 to-gray-50 flex items-center justify-center p-4">
@@ -250,7 +245,7 @@ const RescheduleAppointment = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50/30 to-gray-50 p-3 sm:p-4 md:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
+
         <button
           onClick={() => navigate('/patient-dashboard')}
           className="flex items-center gap-2 text-gray-600 hover:text-green-600 mb-6 transition-colors group  cursor-pointer"
@@ -259,9 +254,9 @@ const RescheduleAppointment = () => {
           <span className="font-medium cursor-pointer">Back to dashboard</span>
         </button>
 
-        {/* Main Card */}
+        
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden">
-          {/* Header */}
+          
           <div className="relative bg-gradient-to-r from-green-600 to-emerald-600 p-6 sm:p-8 md:p-10">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
@@ -278,9 +273,9 @@ const RescheduleAppointment = () => {
             </div>
           </div>
 
-          {/* Body */}
+          
           <div className="p-6 sm:p-8 md:p-10">
-            {/* Current Appointment Info */}
+            
             <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-5 sm:p-6 mb-8">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center flex-shrink-0">
@@ -291,7 +286,7 @@ const RescheduleAppointment = () => {
                     Current Appointment Details
                   </h3>
                   
-                  {/* Doctor Info */}
+                 
                   <div className="flex items-center gap-3 mb-4 pb-4 border-b border-amber-200">
                     <img
                       src={appointment.image || 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'}
@@ -304,7 +299,7 @@ const RescheduleAppointment = () => {
                     </div>
                   </div>
 
-                  {/* Details Grid */}
+                 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="flex items-center gap-3 bg-white/50 rounded-lg p-3">
                       <FaCalendarAlt className="text-amber-600 text-lg flex-shrink-0" />
@@ -332,9 +327,9 @@ const RescheduleAppointment = () => {
               </div>
             </div>
 
-            {/* Reschedule Form */}
+           
             <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Date Selection */}
+           
               <div>
                 <label className="block text-base sm:text-lg font-bold text-gray-900 mb-4">
                   Select New Date
@@ -371,7 +366,7 @@ const RescheduleAppointment = () => {
                 </div>
               </div>
 
-          { /* Time Selection */ }
+         
               <div>
                 <label className="block text-base sm:text-lg font-bold text-gray-900 mb-4">
                   Select Time Slot
@@ -399,7 +394,7 @@ const RescheduleAppointment = () => {
                 </div>
               </div>
 
-              {/* Reason */}
+            
               <div>
                 <label className="block text-base sm:text-lg font-bold text-gray-900 mb-3">
                   Reason for Rescheduling <span className="text-gray-400 font-normal text-sm">(Optional)</span>
@@ -413,7 +408,7 @@ const RescheduleAppointment = () => {
                 />
               </div>
 
-              {/* Summary */}
+              
               {(selectedDate || selectedTime) && (
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-5 sm:p-6">
                   <h4 className="font-bold text-green-900 mb-4 text-base sm:text-lg flex items-center gap-2">
@@ -443,7 +438,7 @@ const RescheduleAppointment = () => {
                 </div>
               )}
 
-              {/* Action Buttons */}
+              
               <div className="flex flex-col sm:flex-row gap-3 pt-6">
                 <button
                   type="button"

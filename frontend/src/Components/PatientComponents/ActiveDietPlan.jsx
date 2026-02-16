@@ -202,14 +202,7 @@ const ActiveDietPlan = () => {
     dispatch(DietChart());
   }, [dispatch]);
 
-  // Debug logging
-  useEffect(() => {
-    if (dietchart) {
-      console.log("📊 Diet Chart Data:", dietchart);
-      console.log("🍽️ Daily Plan:", dietchart.daily_plan);
-      console.log("💚 Lifestyle:", dietchart.lifestyle);
-    }
-  }, [dietchart]);
+
 
   // ✅ Transform object → array for your existing UI, filter out empty meals
   const formattedPlan =

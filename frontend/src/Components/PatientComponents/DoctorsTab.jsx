@@ -266,7 +266,7 @@ export default function DoctorsTab() {
 
                 <button
                   onClick={() => navigate(`/book-appointment/${doc._id}`)}
-                  className="mt-6 w-full py-3 bg-green-600 text-white rounded-lg"
+                  className="mt-6 w-full py-3 bg-green-600 text-white rounded-lg cursor-pointer"
                 >
                   Book Appointment
                 </button>

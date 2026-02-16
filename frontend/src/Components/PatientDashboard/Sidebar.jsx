@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 
+
 export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) {
   const UserMd = User;
 
@@ -51,6 +52,8 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
     };
   }, [sidebarOpen]);
 
+  
+
   useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === "Escape" && sidebarOpen) {
@@ -65,8 +68,8 @@ const handleTabClick = async (key) => {
 
   if (key === "logout") {
 
-    // ⏳ Wait logout to finish
-    const res = await dispatch(logoutThunk());
+  
+    const res =  dispatch(logoutThunk());
 
     if (logoutThunk.fulfilled.match(res)) {
       toast.success("Logout successfully");
@@ -152,12 +155,9 @@ const handleTabClick = async (key) => {
               <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
-                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr3qBVX4XIA8zq3LpBn64zAuOt9_IZ7_H5uA&s" alt="logo" className="w-full h-full object-cover" />
+                  
                 </div>
-                  <div>
-                    <p className="font-medium text-gray-700">Dr. Smith</p>
-                    <p className="text-xs text-gray-500">Administrator</p>
-                  </div>
+        
                 </div>
                 <button
                   onClick={() => handleTabClick("logout")}
@@ -249,34 +249,44 @@ const handleTabClick = async (key) => {
         </nav>
 
         {/* User Profile with Logout (Desktop) */}
-         <button onClick={() => handleTabClick("logout")}>
-        <div className="p-4 border-t border-green-700 bg-green-900 bg-opacity-50">
-          <div className="flex items-center justify-between group cursor-pointer hover:bg-green-800 hover:bg-opacity-50 rounded-lg p-2 transition-all duration-200">
-            <div className="flex items-center space-x-3">
-             
-                <div className="w-10 h-10 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
-                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr3qBVX4XIA8zq3LpBn64zAuOt9_IZ7_H5uA&s" alt="logo" className="w-full h-full object-cover" />
-                </div>
+         <button
+  onClick={() => handleTabClick("logout")}
+  className="w-full"
+>
+  <div className="p-4 border-t border-green-700 bg-green-900/40">
+    
+    <div className="
+      flex items-center justify-between
+      rounded-xl px-3 py-2
+      hover:bg-green-800/60
+      transition-all duration-300
+      group
+    ">
 
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate group-hover:text-green-100">
-                   Smith
-                </p>
-                <p className="text-xs text-green-300 truncate">
-                 Patient
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => handleTabClick("logout")}
-              className="text-red-400 hover:text-red-600 transition-all duration-200 ml-3"
-              aria-label="Logout"
-            >
-              <LogOut size={18} />
-            </button>
-          </div>
+      {/* Left — Profile */}
+      <div className="flex items-center space-x-3">
+
+        {/* Profile Image */}
+        <div className="relative">
+          <h1>Logout</h1>
         </div>
-        </button>
+        
+      </div>
+
+      {/* Logout Icon */}
+      <div className="
+        text-red-400
+        group-hover:text-red-500
+        group-hover:translate-x-1
+        transition-all duration-300
+      ">
+        <LogOut size={18} />
+      </div>
+
+    </div>
+  </div>
+</button>
+
       </aside>
     </>
   );

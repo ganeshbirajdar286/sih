@@ -1042,3 +1042,40 @@ export const patient_diet_chart = async (req, res) => {
     });
   }
 };
+
+export const single_Patient = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Patient ID is required",
+      });
+    }
+
+    const patient = await User.findById(id)
+      .select("Name Age Email Gender Height Weight Medical_records Image_url  Dosha ")
+      .populate("Medical_records  Dosha");
+      
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: "Patient not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      patient,
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};

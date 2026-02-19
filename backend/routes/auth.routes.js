@@ -22,7 +22,8 @@ import {
    submitDosha,
    getdosha,
    patient,
-   patient_diet_chart
+   patient_diet_chart,
+   single_Patient
 } from "../controller/auth.controller.js";
 import { isLogin } from "../middleware/auth.middleware.js";
 import { multerMiddleWare } from "../config/cloudinary.config.js";
@@ -72,6 +73,8 @@ router.get("/doctor/mypatient", isLogin, myPatient);
 router.post("/doctor/appointment/:id", isLogin, Doctor_selected_appointment);
 router.post("/doctor/dietchart", isLogin, dietChart);
 router.post("/doctor/createreport/:id", isLogin, multerMiddleWare, createReport);
+router.delete("/doctor/deleteappointment/:id", isLogin, delete_appointment);
+router.get("/doctor/patient/:id",isLogin,single_Patient)
 
 
 

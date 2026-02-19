@@ -131,7 +131,7 @@ export default function DoctorsTab() {
       </h2>
 
       <div className="mb-4 sm:mb-6 space-y-3">
-        {/* Search Bar */}
+        
         <div className="relative w-full">
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
           <input

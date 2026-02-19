@@ -85,7 +85,7 @@ const handleTabClick = async (key) => {
 
   return (
     <>
-      {/* Mobile Header */}
+    
       <header className="md:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-green-800 to-green-900 shadow-lg z-40">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-2">
@@ -105,7 +105,6 @@ const handleTabClick = async (key) => {
           </button>
         </div>
 
-        {/* Mobile Dropdown Menu */}
         <div
           className={`sidebar absolute left-0 right-0 bg-white shadow-xl border-t border-gray-200 transform transition-all duration-300 ease-in-out z-40 ${sidebarOpen
             ? "translate-y-0 opacity-100 pointer-events-auto"
@@ -113,7 +112,7 @@ const handleTabClick = async (key) => {
             }`}
         >
           <nav className="flex flex-col p-2 space-y-1 max-h-96 overflow-y-auto">
-            {/* Main Section */}
+            
             <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100 mb-2">
               Main
             </div>
@@ -131,7 +130,7 @@ const handleTabClick = async (key) => {
               </button>
             ))}
 
-            {/* Other Section */}
+    
             <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100 mb-2 mt-4">
               Other
             </div>
@@ -149,7 +148,7 @@ const handleTabClick = async (key) => {
               </button>
             ))}
 
-            {/* User Profile with Logout (Mobile) */}
+            
             <button onClick={() => handleTabClick("logout")}>
             <div className="mt-4 border-t border-gray-200 pt-3 px-3" >
               <div className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition">
@@ -173,7 +172,6 @@ const handleTabClick = async (key) => {
         </div>
       </header>
 
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 md:hidden"
@@ -182,12 +180,12 @@ const handleTabClick = async (key) => {
         />
       )}
 
-      {/* Spacer for mobile fixed header */}
+     
       <div className="md:hidden h-16" />
 
-      {/* Desktop Sidebar */}
+      
       <aside className="sidebar hidden md:flex w-64 bg-gradient-to-b from-green-800 to-green-900 text-white flex-col shadow-xl">
-        {/* Header */}
+       
         <div className="p-5 text-xl font-bold border-b border-green-700 flex items-center">
           <div className="w-15 h-15 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
             <img src={logo} alt="logo" className="w-full h-full object-cover" />
@@ -197,7 +195,7 @@ const handleTabClick = async (key) => {
           </h1>
         </div>
 
-        {/* Navigation */}
+       
         <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1 scrollbar-thin scrollbar-thumb-green-700 scrollbar-track-green-800">
           <p className="px-4 pt-2 pb-2 text-xs font-semibold text-green-400 uppercase tracking-wider">
             Main
@@ -247,8 +245,6 @@ const handleTabClick = async (key) => {
             </button>
           ))}
         </nav>
-
-        {/* User Profile with Logout (Desktop) */}
          <button
   onClick={() => handleTabClick("logout")}
   className="w-full"
@@ -263,17 +259,16 @@ const handleTabClick = async (key) => {
       group
     ">
 
-      {/* Left — Profile */}
+     
       <div className="flex items-center space-x-3">
 
-        {/* Profile Image */}
+     
         <div className="relative">
           <h1>Logout</h1>
         </div>
         
       </div>
 
-      {/* Logout Icon */}
       <div className="
         text-red-400
         group-hover:text-red-500

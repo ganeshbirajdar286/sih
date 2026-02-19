@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { myPatient } from "../../feature/Doctor/doctor.thunk";
+import { myPatient, Cancel_appointments } from "../../feature/Doctor/doctor.thunk";
+
 import {
   Calendar,
   Search,
@@ -32,12 +33,16 @@ const PatientTab = () => {
     dispatch(myPatient());
   }, [dispatch]);
 
-  // ── Derived Stats ──
-  const totalCount = appointment.length;
-  const upcomingCount = appointment.filter(
+ 
+  const acceptedAppointments = appointment.filter(
+    (a) => a.Status?.toLowerCase() === "accepted"
+  );
+
+  const totalCount = acceptedAppointments.length;
+  const upcomingCount = acceptedAppointments.filter(
     (a) => a.Status === "Confirmed" || a.Status === "Pending"
   ).length;
-  const completedCount = appointment.filter(
+  const completedCount = acceptedAppointments.filter(
     (a) => a.Status === "Completed"
   ).length;
 
@@ -62,6 +67,8 @@ const PatientTab = () => {
         return "bg-amber-100 text-amber-800 border-amber-200";
       case "cancelled":
         return "bg-red-100 text-red-800 border-red-200";
+      case "accepted":
+        return "bg-emerald-100 text-emerald-800 border-emerald-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -80,8 +87,8 @@ const PatientTab = () => {
     });
   };
 
-  // ── Filter & Sort ──
-  const filteredAppointments = appointment
+  
+  const filteredAppointments = acceptedAppointments
     .filter((appt) => {
       const patient = appt.Patient_id;
       const search = searchQuery.toLowerCase();
@@ -91,10 +98,7 @@ const PatientTab = () => {
           .join(" ")
           .toLowerCase()
           .includes(search);
-      const matchesStatus =
-        selectedStatus === "all" ||
-        appt.Status?.toLowerCase() === selectedStatus;
-      return matchesSearch && matchesStatus;
+      return matchesSearch;
     })
     .sort((a, b) => {
       if (sortBy === "date")
@@ -104,7 +108,7 @@ const PatientTab = () => {
       return 0;
     });
 
-  // ── Loading State ──
+ 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -114,7 +118,7 @@ const PatientTab = () => {
     );
   }
 
-  // ── Error State ──
+  
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-center">
@@ -134,7 +138,7 @@ const PatientTab = () => {
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
 
-      {/* ── Header with Stats ── */}
+      
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <h2 className="text-2xl font-bold text-gray-900">My Appointments</h2>
         <p className="text-gray-500 text-sm mt-1">
@@ -142,7 +146,6 @@ const PatientTab = () => {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-5">
-          {/* Total */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 font-medium">Total</p>
@@ -153,7 +156,7 @@ const PatientTab = () => {
             </div>
           </div>
 
-          {/* Upcoming */}
+        
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 font-medium">Upcoming</p>
@@ -164,7 +167,7 @@ const PatientTab = () => {
             </div>
           </div>
 
-          {/* Completed */}
+          
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 font-medium">Completed</p>
@@ -177,7 +180,6 @@ const PatientTab = () => {
         </div>
       </div>
 
-      {/* ── Filters ── */}
       <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100">
         <div className="flex items-center gap-4 flex-wrap">
           <div className="relative">
@@ -199,32 +201,15 @@ const PatientTab = () => {
             <option value="date">Sort by Date</option>
             <option value="name">Sort by Name</option>
           </select>
-
-          {/* Status filter pills */}
-          <div className="flex gap-2 flex-wrap">
-            {["all", "confirmed", "pending", "cancelled"].map((s) => (
-              <button
-                key={s}
-                onClick={() => setSelectedStatus(s)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium capitalize transition-all ${
-                  selectedStatus === s
-                    ? "bg-emerald-600 text-white shadow"
-                    : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                {s === "all" ? "All" : s}
-              </button>
-            ))}
-          </div>
         </div>
 
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <Zap className="w-4 h-4 text-amber-500" />
-          <span>{filteredAppointments.length} appointments found</span>
+          <span>{filteredAppointments.length} accepted appointments</span>
         </div>
       </div>
 
-      {/* ── Appointment Cards ── */}
+  
       <div className="space-y-3">
         {filteredAppointments.map((appt) => {
           const patient = appt.Patient_id;
@@ -233,16 +218,16 @@ const PatientTab = () => {
               key={appt._id}
               className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
             >
-              {/* Card Row */}
+              
               <div className="p-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 
-                  {/* Left: Patient Info */}
+                 
                   <div
                     className="flex items-start sm:items-center gap-3 cursor-pointer flex-1"
                     onClick={() => toggleAppointment(appt._id)}
                   >
-                    {/* Avatar */}
+                    
                     {patient?.Image_url ? (
                       <img
                         src={patient.Image_url}
@@ -286,25 +271,34 @@ const PatientTab = () => {
                     </div>
                   </div>
 
-                  {/* Right: Action Buttons + Expand */}
+                  
                   <div className="flex items-center gap-2 shrink-0">
 
-                    {/* Cancel Button */}
-                    <button
-                      className="flex items-center gap-1.5 border border-red-200 bg-white text-red-600 px-3 py-2 rounded-xl text-sm font-medium hover:bg-red-50 transition-colors"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // dispatch(cancelAppointment(appt._id)) — wire when ready
-                        alert(`Cancel appointment for ${patient?.Name}?`);
-                      }}
-                    >
-                      <XCircle className="w-4 h-4" />
-                      Cancel
-                    </button>
+                  <button
+                    className="flex items-center gap-1.5 border border-red-200 bg-white text-red-600 px-3 py-2 rounded-xl text-sm font-medium hover:bg-red-50 transition-colors cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const confirmDelete = window.confirm(
+                        `Cancel appointment for ${patient?.Name}?`
+                      );
+                      if (confirmDelete) {
+                        dispatch(Cancel_appointments(appt._id))
+                          .unwrap?.()
+                          .then(() => {
+                            dispatch(myPatient());
+                          })
+                          .catch((err) => {
+                            console.error("Cancel failed:", err);
+                          });
+                      }
+                    }}
+                  >
+                    <XCircle className="w-4 h-4" />
+                    Delete
+                  </button>
 
-                    {/* Call Button */}
                     <button
-                      className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-2 rounded-xl text-sm font-medium hover:bg-emerald-600 transition-colors"
+                      className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-2 rounded-xl text-sm font-medium hover:bg-emerald-600 transition-colors cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         if (patient?.PhoneNumber) {
@@ -316,7 +310,6 @@ const PatientTab = () => {
                       Call
                     </button>
 
-                    {/* Expand toggle */}
                     <div
                       className="cursor-pointer p-1"
                       onClick={() => toggleAppointment(appt._id)}
@@ -331,12 +324,12 @@ const PatientTab = () => {
                 </div>
               </div>
 
-              {/* ── Expanded Details ── */}
+              
               {expandedAppointment === appt._id && (
                 <div className="border-t border-gray-100 p-4 bg-gray-50">
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    {/* Patient Details */}
+                    
                     <div>
                       <h4 className="font-semibold text-gray-900 mb-3">Patient Information</h4>
                       <div className="space-y-2 text-sm">
@@ -355,7 +348,7 @@ const PatientTab = () => {
                       </div>
                     </div>
 
-                    {/* Appointment Details */}
+                   
                     <div>
                       <h4 className="font-semibold text-gray-900 mb-3">Appointment Details</h4>
                       <div className="space-y-2 text-sm">
@@ -380,31 +373,16 @@ const PatientTab = () => {
                       </div>
                     </div>
 
-                    {/* Quick Actions */}
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-3">Quick Actions</h4>
-                      <div className="flex flex-wrap gap-2">
-                        <button className="cursor-pointer flex items-center gap-2 bg-white border border-gray-200 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
-                          <Eye className="w-4 h-4" /> View Profile
-                        </button>
-                      </div>
-                    </div>
+                    
                   </div>
 
-                  {/* Condition Notes */}
+                  
                   {appt.Condition && (
                     <div className="mt-4 p-3 bg-white rounded-lg border border-gray-200">
                       <h4 className="font-semibold text-gray-900 mb-2">Condition / Notes</h4>
                       <p className="text-sm text-gray-600">{appt.Condition}</p>
                     </div>
                   )}
-
-                  {/* Bottom Actions */}
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="flex gap-3">
-                      
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
@@ -412,15 +390,14 @@ const PatientTab = () => {
         })}
       </div>
 
-      {/* ── Empty State ── */}
       {filteredAppointments.length === 0 && !loading && (
         <div className="text-center py-12">
           <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No appointments found</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No accepted appointments</h3>
           <p className="text-gray-600">
             {searchQuery
-              ? `No appointments match "${searchQuery}". Try adjusting your search.`
-              : "No appointments scheduled."}
+              ? `No accepted appointments match "${searchQuery}".`
+              : "No appointments have been accepted yet."}
           </p>
         </div>
       )}

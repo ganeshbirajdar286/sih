@@ -47,13 +47,12 @@ const PatientProfileUpdate = ({ setActiveTab }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file');
       return;
     }
 
-    // Validate file size (5MB max)
+    
     if (file.size > 5 * 1024 * 1024) {
       toast.error('Image size should be less than 5MB');
       return;
@@ -194,7 +193,7 @@ const PatientProfileUpdate = ({ setActiveTab }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
+      
         <div className="text-center mb-10">
          
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
@@ -205,7 +204,7 @@ const PatientProfileUpdate = ({ setActiveTab }) => {
           </p>
         </div>
 
-        {/* Form Card */}
+        
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-green-100">
           <div className="h-2 bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500"></div>
 
@@ -241,21 +240,20 @@ const PatientProfileUpdate = ({ setActiveTab }) => {
                         onChange={handleImageChange}
                         className="hidden"
                       />
-                      
-                      {/* Tooltip */}
+                    
                       <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                         Change photo
                       </span>
                     </label>
 
-                    {/* Success Checkmark (shown when image is uploaded) */}
+                   
                 
                   </div>
                 </div>
 
-                {/* Upload/Remove Buttons */}
+           
                 <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
-                  {/* Upload Button */}
+                 
                   <label className="flex-1 group cursor-pointer">
                     <div className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-200 transform hover:-translate-y-0.5">
                       <Upload className="w-5 h-5" />
@@ -269,7 +267,7 @@ const PatientProfileUpdate = ({ setActiveTab }) => {
                     />
                   </label>
 
-                  {/* Remove Button */}
+                 
                   {preview && (
                     <button
                       type="button"
@@ -282,7 +280,7 @@ const PatientProfileUpdate = ({ setActiveTab }) => {
                   )}
                 </div>
 
-                {/* Upload Guidelines */}
+              
                 <div className="text-center">
                   <p className="text-sm text-gray-500">
                     Recommended: Square image, at least 400x400px
@@ -293,7 +291,6 @@ const PatientProfileUpdate = ({ setActiveTab }) => {
                 </div>
               </div>
 
-              {/* Divider */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-200"></div>
@@ -305,7 +302,6 @@ const PatientProfileUpdate = ({ setActiveTab }) => {
                 </div>
               </div>
 
-              {/* Form Fields */}
               {inputFields.map((field) => {
                 const Icon = field.icon;
                 return (
@@ -365,7 +361,7 @@ const PatientProfileUpdate = ({ setActiveTab }) => {
               })}
             </div>
 
-            {/* Action Buttons */}
+            
             <div className="mt-8 flex gap-4">
               <button
                 type="button"
@@ -395,7 +391,7 @@ const PatientProfileUpdate = ({ setActiveTab }) => {
           </form>
         </div>
 
-        {/* Info Card */}
+      
         <div className="mt-6 bg-green-50 border border-green-100 rounded-xl p-4">
           <div className="flex">
             <div className="flex-shrink-0">

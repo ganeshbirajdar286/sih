@@ -22,12 +22,11 @@ export default function PatientsTab() {
   return (
     <div className="w-full p-4 md:p-6 lg:p-8 bg-gray-50 min-h-screen font-sans">
       
-      {/* Header */}
       <div className="mb-6">
         <DashboardHeader  />
       </div>
 
-      {/* Full Width Grid */}
+      
       <div
         className="
           grid
@@ -39,14 +38,14 @@ export default function PatientsTab() {
         "
       >
         
-        {/* LEFT */}
+       
         <div className="flex flex-col gap-6">
           <PrakritiSnapshot/>
           <Alerts alerts={patientData.alerts} />
           <LifestyleLog log={patientData.lifestyleLog} />
         </div>
 
-        {/* CENTER */}
+        
         <div className="flex flex-col gap-6 md:col-span-2 xl:col-span-2">
           <WeightTrend  />
           <DietaryTracker analysis={patientData.dietaryAnalysis} />

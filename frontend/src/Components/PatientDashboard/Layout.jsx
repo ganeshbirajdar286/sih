@@ -4,25 +4,22 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
-// Placeholder imports - you will need to create these files
-import Header from './Header';     // Your site's header component
-import Sidebar from './Sidebar';   // Your site's sidebar/navigation component
-import Footer from './Footer';     // Your site's footer component
 
+import Header from './Header';     
+import Sidebar from './Sidebar';  
+import Footer from './Footer';    
 function Layout({ children }) {
-  // State to manage the sidebar visibility on mobile
+ 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
 
-  // State to check if the view is mobile
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // Effect to handle window resizing for responsiveness
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      // If resizing to desktop, ensure sidebar is open
+  
       if (!mobile) {
         setSidebarOpen(true);
       } else {
@@ -31,7 +28,7 @@ function Layout({ children }) {
     };
 
     window.addEventListener('resize', handleResize);
-    handleResize(); // Call on initial render
+    handleResize(); 
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -42,10 +39,6 @@ function Layout({ children }) {
 
   return (
     <div className=" min-h-screen flex">
-      {/* This is the main container for the Sidebar.
-        On desktop, it's always visible.
-        On mobile, it appears as an overlay.
-      */}
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div
@@ -64,7 +57,7 @@ function Layout({ children }) {
         )}
       </AnimatePresence>
       
-      {/* Overlay for mobile when sidebar is open */}
+     
       {isMobile && isSidebarOpen && (
         <div 
           onClick={toggleSidebar} 
@@ -72,11 +65,11 @@ function Layout({ children }) {
         ></div>
       )}
 
-      {/* Main Content Area */}
+      
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header toggleSidebar={toggleSidebar} isMobile={isMobile} />
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          {/* Your page content will be rendered here */}
+          
           {children}
         </main>
         <Footer />

@@ -44,7 +44,7 @@ const [selectedType, setSelectedType] = useState("all");   // ✅ added before
 const [selectedMonth, setSelectedMonth] = useState("all"); // ✅ fix for your error
 
 
-  // Sample consultations data
+  
   const consultations = [
     {
       id: 1,

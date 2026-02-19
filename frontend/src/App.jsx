@@ -18,6 +18,8 @@ import DoctorsTab from "./Components/PatientComponents/DoctorsTab.jsx";
 import RescheduleAppointment from "./Components/PatientComponents/RescheduleAppointment.jsx";
 import Appointments from "./Components/PatientDashboard/Appointment.jsx";
 import PrakritiVikritiForm from "./Components/PatientDashboard/DoshaPatientForm.jsx";
+import AppointmentsTab from "./Components/DoctorComponents/AppointmentsTab.jsx";
+import PatientProfile from "./Components/DoctorComponents/PatientProfile.jsx";
 
 function App() {
   const { isAuthenticated, isDoctor } = useSelector((state) => state.user);
@@ -79,6 +81,15 @@ function App() {
       </ProtectedRoute>
      }
      />
+     
+    <Route
+  path="/doctor/patient/:id"
+  element={
+    <ProtectedRoute doctorOnly={true}>
+      <PatientProfile />
+    </ProtectedRoute>
+  }
+/>
 
         <Route
   path="/book-appointment/:id"
@@ -87,6 +98,15 @@ function App() {
       <BookAppointment />
     </ProtectedRoute>
   }
+/>
+
+<Route
+path="/patient/profile/:id"
+element={
+  <ProtectedRoute>
+   <PatientProfile/>
+  </ProtectedRoute>
+}
 />
 
 

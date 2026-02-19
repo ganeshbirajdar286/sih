@@ -34,7 +34,7 @@ export default function DoctorProfile() {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6">
-        {/* Header */}
+     
         <div className="flex items-center gap-4">
           <div className="w-20 h-20 rounded-full bg-green-600 text-white flex items-center justify-center text-3xl font-bold">
             {doc.User_id?.Name?.charAt(0)}
@@ -46,7 +46,7 @@ export default function DoctorProfile() {
           </div>
         </div>
 
-        {/* Info */}
+   
         <div className="mt-6 grid sm:grid-cols-2 gap-4 text-gray-700">
           <p className="flex items-center">
             <FaChartLine className="mr-2 text-green-600" />
@@ -73,7 +73,7 @@ export default function DoctorProfile() {
           )}
         </div>
 
-        {/* About Section */}
+        
         <div className="mt-6">
           <h3 className="font-semibold text-lg mb-2">About Doctor</h3>
           <p className="text-gray-600">

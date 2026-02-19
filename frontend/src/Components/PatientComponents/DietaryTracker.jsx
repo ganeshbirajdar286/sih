@@ -8,7 +8,7 @@ const DietaryTracker = ({ analysis }) => {
   const GUNA_COLORS = ['#8884d8', '#82ca9d'];
   const RASA_COLORS = ['#8884d8', '#82ca9d'];
 
-  // Custom Tooltips
+
   const CustomBarTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
@@ -41,7 +41,7 @@ const DietaryTracker = ({ analysis }) => {
   return (
     <Card title="Dietary Analysis" icon={FaUtensils}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-        {/* Rasa Chart */}
+       
         <div>
           <h4 className="font-semibold text-gray-700 text-center mb-3 sm:mb-4 text-sm sm:text-base">
             Rasa (Six Tastes)
@@ -88,7 +88,7 @@ const DietaryTracker = ({ analysis }) => {
           </ResponsiveContainer>
         </div>
 
-        {/* Guna Chart */}
+       
         <div>
           <h4 className="font-semibold text-gray-700 text-center mb-3 sm:mb-4 text-sm sm:text-base">
             Guna (Qualities)
@@ -125,7 +125,7 @@ const DietaryTracker = ({ analysis }) => {
         </div>
       </div>
 
-      {/* Summary Stats */}
+   
       <div className="mt-6 pt-6 border-t border-gray-100">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
           <div className="bg-blue-50 rounded-lg p-3 border border-blue-100 text-center">

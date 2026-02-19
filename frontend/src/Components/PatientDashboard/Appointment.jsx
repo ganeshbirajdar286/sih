@@ -426,7 +426,6 @@ const Appointments = () => {
                     </div>
 
                     <div className="space-y-2 pt-4 border-t border-gray-100">
-                      {/* --- Added Call Doctor Button --- */}
                       {isLive && (
                         <button 
                           className="w-full mb-2 flex items-center justify-center gap-2 bg-blue-600 text-white px-3 py-2.5 rounded-lg hover:bg-blue-700 transition-all text-sm font-bold shadow-md cursor-pointer"
@@ -439,7 +438,6 @@ const Appointments = () => {
 
                       {appointment.status !== "completed" && timing !== "EXPIRED" && (
                         <div className="grid grid-cols-2 gap-2">
-                          {/* Reschedule logic: Hidden if appointment is 'accepted' */}
                           {appointment.status !== "accepted" && (
                             <button 
                               className="flex items-center justify-center gap-2 border-2 border-green-500 text-green-600 px-3 py-2.5 rounded-lg hover:bg-green-50 transition-all text-xs sm:text-sm font-semibold cursor-pointer" 

@@ -346,7 +346,7 @@ const Reports = () => {
 
     <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl max-h-full overflow-y-auto border border-green-100">
 
-      {/* Header */}
+      
       <div className="p-4 sm:p-6 border-b border-green-100 sticky top-0 bg-white z-10 flex justify-between items-center">
         <h2 className="text-xl sm:text-2xl font-bold text-green-700">
           {selectedReport.title}
@@ -360,10 +360,8 @@ const Reports = () => {
         </button>
       </div>
 
-      {/* Body */}
+   
       <div className="p-4 sm:p-6 space-y-6">
-
-        {/* Top Info */}
         <div>
           <p className="text-gray-600 text-sm sm:text-base">
             {selectedReport.type} • {selectedReport.doctor}
@@ -375,7 +373,7 @@ const Reports = () => {
           </div>
         </div>
 
-        {/* Report Details */}
+        
         <div className="bg-green-50 p-4 rounded-lg border border-green-100">
           <h3 className="font-medium text-green-800 mb-3">
             Report Details
@@ -414,7 +412,7 @@ const Reports = () => {
           </div>
         </div>
 
-        {/* Preview Section */}
+       
         <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-6 rounded-lg text-center shadow-md">
 
           <div className="flex flex-col sm:flex-row justify-center items-center mb-4 gap-4">
@@ -444,7 +442,6 @@ const Reports = () => {
 
       </div>
 
-      {/* Footer */}
       <div className="p-4 sm:p-6 border-t border-green-100 flex flex-col sm:flex-row justify-end gap-3">
 
         <button

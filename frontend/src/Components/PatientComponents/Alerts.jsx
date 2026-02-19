@@ -1,4 +1,4 @@
-// src/components/Alerts.jsx
+
 
 import React from "react";
 import { useSelector } from "react-redux";
@@ -10,26 +10,22 @@ import {
 } from "react-icons/fa";
 
 const Alerts = () => {
-  // ✅ Correct Redux selector
+
   const { getappointmentschedules } = useSelector(
     (state) => state.patient
   );
 
-  // ==============================
-  // 🔔 Generate Alerts
-  // ==============================
+ 
   const alerts =
     getappointmentschedules
       ?.map((appt) => {
         const doctorName =
           appt?.Doctor_id?.User_id?.Name || "Doctor";
 
-        // Appointment date
         const apptDateObj = new Date(
           appt.Appointment_Date
         );
 
-        // 🇮🇳 Format date
         const formattedDate =
           apptDateObj.toLocaleDateString("en-IN", {
             day: "numeric",
@@ -37,10 +33,6 @@ const Alerts = () => {
             year: "numeric",
             timeZone: "Asia/Kolkata",
           });
-
-        // ==============================
-        // ⏰ Extract slot end time
-        // ==============================
         const [, end] =
           appt.Time_slot.split("-");
 
@@ -48,23 +40,16 @@ const Alerts = () => {
           .split(":")
           .map(Number);
 
-        // Appointment END datetime
         const apptEnd = new Date(apptDateObj);
         apptEnd.setHours(endHour);
         apptEnd.setMinutes(endMinute);
         apptEnd.setSeconds(0);
 
-        // ➕ Add 1 hour grace period
         apptEnd.setHours(apptEnd.getHours() + 1);
 
         const now = new Date();
 
-        // ❌ Hide if period over
         if (now > apptEnd) return null;
-
-        // ==============================
-        // 📅 Day difference
-        // ==============================
         const diffDays = Math.ceil(
           (apptDateObj - now) /
             (1000 * 60 * 60 * 24)
@@ -90,10 +75,6 @@ const Alerts = () => {
         };
       })
       .filter(Boolean) || [];
-
-  // ==============================
-  // 🎨 Styles
-  // ==============================
   const alertStyles = {
     warning: {
       bg: "bg-yellow-50",

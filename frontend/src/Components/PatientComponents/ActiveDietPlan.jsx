@@ -35,7 +35,7 @@ const DietPlanCard = ({ item }) => {
                 {item.meal}
               </p>
               
-              {/* Calories Badge */}
+              
               {nutrition.calories && (
                 <span className="bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-0.5 rounded">
                   {nutrition.calories} cal
@@ -64,7 +64,7 @@ const DietPlanCard = ({ item }) => {
       >
         <div className="border-t border-gray-200 p-4 sm:p-5 bg-gray-50 space-y-4">
           
-          {/* Ingredients Section */}
+         
           {mealData.ingredients && mealData.ingredients.length > 0 && (
             <div className="bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
               <p className="font-semibold text-gray-700 mb-2 text-sm sm:text-base flex items-center gap-2">
@@ -84,7 +84,7 @@ const DietPlanCard = ({ item }) => {
             </div>
           )}
 
-          {/* Recipe Instructions */}
+          
           {mealData.instructions && (
             <div>
               <p className="font-semibold text-gray-700 mb-2 text-sm sm:text-base">
@@ -96,7 +96,7 @@ const DietPlanCard = ({ item }) => {
             </div>
           )}
           
-          {/* Complete Nutritional Analysis */}
+          
           <div className="bg-white p-3 sm:p-4 rounded-lg border border-gray-200">
             
             <p className="font-semibold text-gray-700 mb-3 text-sm sm:text-base">
@@ -143,7 +143,6 @@ const DietPlanCard = ({ item }) => {
             </div>
           </div>
 
-          {/* Ayurveda Effects */}
           {(ayurveda.vata || ayurveda.pitta || ayurveda.kapha) && (
             <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-3 sm:p-4 rounded-lg border border-amber-200">
               
@@ -204,7 +203,6 @@ const ActiveDietPlan = () => {
 
 
 
-  // ✅ Transform object → array for your existing UI, filter out empty meals
   const formattedPlan =
     dietchart?.daily_plan
       ? [
@@ -218,7 +216,7 @@ const ActiveDietPlan = () => {
   const note = dietchart?.note || '';
   const durationDays = dietchart?.duration_days || 0;
 
-  // Check if we have actual diet chart data
+
   const hasDietChart = dietchart && dietchart.daily_plan;
 
   return (
@@ -226,7 +224,7 @@ const ActiveDietPlan = () => {
       
       <div className="space-y-3 sm:space-y-4">
 
-        {/* Loading state */}
+        
         {loading ? (
           <p className="text-center text-gray-500">Loading diet plan...</p>
         ) : error ? (
@@ -267,7 +265,7 @@ const ActiveDietPlan = () => {
 
         ) : (
           <>
-            {/* Plan Duration & Doctor's Note */}
+            
             {(durationDays > 0 || note) && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
                 
@@ -294,7 +292,7 @@ const ActiveDietPlan = () => {
               </div>
             )}
 
-            {/* Lifestyle Information */}
+            
             {(lifestyle.Meal_Frequency || lifestyle.Water_Intake || lifestyle.Bowel_Movement) && (
               <div className="bg-gradient-to-r from-green-50 to-teal-50 border border-green-200 rounded-lg p-4">
                 
@@ -336,7 +334,7 @@ const ActiveDietPlan = () => {
               </div>
             )}
 
-            {/* Daily Meals */}
+            
             <div className="space-y-3">
               {formattedPlan.map((item, index) => (
                 <DietPlanCard key={index} item={item} />

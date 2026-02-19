@@ -34,7 +34,7 @@ const Appointments = ({ list }) => {
                             key={index}
                             className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md hover:border-green-300 transition-all duration-300 group"
                         >
-                            {/* Header */}
+                           
                             <div className="flex justify-between items-start mb-3">
                                 <div className="flex items-start flex-1 min-w-0 mr-3">
                                     <div className="bg-green-100 p-2 rounded-lg mr-3 flex-shrink-0 group-hover:bg-green-200 transition-colors duration-300">
@@ -54,7 +54,7 @@ const Appointments = ({ list }) => {
                                 </span>
                             </div>
 
-                            {/* Details */}
+                         
                             <div className="space-y-2 pl-0 sm:pl-11">
                                 <div className="flex items-center text-xs sm:text-sm text-gray-600">
                                     <FaCalendarAlt className="mr-2 flex-shrink-0 w-3 h-3 sm:w-4 sm:h-4" />

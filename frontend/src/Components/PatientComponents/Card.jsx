@@ -1,10 +1,9 @@
-// src/components/Card.jsx
+
 import React from 'react';
 
 const Card = ({ title, icon: Icon, children, className = "" }) => {
     return (
         <div className={`bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 ${className}`}>
-            {/* Card Header */}
             <div className="p-4 sm:p-5 md:p-6 border-b border-gray-100">
                 <div className="flex items-center">
                     {Icon && (
@@ -18,7 +17,7 @@ const Card = ({ title, icon: Icon, children, className = "" }) => {
                 </div>
             </div>
             
-            {/* Card Body */}
+       
             <div className="p-4 sm:p-5 md:p-6">
                 {children}
             </div>

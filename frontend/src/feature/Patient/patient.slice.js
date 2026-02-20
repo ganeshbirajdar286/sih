@@ -11,7 +11,9 @@ import {
   getDosha,
   Patient,
   DietChart,
-  updateProfile
+  updateProfile,
+  addOrUpdateReview,
+  getReview
 } from "./patient.thunk";
 
 const initialState = {
@@ -23,13 +25,14 @@ const initialState = {
   bookedSlot: [],
   getappointmentschedules: [],
   RescheduleAppointment: null,
-    cancel: false, 
+  cancel: false,
   cancelAppointments: null,
-  medicalreport:[],
-  dosha:null,
-  patient:null,
-  dietchart:null,
-  profile:null
+  medicalreport: [],
+  dosha: null,
+  patient: null,
+  dietchart: null,
+  profile: null,
+  reviews: {},
 };
 
 const PatientSlice = createSlice({
@@ -156,85 +159,121 @@ const PatientSlice = createSlice({
       state.getappointmentschedules = state.getappointmentschedules.filter(
         (appt) => appt._id !== deletedId,
       );
-    })
+    });
     builder.addCase(Cancel_appointments.pending, (state) => {
-        state.loading = true;
-      })
+      state.loading = true;
+    });
     builder.addCase(Cancel_appointments.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
+      state.loading = false;
+      state.error = action.payload;
+    });
 
     // getreport
     builder.addCase(getReport.fulfilled, (state, action) => {
       console.log("fulfilled");
       state.loading = false;
       state.medicalreport = action.payload.report;
-    })
+    });
     builder.addCase(getReport.pending, (state) => {
-        state.loading = true;
-      })
+      state.loading = true;
+    });
     builder.addCase(getReport.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
+      state.loading = false;
+      state.error = action.payload;
+    });
 
-      //getDosha
-      builder.addCase(getDosha.fulfilled, (state, action) => {
+    //getDosha
+    builder.addCase(getDosha.fulfilled, (state, action) => {
       console.log("fulfilled");
       state.loading = false;
-      state.dosha= action.payload.dosha[0].doshaAssessment;
-    })
+      state.dosha = action.payload.dosha[0].doshaAssessment;
+    });
     builder.addCase(getDosha.pending, (state) => {
-        state.loading = true;
-      })
+      state.loading = true;
+    });
     builder.addCase(getDosha.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
+      state.loading = false;
+      state.error = action.payload;
+    });
 
-        //Patient
-      builder.addCase(Patient.fulfilled, (state, action) => {
+    //Patient
+    builder.addCase(Patient.fulfilled, (state, action) => {
       console.log("fulfilled");
       state.loading = false;
-      state.patient=action.payload.patient[0];
-    })
+      state.patient = action.payload.patient[0];
+    });
     builder.addCase(Patient.pending, (state) => {
-        state.loading = true;
-      })
+      state.loading = true;
+    });
     builder.addCase(Patient.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
+      state.loading = false;
+      state.error = action.payload;
+    });
 
-        //diet chart
-      builder.addCase(DietChart.fulfilled, (state, action) => {
+    //diet chart
+    builder.addCase(DietChart.fulfilled, (state, action) => {
       console.log("fulfilled");
       state.loading = false;
-      state.dietchart=action.payload.dietChart;
-    })
+      state.dietchart = action.payload.dietChart;
+    });
     builder.addCase(DietChart.pending, (state) => {
-        state.loading = true;
-      })
+      state.loading = true;
+    });
     builder.addCase(DietChart.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
+      state.loading = false;
+      state.error = action.payload;
+    });
 
-         //profile
-      builder.addCase(updateProfile.fulfilled, (state, action) => {
-  console.log("fulfilled");
-  state.loading = false;
-  state.profile = action.payload.user;   
-  
-});
+    //profile
+    builder.addCase(updateProfile.fulfilled, (state, action) => {
+      console.log("fulfilled");
+      state.loading = false;
+      state.profile = action.payload.user;
+    });
 
     builder.addCase(updateProfile.pending, (state) => {
-        state.loading = true;
-      })
+      state.loading = true;
+    });
     builder.addCase(updateProfile.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+     // ── Get Reviews ──
+    builder
+      .addCase(getReview.pending, (state) => {
+        state.reviewLoading = true;
+      })
+      .addCase(getReview.fulfilled, (state, action) => {
+        state.reviewLoading = false;
+        const reviews = action.payload?.reviews || [];
+        const doctorId = action.meta?.arg?.id;
+        if (doctorId) {
+          const avg = reviews.length
+            ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+            : 0;
+          state.reviews[doctorId] = {
+            list: reviews,
+            avgRating: parseFloat(avg.toFixed(1)),
+            total: reviews.length,
+          };
+        }
+      })
+      .addCase(getReview.rejected, (state) => {
+        state.reviewLoading = false;
+      });
+
+    // ── Add or Update Review ──
+    builder
+      .addCase(addOrUpdateReview.pending, (state) => {
+        state.reviewLoading = true;
+      })
+      .addCase(addOrUpdateReview.fulfilled, (state) => {
+        state.reviewLoading = false;
+        // reviews list is refreshed via getReview dispatch after this
+      })
+      .addCase(addOrUpdateReview.rejected, (state) => {
+        state.reviewLoading = false;
       });
   },
 });

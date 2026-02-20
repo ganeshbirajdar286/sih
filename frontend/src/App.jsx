@@ -20,6 +20,7 @@ import Appointments from "./Components/PatientDashboard/Appointment.jsx";
 import PrakritiVikritiForm from "./Components/PatientDashboard/DoshaPatientForm.jsx";
 import AppointmentsTab from "./Components/DoctorComponents/AppointmentsTab.jsx";
 import PatientProfile from "./Components/DoctorComponents/PatientProfile.jsx";
+import CreateDietChart from "./Components/DoctorComponents/Createdietchart.jsx";
 
 function App() {
   const { isAuthenticated, isDoctor } = useSelector((state) => state.user);
@@ -98,6 +99,15 @@ function App() {
       <BookAppointment />
     </ProtectedRoute>
   }
+/>
+
+<Route
+path="/doctor/createDietChart"
+element={
+  <ProtectedRoute  doctorOnly={true} >
+    <CreateDietChart />
+  </ProtectedRoute>
+}
 />
 
 <Route

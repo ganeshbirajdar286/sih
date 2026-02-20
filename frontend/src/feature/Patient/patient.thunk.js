@@ -217,3 +217,30 @@ export const updateProfile = createAsyncThunk(
     }
   },
 );
+
+
+export const addOrUpdateReview = createAsyncThunk(
+  "patient/addReview",
+  async ({ id, form }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(`/patient/review/${id}`, form);
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const getReview = createAsyncThunk(
+  "patient/getReview",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/patient/doctor/reviews/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);

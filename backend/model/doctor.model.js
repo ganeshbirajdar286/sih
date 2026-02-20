@@ -1,46 +1,73 @@
-import {mongoose,Schema} from "mongoose";
+import { mongoose, Schema } from "mongoose";
 
-const doctorSchema=new Schema({
-    User_id:{
-        type:Schema.Types.ObjectId,
-        ref:"User",
+const doctorSchema = new Schema(
+  {
+    User_id: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
-    Specialization:{
-        type:String,
-        enum:[
-    "Dermatologist", "Oncologist", "Cardiologist", "Endocrinologist", "Gastroenterologist",
-    "Neurologist", "Obstetrics and Gynaecology", "Ophthalmologist", "Family doctor",
-    "Psychiatrist", "Pediatrician", "Allergist", "Geriatrician", "Internal medicine",
-    "Nephrologist", "Orthopedics", "Anesthesiologist", "Infectious disease physician",
-    "Radiologist", "General physician", "Hematologist", "Surgeon", "Urologist", "Colorectal surgeon",
-  ]
+    Specialization: {
+      type: String,
+      enum: [
+        "Dermatologist",
+        "Oncologist",
+        "Cardiologist",
+        "Endocrinologist",
+        "Gastroenterologist",
+        "Neurologist",
+        "Obstetrics and Gynaecology",
+        "Ophthalmologist",
+        "Family doctor",
+        "Psychiatrist",
+        "Pediatrician",
+        "Allergist",
+        "Geriatrician",
+        "Internal medicine",
+        "Nephrologist",
+        "Orthopedics",
+        "Anesthesiologist",
+        "Infectious disease physician",
+        "Radiologist",
+        "General physician",
+        "Hematologist",
+        "Surgeon",
+        "Urologist",
+        "Colorectal surgeon",
+      ],
     },
-    Certificates:{
-        type:String,
-         required: true,
+    Certificates: {
+      type: String,
+      required: true,
     },
-    Rating:{
-        type:Number
+    averageRating: {
+      type: Number,
+      default: 0,
     },
-    Experience:{
-        type:Number,
-        required: true,
+    totalReviews: {
+      type: Number,
+      default: 0,
     },
-    Qualifications:{
-        type:String,
-        require:true,
+    Experience: {
+      type: Number,
+      required: true,
     },
-    Clinic_Name:{
-        type:String, 
+    Qualifications: {
+      type: String,
+      require: true,
     },
-    Bio:{
-      type:String,  
+    Clinic_Name: {
+      type: String,
     },
-    Consultation:{
-        type:Number,
-    }
-},{timestamps:true})
+    Bio: {
+      type: String,
+    },
+    Consultation: {
+      type: Number,
+    },
+  },
+  { timestamps: true },
+);
 
-const Doctor=mongoose.model("Doctor",doctorSchema);
+const Doctor = mongoose.model("Doctor", doctorSchema);
 
-export default Doctor
+export default Doctor;

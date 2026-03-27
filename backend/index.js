@@ -10,8 +10,8 @@ dotenv.config()
 
 
 const allowedOrigins = [
-  /\.vercel\.app$/,  // allow ANY Vercel URL
-  process.env.FRONTEND_URL, // your main production URL (optional)
+  /\.vercel\.app$/, 
+  process.env.FRONTEND_URL, 
 ];
 
 const corsOption = {

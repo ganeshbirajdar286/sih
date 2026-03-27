@@ -15,6 +15,7 @@ import {
   FaTimes,
   FaCheckCircle,
   FaHourglassHalf,
+  FaSpinner,
 } from "react-icons/fa";
 // Import added below
 import { getappointmentschedule, Cancel_appointments } from "../../feature/Patient/patient.thunk";
@@ -163,17 +164,12 @@ const Appointments = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50/30 to-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-20 w-20 border-4 border-gray-200 mx-auto"></div>
-            <div className="animate-spin rounded-full h-20 w-20 border-4 border-green-600 border-t-transparent absolute top-0 left-1/2 -translate-x-1/2"></div>
-          </div>
-          <p className="mt-6 text-gray-600 font-medium">
-            Loading your appointments...
-          </p>
-        </div>
-      </div>
+      <div className="p-4 sm:p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+              <div className="text-center">
+                <FaSpinner className="animate-spin text-green-600 text-4xl sm:text-5xl mx-auto mb-4" />
+                <p className="text-gray-600 text-base sm:text-lg">Loading Appointments...</p>
+              </div>
+            </div>
     );
   }
 

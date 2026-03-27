@@ -10,6 +10,7 @@ import {
   FaSearch,
   FaChartLine,
   FaPrint,
+  FaSpinner,
 } from "react-icons/fa";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -144,9 +145,12 @@ const Reports = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading reports...
-      </div>
+     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+                   <div className="text-center">
+                     <FaSpinner className="animate-spin text-green-600 text-4xl sm:text-5xl mx-auto mb-4" />
+                     <p className="text-gray-600 text-base sm:text-lg">Loading Reports...</p>
+                   </div>
+                 </div>
     );
   }
 

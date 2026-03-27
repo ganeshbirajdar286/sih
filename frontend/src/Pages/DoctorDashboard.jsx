@@ -35,7 +35,6 @@ import {
 import PatientsTab from "../Components/DoctorComponents/PatientsTab.jsx";
 import AppointmentsTab from "../Components/DoctorComponents/AppointmentsTab.jsx";
 import DietChartsTab from "../Components/DoctorComponents/DietChartsTab.jsx";
-import ReportsTab from "../Components/DoctorComponents/ReportsTab.jsx";
 import ProfileTab from "../Components/DoctorComponents/ProfileTab.jsx";
 
 // Sidebar items
@@ -44,7 +43,6 @@ const sidebarItems = [
   { id: "patients", icon: Users, label: "My Patients", badge: "1.2k" },
   { id: "appointments", icon: Calendar, label: "Appointments", badge: "18" },
   { id: "dietCharts", icon: FileText, label: "Diet Charts", badge: "863" },
-  { id: "reports", icon: Printer, label: "Reports & Analytics", badge: "📊" },
   { id: "profile", icon: User, label: "Doctor Profile", badge: "⭐" },
 ];
 
@@ -293,7 +291,6 @@ export default function DoctorDashboard() {
     patients: <PatientsTab searchQuery={searchQuery} />,
     appointments: <AppointmentsTab searchQuery={searchQuery} />,
     dietCharts: <DietChartsTab />,
-    reports: <ReportsTab />,
     profile: <ProfileTab />,
   };
 

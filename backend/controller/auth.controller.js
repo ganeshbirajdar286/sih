@@ -15,13 +15,12 @@ import {
   StateGraph,
 } from "@langchain/langgraph";
 import { ChatGroq } from "@langchain/groq";
-import { threadId } from "node:worker_threads";
+import { threadId } from "node:worker_threads"; 
 import DietChart from "../model/Dietchart.model.js";
 import { populate } from "dotenv";
 import Review from "../model/rating.model.js";
 
 //user
-
 export const register = async (req, res) => {
   const {
     Name,
@@ -142,7 +141,6 @@ export const register = async (req, res) => {
     });
   }
 };
-
 export const login = async (req, res) => {
   try {
     const { Email, Password } = req.body;

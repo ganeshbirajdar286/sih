@@ -78,7 +78,7 @@ const simulateRequest = (app, method, url) => {
       json(data) {
         this._data = data;
         resolve({ status: this.statusCode, data });
-        return this;
+        return this; 
       },
       setHeader(key, value) {
         this._headers[key] = value;

@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { type } from "node:os";
+
 
 const mealSchema = new Schema(
   {

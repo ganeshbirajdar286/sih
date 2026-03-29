@@ -36,11 +36,7 @@ export const register = async (req, res) => {
   } = req.body;
 
   try {
-    if (!Name || !Age || !Password || !Gender || !Email) {
-      return res.status(400).json({
-        message: "Required fields missing",
-      });
-    }
+   
 
     const files = req.files || [];
 
@@ -52,9 +48,9 @@ export const register = async (req, res) => {
       (file) => file.fieldname === "certificate",
     );
 
-    const nameExits = await User.findOne({ Name });
+    const EmailExits = await User.findOne({ Email });
 
-    if (nameExits) {
+    if (EmailExits) {
       return res.status(400).json({
         message: "User already exists",
       });
@@ -91,19 +87,7 @@ export const register = async (req, res) => {
 
     let doctorProfile = null;
 
-    if (isDoctor === "true") {
-      if (!Specialization || !Experience) {
-        return res.status(400).json({
-          message: "Specialization & Experience required",
-        });
-      }
-
-      if (!certificateUrl) {
-        return res.status(400).json({
-          message: "Certificate required",
-        });
-      }
-
+    if (isDoctor === "true" ||  isDoctor===true) {
       doctorProfile = await Doctor.create({
         User_id: user._id,
         Specialization,
@@ -141,21 +125,17 @@ export const register = async (req, res) => {
     });
   }
 };
+
 export const login = async (req, res) => {
   try {
     const { Email, Password } = req.body;
-    if (!Email || !Password) {
-      return res.status(400).json({
-        message: "Email and Password are required",
-      });
-    }
-
+  
     const user = await User.findOne({
       Email,
     });
     if (!user) {
       return res.status(401).json({
-        message: "Invalid Name  or password",
+        message: "User not found",
       });
     }
 
@@ -1189,6 +1169,30 @@ export const getdietchart = async (req, res) => {
   }
 };
 
+export const updateDietChart = async (req, res) => {
+  try {
+    const id= req.params.id;
+
+    const updated = await DietChart.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    
+    return res.status(200).json({
+      success:true,
+      dietchart:updated,
+      message:"diet chart updated successfully"
+    })
+
+  } catch (err) {
+   return res.status(500).json({
+      success: false,
+      message: "An error occurred while updateing the dietchart.",
+      error: err.message,
+    });
+  }
+};
 
 //patient and doctor
 export const delete_appointment = async (req, res) => {

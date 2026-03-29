@@ -69,7 +69,7 @@ const FloatingInput = ({ label, type = "text", value, onChange, required, rightS
 };
 
 
-
+ 
 const FloatingSelect = ({ label, value, onChange, options, required }) => (
   <div className="relative">
     <label className="absolute left-4 top-1 text-[10px] sm:text-xs text-emerald-600 font-semibold pointer-events-none">

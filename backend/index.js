@@ -41,7 +41,7 @@ const corsOption = {
 
 const app=express();
 
-const port =process.env.port
+const port =process.env.Port
 app.use(cors(corsOption))
 app.use(cookieParser());  
 app.use(express.json())
@@ -56,3 +56,4 @@ app.listen(port,(res,req)=>{
     console.log(`server is connected to port: ${port}`);
 })
 
+ 

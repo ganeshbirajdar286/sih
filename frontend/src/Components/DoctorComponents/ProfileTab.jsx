@@ -48,7 +48,7 @@ const Field = ({ label, name, type = "text", value, onChange, disabled, textarea
 const TabBtn = ({ id, active, onClick, children }) => (
   <button
     onClick={() => onClick(id)}
-    className={`w-full py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+    className={`w-full py-2.5 px-4 rounded-lg text-sm font-medium transition-all cursor-pointer ${
       active ? "bg-white text-amber-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
     }`}
   >
@@ -61,7 +61,7 @@ const seedFromDoctor = (doc) => ({
   Email:          doc?.User_id?.Email          || "",
   PhoneNumber:    doc?.User_id?.PhoneNumber    || "",
   Specialization: doc?.Specialization          || "",
-  Experience:     doc?.Experience !== undefined ? String(doc.Experience) : "",
+  Experience:     doc?.Experience              || "",
   Bio:            doc?.Bio                     || "",
   Qualifications: doc?.Qualifications          || "",
   Clinic_Name:    doc?.Clinic_Name             || "",
@@ -339,15 +339,15 @@ export default function ProfileTab() {
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-6">
 
               {/* Tabs */}
-              <div className="grid grid-cols-3 gap-1 bg-slate-100 rounded-xl p-1 mb-6">
-                <TabBtn id="personal"     active={activeTab === "personal"}     onClick={setActiveTab}>👤 Personal</TabBtn>
+              <div className="grid grid-cols-3 gap-1 bg-slate-100 rounded-xl p-1 mb-6 ">
+                <TabBtn id="personal"   active={activeTab === "personal"}     onClick={setActiveTab}>👤 Personal</TabBtn>
                 <TabBtn id="professional" active={activeTab === "professional"} onClick={setActiveTab}>💼 Professional</TabBtn>
                 <TabBtn id="settings"     active={activeTab === "settings"}     onClick={setActiveTab}>⚙️ Settings</TabBtn>
               </div>
 
               {/* ── Personal Tab ── */}
               {activeTab === "personal" && (
-                <div className="space-y-5">
+                <div className="space-y-5 ">
                   <h3 className="text-lg font-bold text-slate-800">Personal Information</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Field label="Full Name"          name="Name"        value={profile.Name}        onChange={handleChange} disabled={!isEditing} />
@@ -364,7 +364,7 @@ export default function ProfileTab() {
                       error={errors.PhoneNumber}
                     />
 
-                    <Field label="Experience (years)" name="Experience"  value={profile.Experience}  onChange={handleChange} disabled={!isEditing} type="number" />
+                    <Field label="Experience (years)" name="Experience"  value={profile.Experience}  onChange={handleChange} disabled={!isEditing} type="text" />
                   </div>
                   <Field label="Bio" name="Bio" value={profile.Bio} onChange={handleChange} disabled={!isEditing} textarea rows={4} />
                 </div>

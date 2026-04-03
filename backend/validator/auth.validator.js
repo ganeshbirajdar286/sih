@@ -287,10 +287,8 @@ export const DoctorUpdateProfileValidator = [
   body("Name")
     .optional()
     .trim()
-    .isLength({ min: 3, max: 50 })
-    .withMessage("Name must be between 3 and 50 characters")
-    .matches(/^[a-zA-Z\s]+$/)
-    .withMessage("Name must contain only letters")
+    .isLength({ min: 3 })
+    .withMessage("Name must be at least 3 characters")
     .escape(),
 
   body("Email")
@@ -298,7 +296,7 @@ export const DoctorUpdateProfileValidator = [
     .isEmail().withMessage("Invalid email format"),
 
   body("PhoneNumber")
-    .optional()
+    .optional({ values: "falsy" })
     .isMobilePhone("en-IN")
     .withMessage("Invalid Indian phone number"),
 
@@ -327,21 +325,21 @@ export const DoctorUpdateProfileValidator = [
     .withMessage("Invalid specialization"),
 
   body("Qualifications")
-    .optional()
+     .optional({ values: "falsy" }) //ignore "", null, undefined
     .trim()
     .isLength({ min: 2, max: 200 })
     .withMessage("Qualifications must be valid")
     .escape(),
 
   body("Clinic_Name")
-    .optional()
+     .optional({ values: "falsy" })
     .trim()
     .isLength({ min: 2, max: 100 })
     .withMessage("Clinic name must be valid")
     .escape(),
 
   body("Consultation")
-    .optional()
+     .optional({ values: "falsy" })
     .isFloat({ min: 0 })
     .withMessage("Consultation fee must be a valid number"),
 ];

@@ -21,6 +21,8 @@ import PrakritiVikritiForm from "./Components/PatientDashboard/DoshaPatientForm.
 import AppointmentsTab from "./Components/DoctorComponents/AppointmentsTab.jsx";
 import PatientProfile from "./Components/DoctorComponents/PatientProfile.jsx";
 import CreateDietChart from "./Components/DoctorComponents/Createdietchart.jsx";
+import EditDietChart from "./Components/DoctorComponents/Editdietchart.jsx";
+import DietChartsTab from "./Components/DoctorComponents/DietChartsTab.jsx";
 
 function App() {
   const { isAuthenticated, isDoctor } = useSelector((state) => state.user);
@@ -92,6 +94,15 @@ function App() {
   }
 />
 
+<Route
+path="EditDietChart/:id"
+element={
+  <ProtectedRoute doctorOnly={true}>
+    <EditDietChart/>
+  </ProtectedRoute>
+}
+/>
+
         <Route
   path="/book-appointment/:id"
   element={
@@ -146,6 +157,8 @@ element={
             </ProtectedRoute>
           }
         />
+
+        
 
         <Route
           path="/dashboard"

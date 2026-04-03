@@ -66,9 +66,9 @@ export const conformationappointment =createAsyncThunk(
     }
 )
 export const getDietchart=createAsyncThunk(
-  "doctor/getdietchart",async(_,{rejectWithValue})=>{
+  "doctor/getdietcharts",async(_,{rejectWithValue})=>{
    try {
-     const response=await axiosInstance.get("/doctor/getdietchart");
+     const response=await axiosInstance.get("/doctor/getdietcharts");
     return  response.data
    } catch (error) {
     console.error(error);
@@ -123,3 +123,29 @@ export const profile = createAsyncThunk(
   }
 );
  
+export const getdietchartID = createAsyncThunk(
+  "doctor/getdietchartID",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/doctor/getdietchart/${id}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+export const updateDietChartbyID = createAsyncThunk(
+  "doctor/updateDietChartbyID",
+  async ({ id, formData }, { rejectWithValue }) => { 
+    try {
+      const response = await axiosInstance.put(
+        `/doctor/updatedietchart/${id}`, 
+        formData
+      );
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);

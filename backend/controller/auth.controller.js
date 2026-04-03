@@ -1193,6 +1193,40 @@ export const updateDietChart = async (req, res) => {
     });
   }
 };
+export const getDietchartById = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    if (!id) {
+      return res.status(400).json({
+        message: "DietChart ID is required",
+      });
+    }
+
+    const dietchart = await DietChart
+      .findById(id)
+      .populate("Patient_id", "Name Age Image_url PhoneNumber Email Gender");
+
+    if (!dietchart) {
+      return res.status(404).json({
+        message: "Diet chart not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Diet chart fetched successfully",
+      dietchart,
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
 
 //patient and doctor
 export const delete_appointment = async (req, res) => {

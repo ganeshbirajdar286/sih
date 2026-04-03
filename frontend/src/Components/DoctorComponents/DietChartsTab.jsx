@@ -314,7 +314,6 @@ const DietChartsTab = () => {
           const isExpanded = expandedChart === chart._id;
           const statusStyle = getStatusStyle(chart.status);
           const meals = Object.entries(dailyPlan);
-
           return (
             <div key={chart._id} className="card-hover" style={{ background: "#fff", borderRadius: 20, border: "1.5px solid #f3f0e8", overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
           
@@ -471,7 +470,7 @@ const DietChartsTab = () => {
 
                   
                   <div style={{ padding: "16px 24px 22px", borderTop: "1px solid #f9f7f2", display: "flex", gap: 10, flexWrap: "wrap" }}>
-                    <button className="btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: 7, color: "#fff", border: "none", padding: "9px 18px", borderRadius: 11, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 13 }}>
+                    <button onClick={()=>{navigate(`/EditDietChart/${chart._id}`)}} className="btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: 7, color: "#fff", border: "none", padding: "9px 18px", borderRadius: 11, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 13 }}>
                       <Edit3 style={{ width: 13, height: 13 }} />
                       Edit Chart
                     </button>

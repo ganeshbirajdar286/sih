@@ -7,7 +7,9 @@ import {
   getDietchart,
   createDietChart,
   profileUpdate, 
-  profile
+  profile,
+  getdietchartID,
+  updateDietChartbyID
 } from "./doctor.thunk";
 
 const initialState = {
@@ -19,13 +21,26 @@ const initialState = {
   statusappointment: null,
   getdietchart: [],
   dietchart: null,
-  Profile: null
+  Profile: null,
+   getDietchartById: null,
+    updateLoading: false,
+    updateError: null,
+  updateSuccess: false,
 };
 
 const doctorSlice = createSlice({
   name: "Doctors",
   initialState,
-  reducers: {},
+  reducers: {
+    clearDietchartById(state) {
+      state.getDietchartById = null;
+      state.error = null;
+    },
+    clearUpdateStatus(state) {
+      state.updateError = null;
+      state.updateSuccess = false;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(myPatient.pending, (state) => {
@@ -143,7 +158,42 @@ const doctorSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
+
+          builder
+      //  getdietchartID 
+      .addCase(getdietchartID.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getdietchartID.fulfilled, (state, action) => {
+        state.loading = false;
+        state.getDietchartById = action.payload.dietchart; 
+      })
+      .addCase(getdietchartID.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+       // updateDietchartbyID
+      builder
+       .addCase(updateDietChartbyID.pending, (state) => {
+        state.updateLoading = true;
+        state.updateError = null;
+        state.updateSuccess = false;
+      })
+      .addCase(updateDietChartbyID.fulfilled, (state, action) => {
+        state.updateLoading = false;
+        state.updateSuccess = true;
+        // also refresh the cached chart with the latest saved data
+        state.getDietchartById = action.payload.dietchart;
+      })
+      .addCase(updateDietChartbyID.rejected, (state, action) => {
+        state.updateLoading = false;
+        state.updateError = action.payload;
+        state.updateSuccess = false;
+      });
+
   },
 });
 
+export const { clearDietchartById, clearUpdateStatus } = doctorSlice.actions;
 export default doctorSlice.reducer;

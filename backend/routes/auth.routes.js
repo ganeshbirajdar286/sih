@@ -29,6 +29,7 @@ import {
   getDoctorReviews,
   getprofile,
   updateDietChart,
+  getDietchartById,
 } from "../controller/auth.controller.js";
 import { isLogin } from "../middleware/auth.middleware.js";
 import { multerMiddleWare } from "../config/cloudinary.config.js";
@@ -129,7 +130,8 @@ router.post(
 );
 router.delete("/doctor/deleteappointment/:id", isLogin, delete_appointment);
 router.get("/doctor/patient/:id", isLogin, single_Patient);
-router.get("/doctor/getdietchart", isLogin, getdietchart);
+router.get("/doctor/getdietcharts", isLogin, getdietchart);
+router.get("/doctor/getdietchart/:id",isLogin,getDietchartById);
 router.get("/doctor/profile", isLogin, getprofile);
 router.put("/doctor/updatedietchart/:id", updateDietChart);
 

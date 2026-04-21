@@ -10,6 +10,7 @@ services:
       - app-network
     environment:
       VITE_API_URL: http://backend:3000/api
+    restart: always
 
   backend:
     build:
@@ -31,7 +32,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-
+    restart: always
   db:
     image: mongo:latest
     ports:
@@ -46,7 +47,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+    restart: always
+    
 volumes:
   anime:
 

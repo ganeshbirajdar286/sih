@@ -1,0 +1,60 @@
+
+services:
+  web:
+    build: ./frontend  
+    depends_on:
+      - backend
+    ports:
+      - "3001:5173"
+    networks:
+      - app-network
+    environment:
+      VITE_API_URL: http://backend:3000/api
+
+    develop:
+      watch:
+        - path: ./frontend/package.json
+          action: rebuild
+        - path: ./frontend
+          target: /app
+          action: sync
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+
+    develop:
+      watch:
+        - path: ./backend/package.json
+          action: rebuild
+        - path: ./backend/package-lock.json
+          action: rebuild
+        - path: ./backend
+          target: /app
+          action: sync
+
+    networks:
+      - app-network
+
+  db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - anime:/data/db
+    networks:
+      - app-network
+
+volumes:
+  anime:
+
+networks:
+  app-network:
+    driver: bridge

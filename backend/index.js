@@ -49,7 +49,9 @@ app.use(express.urlencoded({extended:true}))
 
 app.use("/api/auth",authRouter)
 
-
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK" });
+});
 
 app.listen(port,(res,req)=>{
      connect_db();

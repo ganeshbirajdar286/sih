@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { myPatient, Cancel_appointments } from "../../feature/Doctor/doctor.thunk";
+import {
+  myPatient,
+  Cancel_appointments,
+} from "../../feature/Doctor/doctor.thunk";
+
 
 import {
   Calendar,
@@ -20,8 +24,11 @@ import {
   Loader2,
 } from "lucide-react";
 
-const PatientTab = () => {
+const PatientTab = ({ callPatient }) => {
   const dispatch = useDispatch();
+  const { onlineUsers } = useSelector((s) => s.call);
+  const { doctorProfile } = useSelector((s) => s.doctor);
+
   const { appointment, loading, error } = useSelector((state) => state.doctor);
 
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -33,17 +40,16 @@ const PatientTab = () => {
     dispatch(myPatient());
   }, [dispatch]);
 
- 
   const acceptedAppointments = appointment.filter(
-    (a) => a.Status?.toLowerCase() === "accepted"
+    (a) => a.Status?.toLowerCase() === "accepted",
   );
 
   const totalCount = acceptedAppointments.length;
   const upcomingCount = acceptedAppointments.filter(
-    (a) => a.Status === "Confirmed" || a.Status === "Pending"
+    (a) => a.Status === "Confirmed" || a.Status === "Pending",
   ).length;
   const completedCount = acceptedAppointments.filter(
-    (a) => a.Status === "Completed"
+    (a) => a.Status === "Completed",
   ).length;
 
   const getStatusIcon = (status) => {
@@ -87,14 +93,19 @@ const PatientTab = () => {
     });
   };
 
-  
   const filteredAppointments = acceptedAppointments
     .filter((appt) => {
       const patient = appt.Patient_id;
       const search = searchQuery.toLowerCase();
       const matchesSearch =
         !searchQuery ||
-        [patient?.Name, appt.Condition, appt.Status, appt.Time_slot, patient?.Email]
+        [
+          patient?.Name,
+          appt.Condition,
+          appt.Status,
+          appt.Time_slot,
+          patient?.Email,
+        ]
           .join(" ")
           .toLowerCase()
           .includes(search);
@@ -104,21 +115,23 @@ const PatientTab = () => {
       if (sortBy === "date")
         return new Date(a.Appointment_Date) - new Date(b.Appointment_Date);
       if (sortBy === "name")
-        return (a.Patient_id?.Name || "").localeCompare(b.Patient_id?.Name || "");
+        return (a.Patient_id?.Name || "").localeCompare(
+          b.Patient_id?.Name || "",
+        );
       return 0;
     });
 
- 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
-        <span className="ml-3 text-gray-500 text-sm">Loading appointments...</span>
+        <span className="ml-3 text-gray-500 text-sm">
+          Loading appointments...
+        </span>
       </div>
     );
   }
 
-  
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-center">
@@ -137,8 +150,6 @@ const PatientTab = () => {
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-
-      
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <h2 className="text-2xl font-bold text-gray-900">My Appointments</h2>
         <p className="text-gray-500 text-sm mt-1">
@@ -149,29 +160,33 @@ const PatientTab = () => {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 font-medium">Total</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{totalCount}</p>
+              <p className="text-3xl font-bold text-gray-900 mt-1">
+                {totalCount}
+              </p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
               <Calendar className="w-6 h-6 text-blue-600" />
             </div>
           </div>
 
-        
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 font-medium">Upcoming</p>
-              <p className="text-3xl font-bold text-emerald-600 mt-1">{upcomingCount}</p>
+              <p className="text-3xl font-bold text-emerald-600 mt-1">
+                {upcomingCount}
+              </p>
             </div>
             <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
               <ClockIcon className="w-6 h-6 text-emerald-600" />
             </div>
           </div>
 
-          
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 font-medium">Completed</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{completedCount}</p>
+              <p className="text-3xl font-bold text-gray-900 mt-1">
+                {completedCount}
+              </p>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
               <CheckCircle className="w-6 h-6 text-purple-600" />
@@ -209,7 +224,6 @@ const PatientTab = () => {
         </div>
       </div>
 
-  
       <div className="space-y-3">
         {filteredAppointments.map((appt) => {
           const patient = appt.Patient_id;
@@ -218,16 +232,12 @@ const PatientTab = () => {
               key={appt._id}
               className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
             >
-              
               <div className="p-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-
-                 
                   <div
                     className="flex items-start sm:items-center gap-3 cursor-pointer flex-1"
                     onClick={() => toggleAppointment(appt._id)}
                   >
-                    
                     {patient?.Image_url ? (
                       <img
                         src={patient.Image_url}
@@ -245,7 +255,9 @@ const PatientTab = () => {
                         <h3 className="font-semibold text-gray-900 capitalize">
                           {patient?.Name || "Unknown"}
                         </h3>
-                        <span className="text-sm text-gray-500">• {patient?.Age} yrs</span>
+                        <span className="text-sm text-gray-500">
+                          • {patient?.Age} yrs
+                        </span>
                         <span
                           className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeStyle(appt.Status)}`}
                         >
@@ -271,44 +283,44 @@ const PatientTab = () => {
                     </div>
                   </div>
 
-                  
                   <div className="flex items-center gap-2 shrink-0">
-
-                  <button
-                    className="flex items-center gap-1.5 border border-red-200 bg-white text-red-600 px-3 py-2 rounded-xl text-sm font-medium hover:bg-red-50 transition-colors cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const confirmDelete = window.confirm(
-                        `Cancel appointment for ${patient?.Name}?`
-                      );
-                      if (confirmDelete) {
-                        dispatch(Cancel_appointments(appt._id))
-                          .unwrap?.()
-                          .then(() => {
-                            dispatch(myPatient());
-                          })
-                          .catch((err) => {
-                            console.error("Cancel failed:", err);
-                          });
-                      }
-                    }}
-                  >
-                    <XCircle className="w-4 h-4" />
-                    Delete
-                  </button>
-
                     <button
-                      className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-2 rounded-xl text-sm font-medium hover:bg-emerald-600 transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 border border-red-200 bg-white text-red-600 px-3 py-2 rounded-xl text-sm font-medium hover:bg-red-50 transition-colors cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (patient?.PhoneNumber) {
-                          window.location.href = `tel:${patient.PhoneNumber}`;
+                        const confirmDelete = window.confirm(
+                          `Cancel appointment for ${patient?.Name}?`,
+                        );
+                        if (confirmDelete) {
+                          dispatch(Cancel_appointments(appt._id))
+                            .unwrap?.()
+                            .then(() => {
+                              dispatch(myPatient());
+                            })
+                            .catch((err) => {
+                              console.error("Cancel failed:", err);
+                            });
                         }
                       }}
                     >
-                      <Phone className="w-4 h-4" />
-                      Call
+                      <XCircle className="w-4 h-4" />
+                      Delete
                     </button>
+
+                    <button
+      className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-2 rounded-xl text-sm font-medium hover:bg-emerald-600 transition-colors cursor-pointer"
+      onClick={() => {
+        const patientSocketId = onlineUsers[patient?._id];
+        if (patientSocketId) {
+          callPatient(patientSocketId, doctorProfile?.Name || "Doctor"); // ✅ uses prop
+        } else {
+          alert("Patient is not online right now.");
+        }
+      }}
+    >
+      <Phone className="w-4 h-4" />
+      Call
+    </button>
 
                     <div
                       className="cursor-pointer p-1"
@@ -324,37 +336,45 @@ const PatientTab = () => {
                 </div>
               </div>
 
-              
               {expandedAppointment === appt._id && (
                 <div className="border-t border-gray-100 p-4 bg-gray-50">
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                    
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-3">Patient Information</h4>
+                      <h4 className="font-semibold text-gray-900 mb-3">
+                        Patient Information
+                      </h4>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-500">Phone:</span>
-                          <span className="font-medium">{patient?.PhoneNumber || "—"}</span>
+                          <span className="font-medium">
+                            {patient?.PhoneNumber || "—"}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-500">Email:</span>
-                          <span className="font-medium text-right break-all">{patient?.Email || "—"}</span>
+                          <span className="font-medium text-right break-all">
+                            {patient?.Email || "—"}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-500">Age:</span>
-                          <span className="font-medium">{patient?.Age} yrs</span>
+                          <span className="font-medium">
+                            {patient?.Age} yrs
+                          </span>
                         </div>
                       </div>
                     </div>
 
-                   
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-3">Appointment Details</h4>
+                      <h4 className="font-semibold text-gray-900 mb-3">
+                        Appointment Details
+                      </h4>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-500">Date:</span>
-                          <span className="font-medium">{formatDate(appt.Appointment_Date)}</span>
+                          <span className="font-medium">
+                            {formatDate(appt.Appointment_Date)}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-500">Time Slot:</span>
@@ -362,24 +382,27 @@ const PatientTab = () => {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-500">Status:</span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeStyle(appt.Status)}`}>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeStyle(appt.Status)}`}
+                          >
                             {appt.Status}
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-500">Booked On:</span>
-                          <span className="font-medium">{formatDate(appt.createdAt)}</span>
+                          <span className="font-medium">
+                            {formatDate(appt.createdAt)}
+                          </span>
                         </div>
                       </div>
                     </div>
-
-                    
                   </div>
 
-                  
                   {appt.Condition && (
                     <div className="mt-4 p-3 bg-white rounded-lg border border-gray-200">
-                      <h4 className="font-semibold text-gray-900 mb-2">Condition / Notes</h4>
+                      <h4 className="font-semibold text-gray-900 mb-2">
+                        Condition / Notes
+                      </h4>
                       <p className="text-sm text-gray-600">{appt.Condition}</p>
                     </div>
                   )}
@@ -393,7 +416,9 @@ const PatientTab = () => {
       {filteredAppointments.length === 0 && !loading && (
         <div className="text-center py-12">
           <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No accepted appointments</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            No accepted appointments
+          </h3>
           <p className="text-gray-600">
             {searchQuery
               ? `No accepted appointments match "${searchQuery}".`

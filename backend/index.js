@@ -4,6 +4,9 @@ import authRouter from "./routes/auth.routes.js"
 import connect_db from "./config/db.connted.js"
 import cookieParser from "cookie-parser";
 import  cors from "cors"
+import { createServer } from "http";
+import initializeSocket from "./services/video-call-services.js";
+
 
 
 dotenv.config()
@@ -40,6 +43,8 @@ const corsOption = {
 };
 
 const app=express();
+const server = createServer(app);
+const io = initializeSocket(server);
 
 const port =process.env.Port
 app.use(cors(corsOption))
@@ -53,7 +58,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
 
-app.listen(port,(res,req)=>{
+server.listen(port,(res,req)=>{ 
      connect_db();
     console.log(`server is connected to port: ${port}`);
 })

@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { loginThunk, logoutThunk, registerThunk,getDoshaStatusThunk,submitDoshaThunk  } from "./user.thunk";
 
+
 const userFromStorage = localStorage.getItem("user");
 
 const initialState = {

@@ -1,5 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
+import { useEffect } from "react";
+import CallModal from "./Components/CallModal.jsx";
+
 
 import HomePage from "./Pages/HomePage.jsx";
 import SignIn from "./Pages/SignIn.jsx";
@@ -24,11 +27,49 @@ import CreateDietChart from "./Components/DoctorComponents/Createdietchart.jsx";
 import EditDietChart from "./Components/DoctorComponents/Editdietchart.jsx";
 import DietChartsTab from "./Components/DoctorComponents/DietChartsTab.jsx";
 
+import { getSocket } from "./services/socket_init.js";
+import { setIncomingCall, setCallEnded,setOnlineUsers } from "./feature/video_call/call.slice.js";
+import { useWebRTC } from "./hook/useWebRTC";
+
 function App() {
-  const { isAuthenticated, isDoctor } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const { isAuthenticated, isDoctor, userProfile } = useSelector(
+    (state) => state.user,
+  );
+
+ const { addIceCandidate, answerCall, endCall, callPatient, localRef, remoteRef } = useWebRTC(); // ✅ single instance
+  const callerInfo = useSelector((s) => s.call.callerInfo);
+
+
+  useEffect(() => {
+    if (!userProfile?._id) return; 
+    console.log("Registering socket for user:", userProfile._id);
+
+    const socket = getSocket();
+    socket.emit("register", { userId: userProfile._id });
+
+    socket.on("incoming-call", (data) => dispatch(setIncomingCall(data)));
+    socket.on("ice-candidate", ({ candidate }) => addIceCandidate(candidate));
+    socket.on("call-ended", () => dispatch(setCallEnded()));
+    socket.on("online-users", (onlineUsers) => {
+  dispatch(setOnlineUsers(onlineUsers));
+});
+    return () => {
+      socket.off("incoming-call");
+      socket.off("ice-candidate");
+      socket.off("call-ended");
+    };
+  }, [userProfile?._id]);
 
   return (
     <>
+<CallModal
+        localRef={localRef}
+        remoteRef={remoteRef}
+        onAnswer={() => answerCall(callerInfo)}
+        onEnd={endCall}
+      />
+
       <Routes>
         <Route path="/" element={<HomePage />} />
 
@@ -54,7 +95,7 @@ function App() {
           path="/doctor-dashboard"
           element={
             <ProtectedRoute doctorOnly>
-              <DoctorDashboard />
+              <DoctorDashboard callPatient={callPatient} /> 
             </ProtectedRoute>
           }
         />
@@ -71,65 +112,63 @@ function App() {
           path="/dosha-assessment"
           element={
             <ProtectedRoute>
-              < PrakritiVikritiForm/>
+              <PrakritiVikritiForm />
             </ProtectedRoute>
           }
-        
         />
-     <Route
-     path="/doctor"
-     element={
-      <ProtectedRoute>
-        <DoctorsTab/>
-      </ProtectedRoute>
-     }
-     />
-     
-    <Route
-  path="/doctor/patient/:id"
-  element={
-    <ProtectedRoute doctorOnly={true}>
-      <PatientProfile />
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-path="EditDietChart/:id"
-element={
-  <ProtectedRoute doctorOnly={true}>
-    <EditDietChart/>
-  </ProtectedRoute>
-}
-/>
+        <Route
+          path="/doctor"
+          element={
+            <ProtectedRoute>
+              <DoctorsTab />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
-  path="/book-appointment/:id"
-  element={
-    <ProtectedRoute>
-      <BookAppointment />
-    </ProtectedRoute>
-  }
-/>
+          path="/doctor/patient/:id"
+          element={
+            <ProtectedRoute doctorOnly={true}>
+              <PatientProfile />
+            </ProtectedRoute>
+          }
+        />
 
-<Route
-path="/doctor/createDietChart"
-element={
-  <ProtectedRoute  doctorOnly={true} >
-    <CreateDietChart />
-  </ProtectedRoute>
-}
-/>
+        <Route
+          path="EditDietChart/:id"
+          element={
+            <ProtectedRoute doctorOnly={true}>
+              <EditDietChart />
+            </ProtectedRoute>
+          }
+        />
 
-<Route
-path="/patient/profile/:id"
-element={
-  <ProtectedRoute>
-   <PatientProfile/>
-  </ProtectedRoute>
-}
-/>
+        <Route
+          path="/book-appointment/:id"
+          element={
+            <ProtectedRoute>
+              <BookAppointment />
+            </ProtectedRoute>
+          }
+        />
 
+        <Route
+          path="/doctor/createDietChart"
+          element={
+            <ProtectedRoute doctorOnly={true}>
+              <CreateDietChart />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/patient/profile/:id"
+          element={
+            <ProtectedRoute>
+              <PatientProfile />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/patient-dashboard"
@@ -140,15 +179,14 @@ element={
           }
         />
 
-<Route
-path="/appointments"
-element={
-
-  <ProtectedRoute>
-    <Appointments/>
-  </ProtectedRoute>
-}
-/>
+        <Route
+          path="/appointments"
+          element={
+            <ProtectedRoute>
+              <Appointments />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/RescheduleAppointment/:id"
           element={
@@ -157,8 +195,6 @@ element={
             </ProtectedRoute>
           }
         />
-
-        
 
         <Route
           path="/dashboard"

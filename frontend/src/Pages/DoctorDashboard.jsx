@@ -275,7 +275,7 @@ const EnhancedOverview = ({ currentTime, setActiveTab }) => (
   </div>
 );
 
-export default function DoctorDashboard() {
+export default function DoctorDashboard({callPatient}) {
   const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -288,7 +288,7 @@ export default function DoctorDashboard() {
 
   const contentMap = {
     overview: <EnhancedOverview currentTime={currentTime} setActiveTab={setActiveTab} />,
-    patients: <PatientsTab searchQuery={searchQuery} />,
+    patients: <PatientsTab searchQuery={searchQuery} callPatient={callPatient} />,
     appointments: <AppointmentsTab searchQuery={searchQuery} />,
     dietCharts: <DietChartsTab />,
     profile: <ProfileTab />,

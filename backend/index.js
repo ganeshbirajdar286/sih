@@ -13,8 +13,8 @@ dotenv.config()
 
 
 const allowedOrigins = [
-  /\.vercel\.app$/, 
-  process.env.FRONTEND_URL, 
+  /\.vercel\.app$/,
+  ...process.env.FRONTEND_URL.split(","),
 ];
 
 const corsOption = {
@@ -58,9 +58,8 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
 
-server.listen(port,(res,req)=>{ 
-     connect_db();
-    console.log(`server is connected to port: ${port}`);
-})
-
+server.listen(port, "0.0.0.0", () => {
+  connect_db();
+  console.log(`Server running on ${port}`);
+});
  

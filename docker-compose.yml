@@ -5,11 +5,12 @@ services:
       backend:
         condition: service_healthy
     ports:
-      - "3001:5173"
+      - "3002:5173"
     networks:
       - app-network
     environment:
-      VITE_API_URL: http://backend:3000/api
+      VITE_API_URL: http://localhost:3001/api
+      VITE_SOCKET_URL: http://localhost:3001
     restart: always
 
   backend:
@@ -20,14 +21,14 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "3001:3001"
     env_file:
       - ./backend/.env
     networks:
       - app-network
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', res => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,7 +37,7 @@ services:
   db:
     image: mongo:latest
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - anime:/data/db
     networks:

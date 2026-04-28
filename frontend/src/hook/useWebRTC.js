@@ -85,6 +85,7 @@ export const useWebRTC = () => {
 
   // ─── Doctor calls ──────────────────────────────────────────
   const callPatient = useCallback(async (patientSocketId, doctorName) => {
+
     const stream = await getMedia();
     const peer   = createPeer(stream);
     const offer  = await peer.createOffer();

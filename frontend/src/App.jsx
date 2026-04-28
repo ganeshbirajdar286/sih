@@ -48,7 +48,9 @@ function App() {
     const socket = getSocket();
     socket.emit("register", { userId: userProfile._id });
 
-    socket.on("incoming-call", (data) => dispatch(setIncomingCall(data)));
+    socket.on("incoming-call", (data) => {
+  if (!isDoctor) dispatch(setIncomingCall(data));
+});
     socket.on("ice-candidate", ({ candidate }) => addIceCandidate(candidate));
     socket.on("call-ended", () => dispatch(setCallEnded()));
     socket.on("online-users", (onlineUsers) => {

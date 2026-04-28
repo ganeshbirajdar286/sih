@@ -91,7 +91,7 @@ const CallModal = ({ localRef, remoteRef, onAnswer, onEnd }) => {
           )}
 
           {/* Incoming call overlay */}
-          {isReceivingCall && !callAccepted && (
+          {isReceivingCall && !callAccepted && !isCalling && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/90 gap-6">
               <div className="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-400/40 flex items-center justify-center">
                 <User className="w-10 h-10 text-emerald-400" />

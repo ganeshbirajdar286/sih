@@ -20,6 +20,7 @@ const callSlice = createSlice({
 },
     setIsCalling(state, { payload }) {
       state.isCalling = payload;
+      state.isReceivingCall = false;
     },
     setIncomingCall(state, { payload }) {
       // payload: { callerName, patientId, signal }

@@ -217,9 +217,16 @@ export const submitDosha = async (req, res) => {
   try {
     const { prakriti, vikriti, dominantPrakriti, dominantVikriti } = req.body;
 
+    // Validation
+    if (!prakriti || !vikriti || !dominantPrakriti || !dominantVikriti) {
+      return res.status(400).json({
+        message: "All dosha assessment fields are required",
+      });
+    }
+
+    // Create dosha entry
     const data = await Dosha.create({
       Patient_id: req.user.userId,
-
       doshaAssessment: {
         prakriti,
         vikriti,
@@ -228,26 +235,30 @@ export const submitDosha = async (req, res) => {
       },
     });
 
-    const user = await User.findByIdAndUpdate(
+    // Update user profile
+    await User.findByIdAndUpdate(
       req.user.userId,
       {
         Dosha: data._id,
         lastFilledAt: new Date(),
       },
-      { new: true },
+      { new: true }
     );
 
-    res.status(200).json({
-      message: "Dosha assessment saved",
+    return res.status(201).json({
+      message: "Dosha assessment saved successfully",
       data,
     });
+
   } catch (err) {
-    res.status(500).json({
+    console.error("Submit Dosha Error:", err);
+
+    return res.status(500).json({
+      message: "Internal server error",
       error: err.message,
     });
   }
 };
-
 //patient
 
 export const PatientUpdateProfile = async (req, res) => {

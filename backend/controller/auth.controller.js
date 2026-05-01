@@ -105,12 +105,13 @@ export const register = async (req, res) => {
     if (doctorProfile) {
       const token = jwtToken(user?.id, doctorProfile?._id);
 
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: false,
-        sameSite: "lax",
-        maxAge: 1000 * 60 * 60 * 24 * 365,
-      });
+    const isProduction=process.env.NODE_ENV==="production"
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction?"none":"lax",
+      maxAge: 1000 * 60 * 60 * 24 * 365,
+    });
     }
 
     res.status(201).json({
@@ -151,10 +152,11 @@ export const login = async (req, res) => {
 
     const token = jwtToken(user?._id, user?.Doctor_id);
 
+    const isProduction= process.env.NODE_ENV==="production"
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: isProduction,
+      sameSite: isProduction?"none":"lax",
       maxAge: 1000 * 60 * 60 * 24 * 365,
     });
 
@@ -173,10 +175,11 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
+    const isProduction=process.env.NODE_ENV==="production"
     res.clearCookie("token", {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false, // localhost
+      sameSite: isProduction?"none":"lax",
+      secure: isProduction, // localhost
     });
 
     return res.status(200).json({

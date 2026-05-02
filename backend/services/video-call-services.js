@@ -58,20 +58,39 @@ const initializeSocket = (server) => {
       }
     });
 
-    // ✅ Fixed: end call only for the paired peer
-    socket.on("end-call", () => {
-      const peerSocketId = callPairs.get(socket.id);
-      if (peerSocketId) {
-        io.to(peerSocketId).emit("call-ended");
-        callPairs.delete(peerSocketId);
-      }
-      callPairs.delete(socket.id);
-    });
+   socket.on("end-call", () => {
+  const peerSocketId = callPairs.get(socket.id);
+  if (peerSocketId) {
+    io.to(peerSocketId).emit("call-ended");
+    callPairs.delete(peerSocketId);
+  }
+  callPairs.delete(socket.id);
+
+  // ✅ Broadcast updated map so frontend knows to re-register if needed
+  const onlineUsers = Object.fromEntries(userSocketMap);
+  io.emit("online-users", onlineUsers);
+});
 
     socket.on("disconnect", () => {
-  // ... existing cleanup ...
+  // Remove disconnected socket from map
+  for (const [userId, socketId] of userSocketMap.entries()) {
+    if (socketId === socket.id) {
+      userSocketMap.delete(userId);
+      break;
+    }
+  }
+
+  // Clean up call pairs
+  const peerSocketId = callPairs.get(socket.id);
+  if (peerSocketId) {
+    io.to(peerSocketId).emit("call-ended");
+    callPairs.delete(peerSocketId);
+  }
+  callPairs.delete(socket.id);
+
+  // Now broadcast accurate online users
   const onlineUsers = Object.fromEntries(userSocketMap);
-  io.emit("online-users", onlineUsers); // ✅ update everyone
+  io.emit("online-users", onlineUsers);
 });
   });
 

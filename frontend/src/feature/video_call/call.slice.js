@@ -33,8 +33,11 @@ const callSlice = createSlice({
       state.isReceivingCall = false;
     },
     setCallEnded(state) {
-      return { ...initialState };        // full reset
-    },
+  return {
+    ...initialState,
+    onlineUsers: state.onlineUsers, //  keep online users across call resets
+  };
+},
     setLocalStream(state, { payload }) {
       state.localStream = payload;
     },

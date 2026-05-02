@@ -101,9 +101,9 @@ export const register = async (req, res) => {
       { Doctor_id: doctorProfile?._id },
       { new: true },
     );
-
+    let token; 
     if (doctorProfile) {
-      const token = jwtToken(user?.id, doctorProfile?._id);
+       token = jwtToken(user?.id, doctorProfile?._id);
 
     const isProduction=process.env.NODE_ENV==="production"
     res.cookie("token", token, {
@@ -118,6 +118,7 @@ export const register = async (req, res) => {
       message: "Registration successful",
       responseData: user,
       autoLogin: isDoctor === "true",
+      token:token,
     });
   } catch (error) {
     res.status(500).json({
@@ -164,6 +165,7 @@ export const login = async (req, res) => {
       message: "Login successful",
       role,
       responseData: user,
+      token:token,
     });
   } catch (error) {
     return res.status(500).json({
@@ -184,6 +186,7 @@ export const logout = async (req, res) => {
 
     return res.status(200).json({
       message: "User logout successfully",
+      token:null,
     });
   } catch (error) {
     console.log(error);

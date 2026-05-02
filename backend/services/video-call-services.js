@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import{ socketMiddleware}  from "../middleware/socket.middleware.js";
 
 const initializeSocket = (server) => {
   const io = new Server(server, {
@@ -9,6 +10,8 @@ const initializeSocket = (server) => {
     },
     pingTimeout: 60000,
   });
+
+  io.use(socketMiddleware);
 
   const userSocketMap = new Map(); // userId → socketId
   const callPairs = new Map();     // socketId → peer socketId

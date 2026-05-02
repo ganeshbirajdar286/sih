@@ -596,6 +596,7 @@ describe("logout", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
       message: "User logout successfully",
+      token: null,
     });
   });
 });

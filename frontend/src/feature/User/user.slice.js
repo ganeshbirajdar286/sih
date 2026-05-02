@@ -1,6 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { loginThunk, logoutThunk, registerThunk,getDoshaStatusThunk,submitDoshaThunk  } from "./user.thunk";
-
+import {
+  loginThunk,
+  logoutThunk,
+  registerThunk,
+  getDoshaStatusThunk,
+  submitDoshaThunk,
+} from "./user.thunk";
 
 const userFromStorage = localStorage.getItem("user");
 
@@ -8,9 +13,9 @@ const initialState = {
   isAuthenticated: !!userFromStorage,
   userProfile: userFromStorage ? JSON.parse(userFromStorage) : null,
   isDoctor: userFromStorage ? JSON.parse(userFromStorage).isDoctor : null,
-  mustFill:false,
+  mustFill: false,
   ButtonLoading: false,
-   doshaData: null, 
+  doshaData: null,
 };
 
 const userSlice = createSlice({
@@ -27,6 +32,7 @@ const userSlice = createSlice({
     builder.addCase(loginThunk.fulfilled, (state, action) => {
       console.log("fulfilled");
       const user = action.payload?.responseData;
+      const token =action.payload?.token;
 
       state.ButtonLoading = false;
       state.isAuthenticated = true;
@@ -35,6 +41,7 @@ const userSlice = createSlice({
 
       // Persist
       localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("auth_token", token);
     });
     builder.addCase(loginThunk.pending, (state, action) => {
       console.log("pending");
@@ -47,25 +54,27 @@ const userSlice = createSlice({
 
     // register
     builder.addCase(registerThunk.fulfilled, (state, action) => {
-  console.log("Register fulfilled");
+      console.log("Register fulfilled");
 
-  const user = action.payload?.responseData;
-  const autoLogin = action.payload?.autoLogin;
+      const user = action.payload?.responseData;
+      const autoLogin = action.payload?.autoLogin;
+      const token =action.payload?.token;
 
-  state.ButtonLoading = false;
+      state.ButtonLoading = false;
 
-  if (autoLogin) {
-    state.isAuthenticated = true;
-    state.userProfile = user;
-    state.isDoctor = user?.isDoctor;
+      if (autoLogin) {
+        state.isAuthenticated = true;
+        state.userProfile = user;
+        state.isDoctor = user?.isDoctor;
 
-    localStorage.setItem("user", JSON.stringify(user));
-  } else {
-    state.isAuthenticated = false;
-    state.userProfile = null;
-    state.isDoctor = null;
-  }
-});
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("auth_token",token);
+      } else {
+        state.isAuthenticated = false;
+        state.userProfile = null;
+        state.isDoctor = null;
+      }
+    });
 
     builder.addCase(registerThunk.pending, (state, action) => {
       console.log("pending");
@@ -83,6 +92,7 @@ const userSlice = createSlice({
       state.isAuthenticated = false;
       state.userProfile = null;
       state.isDoctor = null;
+      localStorage.removeItem("auth_token");
     });
     builder.addCase(logoutThunk.pending, (state, action) => {
       console.log("pending");
@@ -93,11 +103,11 @@ const userSlice = createSlice({
       state.ButtonLoading = false;
     });
 
-//getDoshaStatusThunk
-     builder.addCase(getDoshaStatusThunk.fulfilled, (state, action) => {
+    //getDoshaStatusThunk
+    builder.addCase(getDoshaStatusThunk.fulfilled, (state, action) => {
       console.log("fulfilled");
       state.ButtonLoading = false;
-      state.mustFill=action.payload.mustFill;
+      state.mustFill = action.payload.mustFill;
     });
     builder.addCase(getDoshaStatusThunk.pending, (state, action) => {
       console.log("pending");
@@ -109,10 +119,10 @@ const userSlice = createSlice({
     });
 
     //submitDoshaThunk
-     builder.addCase(submitDoshaThunk.fulfilled, (state, action) => {
+    builder.addCase(submitDoshaThunk.fulfilled, (state, action) => {
       console.log("fulfilled");
       state.ButtonLoading = false;
-      state.doshaData=action.payload.data;
+      state.doshaData = action.payload.data;
     });
     builder.addCase(submitDoshaThunk.pending, (state, action) => {
       console.log("pending");

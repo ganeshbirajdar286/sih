@@ -7,6 +7,9 @@ export const initializeSocket = () => {
 
   const Backend_Socket_URL = import.meta.env.VITE_SOCKET_URL;
   socket = io(Backend_Socket_URL, {
+    auth:{
+      token:localStorage.getItem("auth_token")
+    },
     withCredentials: true,
     transports: ["websocket", "polling"],
     reconnectionAttempts: 5,

@@ -316,12 +316,31 @@ export const DoctorUpdateProfileValidator = [
     .optional()
     .trim()
     .isIn([
-      "Cardiologist",
-      "Dermatologist",
-      "Neurologist",
-      "Orthopedic",
-      "General Physician"
-    ])
+        "Dermatologist",
+        "Oncologist",
+        "Cardiologist",
+        "Endocrinologist",
+        "Gastroenterologist",
+        "Neurologist",
+        "Obstetrics and Gynaecology",
+        "Ophthalmologist",
+        "Family doctor",
+        "Psychiatrist",
+        "Pediatrician",
+        "Allergist",
+        "Geriatrician",
+        "Internal medicine",
+        "Nephrologist",
+        "Orthopedics",
+        "Anesthesiologist",
+        "Infectious disease physician",
+        "Radiologist",
+        "General physician",
+        "Hematologist",
+        "Surgeon",
+        "Urologist",
+        "Colorectal surgeon",
+      ])
     .withMessage("Invalid specialization"),
 
   body("Qualifications")

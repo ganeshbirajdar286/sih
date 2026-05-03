@@ -16,7 +16,7 @@ export const useWebRTC = () => {
   const localRef  = useRef(null);
   const remoteRef = useRef(null);
   const streamRef = useRef(null);
-  const iceCandidateQueue = useRef([]); // ✅ queue candidates
+  const iceCandidateQueue = useRef([]); 
 
  const getMedia = async () => {
   const stream = await navigator.mediaDevices.getUserMedia({
@@ -26,12 +26,12 @@ export const useWebRTC = () => {
   streamRef.current = stream;
   dispatch(setLocalStream(true));
 
-  // ✅ Use requestAnimationFrame to wait for modal to mount
+ 
   const assignLocal = () => {
     if (localRef.current) {
       localRef.current.srcObject = stream;
     } else {
-      requestAnimationFrame(assignLocal); // retry until element exists
+      requestAnimationFrame(assignLocal); 
     }
   };
   requestAnimationFrame(assignLocal);
@@ -44,19 +44,19 @@ export const useWebRTC = () => {
     stream.getTracks().forEach((t) => peer.addTrack(t, stream));
 
     peer.ontrack = (e) => {
-      console.log("✅ Got remote track", e.streams[0]); // debug
+      console.log("✅ Got remote track", e.streams[0]); 
       if (remoteRef.current) remoteRef.current.srcObject = e.streams[0];
       dispatch(setRemoteStream(true));
     };
 
     peer.onicecandidate = (e) => {
       if (e.candidate) {
-        console.log("📤 Sending ICE candidate"); // debug
+        console.log("📤 Sending ICE candidate"); 
         getSocket().emit("ice-candidate", { candidate: e.candidate });
       }
     };
 
-    // ✅ Log connection state changes
+   
     peer.onconnectionstatechange = () => {
       console.log("🔗 Connection state:", peer.connectionState);
     };
@@ -65,7 +65,7 @@ export const useWebRTC = () => {
     return peer;
   };
 
-  // ✅ Flush queued ICE candidates after remote description is set
+
   const flushIceQueue = async () => {
     for (const candidate of iceCandidateQueue.current) {
       await peerRef.current.addIceCandidate(new RTCIceCandidate(candidate));
@@ -91,10 +91,10 @@ export const useWebRTC = () => {
     const offer  = await peer.createOffer();
     await peer.setLocalDescription(offer);
 
-    console.log("📞 Calling patient socket:", patientSocketId); // debug
+    console.log("📞 Calling patient socket:", patientSocketId); 
 
     getSocket().emit("call-user", {
-      to:     patientSocketId, // already a socketId
+      to:     patientSocketId,
       from:   getSocket().id,
       name:   doctorName,
       signal: offer,
@@ -103,16 +103,16 @@ export const useWebRTC = () => {
     dispatch(setIsCalling(true));
 
     getSocket().once("call-accepted", async ({ signal }) => {
-      console.log("✅ Call accepted, setting remote description"); // debug
+      console.log("✅ Call accepted, setting remote description"); 
       await peer.setRemoteDescription(new RTCSessionDescription(signal));
-      await flushIceQueue(); // ✅ flush queued candidates
+      await flushIceQueue();
       dispatch(setCallAccepted());
     });
   }, [dispatch]);
 
   // ─── Patient answers ───────────────────────────────────────
   const answerCall = useCallback(async (callerInfo) => {
-    console.log("📲 Answering call from:", callerInfo); // debug
+    console.log("📲 Answering call from:", callerInfo); 
 
     if (!callerInfo?.signal) {
       console.error("❌ No signal in callerInfo!", callerInfo);
@@ -125,36 +125,34 @@ export const useWebRTC = () => {
     await peer.setRemoteDescription(
       new RTCSessionDescription(callerInfo.signal)
     );
-    await flushIceQueue(); // ✅ flush queued candidates
+    await flushIceQueue(); 
 
     const answer = await peer.createAnswer();
     await peer.setLocalDescription(answer);
 
     getSocket().emit("answer-call", {
-      to:     callerInfo.from, // caller's socket.id
+      to:     callerInfo.from, 
       signal: answer,
     });
 
     dispatch(setCallAccepted());
   }, [dispatch]);
 
-  // ─── Hang up ───────────────────────────────────────────────
   const endCall = useCallback(() => {
     stopMedia();
     getSocket().emit("end-call");
     dispatch(setCallEnded());
   }, [dispatch]);
 
-  // ─── ICE from remote — queue if peer not ready ────────────
+
   const addIceCandidate = useCallback(async (candidate) => {
     if (!candidate) return;
 
     const peer = peerRef.current;
     if (peer && peer.remoteDescription) {
-      // ✅ Remote description is set, add directly
+      
       await peer.addIceCandidate(new RTCIceCandidate(candidate));
     } else {
-      // ✅ Queue it for later
       console.log("⏳ Queuing ICE candidate");
       iceCandidateQueue.current.push(candidate);
     }

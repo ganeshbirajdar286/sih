@@ -5,7 +5,7 @@ const initialState = {
   isReceivingCall: false,
   callAccepted: false,
   callEnded: false,
-  callerInfo: null,       // { name, patientId, signal }
+  callerInfo: null,       
   localStream: null,
   remoteStream: null,
   onlineUsers: {},

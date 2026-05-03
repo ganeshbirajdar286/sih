@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-// Patient-specific components
+
 import Sidebar from "../Components/PatientDashboard/Sidebar";
 import Header from "../Components/PatientDashboard/Header";
 import DoctorsTab from "../Components/PatientComponents/DoctorsTab";
@@ -11,7 +11,7 @@ import PatientProfileUpdate from "../Components/PatientDashboard/Patientprofileu
 
 export default function PatientDashboard() {
   
-  // 👇 default tab set to "patients"
+ 
   const [activeTab, setActiveTab] = useState("patients");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");

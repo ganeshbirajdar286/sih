@@ -7,7 +7,7 @@ const PublicRoute = ({ children }) => {
     useSelector((state) => state.user);
 
 
-  // 🔐 Already logged in → block
+  //  Already logged in → block
   if (isAuthenticated) {
     return isDoctor ? (
       <Navigate

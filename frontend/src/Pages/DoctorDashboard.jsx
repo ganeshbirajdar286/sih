@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-// Doctor-specific components
+
 import Header from "../Components/DoctorComponents/Header.jsx";
 import Sidebar from "../Components/DoctorComponents/Sidebar.jsx";
 import StatCard from "../Components/DoctorComponents/StatCard.jsx";
@@ -31,13 +31,13 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-// Tabs
+
 import PatientsTab from "../Components/DoctorComponents/PatientsTab.jsx";
 import AppointmentsTab from "../Components/DoctorComponents/AppointmentsTab.jsx";
 import DietChartsTab from "../Components/DoctorComponents/DietChartsTab.jsx";
 import ProfileTab from "../Components/DoctorComponents/ProfileTab.jsx";
 
-// Sidebar items
+
 const sidebarItems = [
   { id: "overview", icon: BarChart3, label: "Dashboard Overview", badge: "New" },
   { id: "patients", icon: Users, label: "My Patients", badge: "1.2k" },
@@ -46,7 +46,7 @@ const sidebarItems = [
   { id: "profile", icon: User, label: "Doctor Profile", badge: "⭐" },
 ];
 
-// Quick stats
+
 const quickStats = [
   { label: "Active Patients", value: "247", change: "+12", icon: Users, color: "bg-emerald-500", trend: "up" },
   { label: "Pending Charts", value: "18", change: "-3", icon: FileText, color: "bg-amber-500", trend: "down" },
@@ -56,7 +56,7 @@ const quickStats = [
   { label: "Recipes Used", value: "89", change: "+15", icon: ChefHat, color: "bg-purple-500", trend: "up" },
 ];
 
-// Recent activities
+
 const recentActivities = [
   { time: "2 min ago", action: "New patient registration", patient: "Rahul Sharma", type: "success", icon: Users },
   { time: "15 min ago", action: "Diet chart created", patient: "Priya Patel", type: "info", icon: FileText },
@@ -65,7 +65,7 @@ const recentActivities = [
   { time: "3 hours ago", action: "Lab results received", patient: "Vikram Joshi", type: "info", icon: Activity },
 ];
 
-// Health metrics
+
 const healthMetrics = [
   { icon: Heart, label: "Avg. BP", value: "120/80", status: "normal", trend: "stable" },
   { icon: Scale, label: "Avg. Weight", value: "68.2kg", status: "good", trend: "down" },
@@ -73,14 +73,14 @@ const healthMetrics = [
   { icon: Brain, label: "Mental Score", value: "8.2/10", status: "excellent", trend: "up" },
 ];
 
-// Dosha distribution
+
 const doshaDistribution = [
   { dosha: "Vata", percentage: 35, color: "bg-blue-500", patients: 86 },
   { dosha: "Pitta", percentage: 45, color: "bg-red-500", patients: 111 },
   { dosha: "Kapha", percentage: 20, color: "bg-yellow-500", patients: 50 },
 ];
 
-// Quick actions
+
 const quickActions = [
   { icon: Plus, label: "New Patient", description: "Add new patient record", color: "bg-emerald-500", link: "patients" },
   { icon: FileText, label: "Create Diet Chart", description: "Generate Ayurvedic diet plan", color: "bg-blue-500", link: "dietCharts" },
@@ -88,7 +88,7 @@ const quickActions = [
   { icon: Stethoscope, label: "New Consultation", description: "Start a new consultation", color: "bg-green-500", link: "consultations" },
 ];
 
-// Enhanced Overview Component
+
 const EnhancedOverview = ({ currentTime, setActiveTab }) => (
   <div className="space-y-6">
     {/* Welcome Section */}

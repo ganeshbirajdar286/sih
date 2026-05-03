@@ -10,7 +10,6 @@ const ProtectedRoute = ({
     (state) => state.user
   );
 
-  // Safety guard
   if (!userState) {
     return <Navigate to="/signin" replace />;
   }
@@ -22,7 +21,7 @@ const ProtectedRoute = ({
   } = userState;
 
 
-  // ⏳ Loading screen (optional)
+
   if (screenLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -32,13 +31,11 @@ const ProtectedRoute = ({
   }
 
 
-  // ❌ Not logged in
   if (!isAuthenticated) {
     return <Navigate to="/signin" replace />;
   }
 
 
-  // 👨‍⚕️ Doctor-only route
   if (doctorOnly && !isDoctor) {
     return (
       <Navigate
@@ -49,7 +46,7 @@ const ProtectedRoute = ({
   }
 
 
-  // 🧑 Patient-only route
+
   if (!doctorOnly && isDoctor) {
     return (
       <Navigate

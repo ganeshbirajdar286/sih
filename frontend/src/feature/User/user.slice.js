@@ -38,10 +38,9 @@ const userSlice = createSlice({
       state.isAuthenticated = true;
       state.userProfile = user;
       state.isDoctor = user?.isDoctor;
-
       // Persist
       localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("auth_token", token);
+      localStorage.setItem("auth_token",token);
     });
     builder.addCase(loginThunk.pending, (state, action) => {
       console.log("pending");

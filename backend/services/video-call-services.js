@@ -23,14 +23,14 @@ const initializeSocket = (server) => {
   if (!userId) return;
   userSocketMap.set(userId.toString(), socket.id);
 
-  // ✅ Broadcast updated online users map to all clients
+  //  Broadcast updated online users map to all clients
   const onlineUsers = Object.fromEntries(userSocketMap);
   io.emit("online-users", onlineUsers); // { userId: socketId, ... }
 });
 
     socket.on("call-user", ({ to, from, name, signal, fromUserId }) => {
   // "to" is already a socketId from the frontend, no need to look up
-  const targetSocketId = to; // ✅ use directly
+  const targetSocketId = to; //  use directly
 
   if (!io.sockets.sockets.get(targetSocketId)) {
     socket.emit("user-offline");
@@ -53,7 +53,7 @@ const initializeSocket = (server) => {
       io.to(to).emit("call-accepted", { signal });
     });
 
-    // ✅ Fixed: route ICE candidates only to the paired peer
+    //  Fixed: route ICE candidates only to the paired peer
     socket.on("ice-candidate", ({ candidate }) => {
       const peerSocketId = callPairs.get(socket.id);
       if (peerSocketId) {
@@ -69,7 +69,7 @@ const initializeSocket = (server) => {
   }
   callPairs.delete(socket.id);
 
-  // ✅ Broadcast updated map so frontend knows to re-register if needed
+  // Broadcast updated map so frontend knows to re-register if needed
   const onlineUsers = Object.fromEntries(userSocketMap);
   io.emit("online-users", onlineUsers);
 });

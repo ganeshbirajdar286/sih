@@ -218,7 +218,6 @@ const AppointmentsTab = () => {
     }
   };
 
-
   const pillOptions = [
     { key: "all", label: "All" },
     { key: "pending", label: "Pending" },
@@ -266,7 +265,6 @@ const AppointmentsTab = () => {
     return localAppointments.filter((a) => statusToPill(a.Status) === pillKey)
       .length;
   };
-
 
   const filtered = localAppointments
     .filter((apt) => {
@@ -344,7 +342,6 @@ const AppointmentsTab = () => {
         <div style={styles.topStrip} />
 
         <div style={styles.container}>
-         
           <div className="at-card" style={styles.header}>
             <div>
               <div style={styles.headerEyebrow}>
@@ -360,7 +357,6 @@ const AppointmentsTab = () => {
             </div>
           </div>
 
-          
           <div
             className="at-card"
             style={{ ...styles.toolbar, animationDelay: "0.06s" }}
@@ -398,7 +394,6 @@ const AppointmentsTab = () => {
             </div>
           </div>
 
-        
           <div
             className="at-card"
             style={{ ...styles.pillRow, animationDelay: "0.1s" }}
@@ -456,7 +451,6 @@ const AppointmentsTab = () => {
             </div>
           )}
 
-          
           {error && !loading && (
             <div style={styles.errorBox}>
               <XCircle size={20} style={{ color: "#ef4444" }} />
@@ -468,14 +462,15 @@ const AppointmentsTab = () => {
             </div>
           )}
 
-     
           {!loading && !error && (
             <div style={styles.list}>
               {filtered.map((apt, idx) => {
                 const patient = apt.Patient_id;
                 const isOpen = expandedId === apt._id;
                 const m = getMeta(apt.Status);
-
+                const isResolved =
+                  apt.Status?.toLowerCase() === "accepted" ||
+                  apt.Status?.toLowerCase() === "rejected";
                 return (
                   <div
                     key={apt._id}
@@ -486,13 +481,11 @@ const AppointmentsTab = () => {
                       borderLeft: `4px solid ${m.color}`,
                     }}
                   >
-                   
                     <div
                       className="at-expand-btn"
                       style={styles.apptRow}
                       onClick={() => setExpandedId(isOpen ? null : apt._id)}
                     >
-                      
                       <div style={styles.avatarWrap}>
                         {patient?.Image_url ? (
                           <img
@@ -512,7 +505,6 @@ const AppointmentsTab = () => {
                         )}
                       </div>
 
-                    
                       <div style={styles.apptMain}>
                         <div style={styles.apptNameRow}>
                           <span style={styles.apptName}>
@@ -553,7 +545,6 @@ const AppointmentsTab = () => {
                         )}
                       </div>
 
-                     
                       <div style={styles.chevron}>
                         {isOpen ? (
                           <ChevronUp size={18} style={{ color: "#10b981" }} />
@@ -563,11 +554,9 @@ const AppointmentsTab = () => {
                       </div>
                     </div>
 
-                   
                     {isOpen && (
                       <div style={styles.expanded}>
                         <div style={styles.expandedGrid}>
-                         
                           <div style={styles.expandSection}>
                             <h4 style={styles.expandHeading}>Patient Info</h4>
                             <div style={styles.detailList}>
@@ -610,11 +599,9 @@ const AppointmentsTab = () => {
                             </div>
                           </div>
 
-                         
                           <div style={styles.expandSection}>
                             <h4 style={styles.expandHeading}>Quick Actions</h4>
                             <div style={styles.actionBtns}>
-                            
                               <button
                                 className="at-action-btn"
                                 style={styles.actionBtn}
@@ -626,20 +613,22 @@ const AppointmentsTab = () => {
                                 View Profile
                               </button>
 
-                            
+                              {/* Accept */}
                               <button
                                 className="at-confirm-btn"
                                 style={{
                                   ...styles.confirmBtn,
                                   opacity:
-                                    confirmingId === apt._id + "Accepted"
-                                      ? 0.7
+                                    confirmingId === apt._id + "Accepted" ||
+                                    isResolved
+                                      ? 0.4
                                       : 1,
-                                  cursor: confirmingId
-                                    ? "not-allowed"
-                                    : "pointer",
+                                  cursor:
+                                    confirmingId || isResolved
+                                      ? "not-allowed"
+                                      : "pointer",
                                 }}
-                                disabled={!!confirmingId}
+                                disabled={!!confirmingId || isResolved}
                                 onClick={() =>
                                   handleStatusUpdate(apt._id, "Accepted")
                                 }
@@ -657,20 +646,22 @@ const AppointmentsTab = () => {
                                 Accept
                               </button>
 
-                             
+                              {/* Reject */}
                               <button
                                 className="at-reject-btn"
                                 style={{
                                   ...styles.rejectBtn,
                                   opacity:
-                                    confirmingId === apt._id + "Rejected"
-                                      ? 0.7
+                                    confirmingId === apt._id + "Rejected" ||
+                                    isResolved
+                                      ? 0.4
                                       : 1,
-                                  cursor: confirmingId
-                                    ? "not-allowed"
-                                    : "pointer",
+                                  cursor:
+                                    confirmingId || isResolved
+                                      ? "not-allowed"
+                                      : "pointer",
                                 }}
-                                disabled={!!confirmingId}
+                                disabled={!!confirmingId || isResolved}
                                 onClick={() =>
                                   handleStatusUpdate(apt._id, "Rejected")
                                 }
@@ -688,7 +679,6 @@ const AppointmentsTab = () => {
                                 Reject
                               </button>
 
-                            
                               <button
                                 className="at-delete-btn"
                                 style={{
@@ -725,7 +715,6 @@ const AppointmentsTab = () => {
             </div>
           )}
 
-        
           {!loading && !error && filtered.length === 0 && (
             <div style={styles.emptyState}>
               <div style={styles.emptyIconWrap}>
@@ -744,7 +733,6 @@ const AppointmentsTab = () => {
     </>
   );
 };
-
 
 const styles = {
   page: {

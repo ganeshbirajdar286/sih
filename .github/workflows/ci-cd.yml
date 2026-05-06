@@ -1,68 +1,57 @@
 # Production-level CI/CD Pipeline for Full-Stack Application
-# This workflow handles linting, testing, building, security scanning, and deployment
-
 name: CI/CD Pipeline
 
-# Trigger the workflow on push and pull request events
 on:
   push:
     branches:
-      - main          # Trigger on pushes to main branch
+      - main
   pull_request:
     branches:
-      - main          # Trigger on PRs targeting main
+      - main
 
-# Environment variables available to all jobs
 env:
-  NODE_VERSION: '20'  # Node.js version to use across all jobs
-  MONGODB_URI: ${{ secrets.MONGODB_URI }}  # MongoDB connection string from secrets
+  NODE_VERSION: '20'
+  MONGODB_URI: ${{ secrets.MONGODB_URI }}
 
-# Define jobs that run in parallel or sequentially
 jobs:
-  # Job 1: Code Quality and Linting
+  # Job 1: Lint
   lint:
     name: Lint Code
-    runs-on: ubuntu-latest  # Use latest Ubuntu runner
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository code
-      # Uses: actions/checkout@v4 - Official GitHub action to clone repo
-      # Why: Needed to access source code for linting
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Setup Node.js environment
-      # Uses: actions/setup-node@v4 - Official Node.js setup action
-      # Why: Installs specified Node.js version and configures npm
-      - name: Setup Node.js
+      - name: Setup Node.js for frontend
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'  # Caches npm dependencies for faster builds
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
-      # Step 3: Install frontend dependencies
-      # Why: Frontend needs dependencies for linting
       - name: Install frontend dependencies
         run: |
           cd frontend
-          npm ci  # npm ci (clean install) is faster and more reproducible than npm install
+          npm ci
 
-      # Step 4: Lint frontend code
-      # Why: Catches code style issues and potential bugs before they reach production
       - name: Lint frontend
         run: |
           cd frontend
           npm run lint
 
-      # Step 5: Install backend dependencies
-      # Why: Backend needs dependencies for linting
+      - name: Setup Node.js for backend
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
       - name: Install backend dependencies
         run: |
           cd backend
           npm ci
 
-      # Step 6: Lint backend code (if ESLint is configured)
-      # Why: Ensures backend code follows consistent style and best practices
       - name: Lint backend
         run: |
           cd backend
@@ -74,61 +63,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository code
-      # Why: Access to frontend source code and tests
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Setup Node.js environment
-      # Why: Required to run frontend tests with Vitest
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: frontend/package.json  # Cache based on frontend package.json
+          cache-dependency-path: frontend/package-lock.json
 
-      # Step 3: Install frontend dependencies
-      # Why: Test dependencies (vitest, testing-library) need to be installed
       - name: Install frontend dependencies
         run: |
           cd frontend
           npm ci
 
-      # Step 4: Run frontend tests
-      # Why: Ensures frontend components and logic work as expected
       - name: Run frontend tests
         run: |
           cd frontend
           npm run test:run
 
-      # Step 5: Upload test coverage reports
-      # Uses: actions/upload-artifact@v4 - Upload files as workflow artifacts
-      # Why: Preserves test coverage for analysis and historical tracking
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
-        if: always()  # Run even if tests fail
+        if: always()
         with:
           name: frontend-coverage
           path: frontend/coverage/
-          retention-days: 30  # Keep for 30 days
+          retention-days: 30
 
   # Job 3: Backend Testing
   test-backend:
     name: Test Backend
     runs-on: ubuntu-latest
 
-    # Service containers for backend tests
     services:
-      # MongoDB service container
-      # Why: Backend tests need a database to run integration tests
       mongodb:
-        image: mongo:7.0  # Use MongoDB 7.0 image
+        image: mongo:7.0
         env:
           MONGO_INITDB_ROOT_USERNAME: admin
           MONGO_INITDB_ROOT_PASSWORD: password
         ports:
-          - 27017:27017  # Expose MongoDB on default port
+          - 27017:27017
         options: >-
           --health-cmd "mongosh --eval 'db.runCommand({ping: 1})'"
           --health-interval 10s
@@ -136,29 +111,21 @@ jobs:
           --health-retries 5
 
     steps:
-      # Step 1: Checkout repository code
-      # Why: Access to backend source code and tests
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Setup Node.js environment
-      # Why: Required to run backend tests with Jest
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: backend/package.json
+          cache-dependency-path: backend/package-lock.json
 
-      # Step 3: Install backend dependencies
-      # Why: Test dependencies (jest) need to be installed
       - name: Install backend dependencies
         run: |
           cd backend
           npm ci
 
-      # Step 4: Run backend tests
-      # Why: Ensures backend API endpoints, database operations, and business logic work correctly
       - name: Run backend tests
         run: |
           cd backend
@@ -167,8 +134,6 @@ jobs:
           MONGODB_URI: mongodb://admin:password@localhost:27017/test?authSource=admin
           NODE_ENV: test
 
-      # Step 5: Upload test coverage reports
-      # Why: Preserves backend test coverage for analysis
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -181,65 +146,52 @@ jobs:
   build-frontend:
     name: Build Frontend
     runs-on: ubuntu-latest
-    needs: [lint, test-frontend]  # Only run if lint and tests pass
+    needs: [lint, test-frontend]
 
     steps:
-      # Step 1: Checkout repository code
-      # Why: Access to frontend source code for building
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Setup Node.js environment
-      # Why: Required to run Vite build process
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: frontend/package.json
+          cache-dependency-path: frontend/package-lock.json
 
-      # Step 3: Install frontend dependencies
-      # Why: All dependencies needed for production build
       - name: Install frontend dependencies
         run: |
           cd frontend
           npm ci
 
-      # Step 4: Build frontend for production
-      # Why: Creates optimized, minified production bundle
       - name: Build frontend
         run: |
           cd frontend
           npm run build
 
-      # Step 5: Upload build artifacts
-      # Why: Makes built files available for deployment job
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
           path: frontend/dist/
-          retention-days: 7  # Keep for 7 days
+          retention-days: 7
 
   # Job 5: Security Scanning
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
-    needs: [lint]  # Can run in parallel with tests
+    needs: [lint]
 
     steps:
-      # Step 1: Checkout repository code
-      # Why: Access to code for security analysis
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Run npm audit for frontend
-      # Uses: actions/setup-node@v4
-      # Why: Checks for known vulnerabilities in frontend dependencies
-      - name: Setup Node.js for frontend
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend dependencies
         run: |
@@ -249,11 +201,16 @@ jobs:
       - name: Run npm audit (frontend)
         run: |
           cd frontend
-          npm audit --audit-level=moderate  # Fail on moderate+ vulnerabilities
-        continue-on-error: true  # Don't fail the pipeline, just warn
+          npm audit --audit-level=moderate
+        continue-on-error: true
 
-      # Step 3: Run npm audit for backend
-      # Why: Checks for known vulnerabilities in backend dependencies
+      - name: Setup Node.js for backend
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
       - name: Install backend dependencies
         run: |
           cd backend
@@ -265,20 +222,17 @@ jobs:
           npm audit --audit-level=moderate
         continue-on-error: true
 
-      # Step 4: Run CodeQL Analysis
-      # Uses: github/codeql-action/init@v3 - GitHub's advanced security analysis
-      # Why: Detects security vulnerabilities, code quality issues, and potential bugs
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: javascript  # Analyze JavaScript/TypeScript code
+          languages: javascript
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:javascript"
 
-  # Job 6: Deploy to Production (conditional)
+  # Job 6: Deploy to Production
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
@@ -295,44 +249,37 @@ jobs:
           name: frontend-build
           path: frontend/dist/
 
-    #  Trigger Render Backend Deployment via Deploy Hook
       - name: Deploy backend to Render
         run: |
-         curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
 
-    #  Wait for Render to spin up (cold starts can take 30–60s)
       - name: Wait for Render to deploy
         run: sleep 60
 
-    # Health check against your Render service URL
       - name: Health check
         run: |
-         curl -f ${{ secrets.APP_URL }}/health || exit 1
+          curl -f ${{ secrets.APP_URL }}/health || exit 1
 
       - name: Notify deployment success
         uses: actions/github-script@v7
         if: success()
         with:
-         script: |
-          github.rest.repos.createCommitComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            commit_sha: context.sha,
-            body: ' Deployment to Render production successful!'
-          })
-          
+          script: |
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: '✅ Deployment to Render production successful!'
+            })
 
-  # Job 8: Notify on Failure
+  # Job 7: Notify on Failure
   notify-failure:
     name: Notify on Failure
     runs-on: ubuntu-latest
     needs: [lint, test-frontend, test-backend, build-frontend, security-scan]
-    if: failure()  # Only run if any previous job fails
+    if: failure()
 
     steps:
-      # Step 1: Send failure notification
-      # Uses: actions/github-script@v7
-      # Why: Alerts team about pipeline failures
       - name: Send failure notification
         uses: actions/github-script@v7
         with:
@@ -348,7 +295,6 @@ jobs:
             Triggered by: ${actor}
             View details: ${context.serverUrl}/${repo}/actions/runs/${context.runId}`;
 
-            // Create an issue for tracking failures
             github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,

@@ -258,8 +258,15 @@ jobs:
         run: |
           curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
 
-      - name: Wait for Render to deploy
-        run: sleep 180
+      - name: Wait for Render to deploy  
+        run: |
+               for i in {1..18}; do
+                echo "Checking deployment... Attempt $i"
+                curl -L -f "${{ secrets.APP_URL }}/health" && exit 0
+               sleep 10
+                done
+                echo "Deployment failed health check"
+                 exit 1
 
       - name: Health check
         run: |

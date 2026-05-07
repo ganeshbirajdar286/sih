@@ -4,7 +4,7 @@ import { PhoneOff, Phone, Mic, MicOff, Video, VideoOff, User } from "lucide-reac
 
 const CallModal = ({ localRef, remoteRef, onAnswer, onEnd }) => {
   const { isCalling, callAccepted, isReceivingCall, callerInfo } =
-    useSelector((s) => s.call);
+    useSelector((s) => s.call ?? {});
 
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(true);

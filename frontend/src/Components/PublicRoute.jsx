@@ -3,8 +3,8 @@ import { Navigate } from "react-router-dom";
 
 const PublicRoute = ({ children }) => {
 
-  const { isAuthenticated, isDoctor } =
-    useSelector((state) => state.user);
+ const { isAuthenticated, isDoctor } =
+    useSelector((state) => state.user ?? {});
 
 
   //  Already logged in → block

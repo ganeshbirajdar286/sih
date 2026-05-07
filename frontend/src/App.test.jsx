@@ -6,6 +6,7 @@ import { render } from "@testing-library/react";
 import { configureStore } from "@reduxjs/toolkit";
 import { MemoryRouter, Routes, Route, Navigate } from "react-router-dom";
 import App from "../src/App.jsx"
+import { useSelector } from "react-redux";  
 
 import ProtectedRoute from "./Components/ProtectedRoute.jsx";
 import PublicRoute from "./Components/PublicRoute.jsx";
@@ -23,6 +24,13 @@ vi.mock("react-hot-toast", () => ({
   Toaster: () => null,
 }));
 
+vi.mock("lucide-react", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+  };
+});
+
 // Mock page components
 const HomePage = () => <div data-testid="home-page">Home Page</div>;
 const SignIn = () => <div data-testid="signin-page">Sign In Page</div>;
@@ -39,6 +47,8 @@ const PatientProfile = () => <div data-testid="patient-profile">Patient Profile<
 
 // Test App component that mirrors the real App routes
 function TestApp() {
+
+    const { isAuthenticated, isDoctor } = useSelector((state) => state.user ?? {});
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
@@ -148,6 +158,19 @@ function TestApp() {
           <ProtectedRoute>
             <RescheduleAppointment />
           </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/dashboard"
+        element={
+          !isAuthenticated ? (
+            <Navigate to="/signin" replace />
+          ) : isDoctor ? (
+            <Navigate to="/doctor-dashboard" replace />
+          ) : (
+            <Navigate to="/patient-dashboard" replace />
+          )
         }
       />
 

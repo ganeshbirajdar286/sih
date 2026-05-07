@@ -233,12 +233,6 @@ export default function ProfileTab() {
     { label: "Specialty", value: profile.Specialization || "—" },
   ];
 
-  const pct = (() => {
-    const vals   = Object.values(profile);
-    const filled = vals.filter(Boolean).length;
-    return Math.round((filled / vals.length) * 100);
-  })();
-
   if (loading && !Profile) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50 to-blue-50/30 p-4 sm:p-6 flex items-center justify-center">

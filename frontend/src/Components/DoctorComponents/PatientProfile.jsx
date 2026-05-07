@@ -6,7 +6,6 @@ import { single_patient } from "../../feature/Doctor/doctor.thunk";
 import {
   User,
   Mail,
-  Phone,
   Ruler,
   Weight,
   FileText,

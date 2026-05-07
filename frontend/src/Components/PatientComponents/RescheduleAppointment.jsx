@@ -6,7 +6,6 @@ import {
   FaClock, 
   FaTimes, 
   FaCheck,
-  FaUserMd,
   FaExclamationTriangle,
   FaArrowLeft,
   FaMapMarkerAlt

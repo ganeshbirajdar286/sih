@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { screen, waitFor } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import React from "react";
 import { Provider } from "react-redux";
 import { render } from "@testing-library/react";
 import { configureStore } from "@reduxjs/toolkit";
 import { MemoryRouter, Routes, Route, Navigate } from "react-router-dom";
+import App from "../src/App.jsx"
 
 import ProtectedRoute from "./Components/ProtectedRoute.jsx";
 import PublicRoute from "./Components/PublicRoute.jsx";

@@ -9,9 +9,6 @@ import {
 import {
   Calendar,
   Search,
-  Eye,
-  Edit3,
-  Trash2,
   Phone,
   Clock,
   User,
@@ -31,7 +28,6 @@ const PatientTab = ({ callPatient }) => {
 
   const { appointment, loading, error } = useSelector((state) => state.doctor);
 
-  const [selectedStatus, setSelectedStatus] = useState("all");
   const [sortBy, setSortBy] = useState("date");
   const [expandedAppointment, setExpandedAppointment] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,18 +48,6 @@ const PatientTab = ({ callPatient }) => {
     (a) => a.Status === "Completed",
   ).length;
 
-  const getStatusIcon = (status) => {
-    switch (status?.toLowerCase()) {
-      case "confirmed":
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case "pending":
-        return <ClockIcon className="w-4 h-4 text-amber-500" />;
-      case "cancelled":
-        return <XCircle className="w-4 h-4 text-red-500" />;
-      default:
-        return <ClockIcon className="w-4 h-4 text-gray-400" />;
-    }
-  };
 
   const getStatusBadgeStyle = (status) => {
     switch (status?.toLowerCase()) {

@@ -4,12 +4,9 @@ import {
   FaFileMedical,
   FaDownload,
   FaEye,
-  FaShare,
   FaCalendarAlt,
-  FaFilter,
   FaSearch,
   FaChartLine,
-  FaPrint,
   FaSpinner,
 } from "react-icons/fa";
 
@@ -19,7 +16,6 @@ import { getReport } from "../../feature/Patient/patient.thunk";
 const Reports = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [selectedReport, setSelectedReport] = useState(null);
-  const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const dispatch = useDispatch();
@@ -120,16 +116,7 @@ const Reports = () => {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+
 
   const formatDate = (dateString) =>
     new Date(dateString).toLocaleDateString("en-US", {

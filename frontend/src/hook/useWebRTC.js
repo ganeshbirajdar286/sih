@@ -1,5 +1,5 @@
-import { useRef, useCallback, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useRef, useCallback,} from "react";
+import { useDispatch, } from "react-redux";
 import {
   setIsCalling, setCallAccepted, setCallEnded,
   setLocalStream, setRemoteStream,

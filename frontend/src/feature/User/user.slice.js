@@ -42,11 +42,11 @@ const userSlice = createSlice({
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("auth_token",token);
     });
-    builder.addCase(loginThunk.pending, (state, action) => {
+    builder.addCase(loginThunk.pending, (state) => {
       console.log("pending");
       state.ButtonLoading = true;
     });
-    builder.addCase(loginThunk.rejected, (state, action) => {
+    builder.addCase(loginThunk.rejected, (state) => {
       console.log("rejected");
       state.ButtonLoading = false;
     });
@@ -75,17 +75,17 @@ const userSlice = createSlice({
       }
     });
 
-    builder.addCase(registerThunk.pending, (state, action) => {
+    builder.addCase(registerThunk.pending, (state) => {
       console.log("pending");
       state.ButtonLoading = true;
     });
-    builder.addCase(registerThunk.rejected, (state, action) => {
+    builder.addCase(registerThunk.rejected, (state) => {
       console.log("rejected");
       state.ButtonLoading = false;
     });
 
     // logout user
-    builder.addCase(logoutThunk.fulfilled, (state, action) => {
+    builder.addCase(logoutThunk.fulfilled, (state) => {
       console.log("fulfilled");
       state.ButtonLoading = false;
       state.isAuthenticated = false;
@@ -93,11 +93,11 @@ const userSlice = createSlice({
       state.isDoctor = null;
       localStorage.removeItem("auth_token");
     });
-    builder.addCase(logoutThunk.pending, (state, action) => {
+    builder.addCase(logoutThunk.pending, (state) => {
       console.log("pending");
       state.ButtonLoading = true;
     });
-    builder.addCase(logoutThunk.rejected, (state, action) => {
+    builder.addCase(logoutThunk.rejected, (state) => {
       console.log("rejected");
       state.ButtonLoading = false;
     });
@@ -108,11 +108,11 @@ const userSlice = createSlice({
       state.ButtonLoading = false;
       state.mustFill = action.payload.mustFill;
     });
-    builder.addCase(getDoshaStatusThunk.pending, (state, action) => {
+    builder.addCase(getDoshaStatusThunk.pending, (state) => {
       console.log("pending");
       state.ButtonLoading = true;
     });
-    builder.addCase(getDoshaStatusThunk.rejected, (state, action) => {
+    builder.addCase(getDoshaStatusThunk.rejected, (state) => {
       console.log("rejected");
       state.ButtonLoading = false;
     });
@@ -123,11 +123,11 @@ const userSlice = createSlice({
       state.ButtonLoading = false;
       state.doshaData = action.payload.data;
     });
-    builder.addCase(submitDoshaThunk.pending, (state, action) => {
+    builder.addCase(submitDoshaThunk.pending, (state) => {
       console.log("pending");
       state.ButtonLoading = true;
     });
-    builder.addCase(submitDoshaThunk.rejected, (state, action) => {
+    builder.addCase(submitDoshaThunk.rejected, (state) => {
       console.log("rejected");
       state.ButtonLoading = false;
     });

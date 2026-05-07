@@ -208,7 +208,7 @@ const AppointmentsTab = () => {
 
       toast.success("Appointment deleted");
     } catch (err) {
-      console.error("Delete failed → reverting");
+      console.error("Delete failed → reverting",err);
 
       // 3️⃣ Revert if API fails
       setLocalAppointments(oldData);

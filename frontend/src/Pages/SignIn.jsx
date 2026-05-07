@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch} from "react-redux";
 import { loginThunk,getDoshaStatusThunk } from "../feature/User/user.thunk";
 import toast from "react-hot-toast";
 
 const SignIn = () => {
   const [Email, setEmail] = useState("");
   const [Password, setPassword] = useState("");
-  const [role, setRole] = useState("patient");
   const [isFocused, setIsFocused] = useState({
     email: false,
     password: false,
@@ -16,7 +15,6 @@ const SignIn = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
 
   const dispatch = useDispatch();
@@ -62,7 +60,7 @@ const SignIn = () => {
       navigate("/patient-dashboard");
     }
   } catch (error) {
-    toast.error("Login failed");
+    toast.error("Login failed",error);
   } finally {
     setIsLoading(false);
   }

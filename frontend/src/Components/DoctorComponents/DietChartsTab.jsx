@@ -140,7 +140,7 @@ const DietChartsTab = () => {
   const { getdietchart: dietCharts = [], loading, error } = useSelector((state) => state.doctor);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedStatus] = useState("all");
   const [expandedChart, setExpandedChart] = useState(null);
   const [sortOption, setSortOption] = useState("recent");
 

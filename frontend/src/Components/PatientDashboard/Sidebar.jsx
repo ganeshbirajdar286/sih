@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import {
-  Activity, Users, User, Building, Stethoscope, Calendar,
-  TrendingUp, FileText, Menu, X, LogOut, Apple
+ Users, User,   Calendar,
+  TrendingUp,  Menu, X, LogOut
 } from "lucide-react";
 import logo from "../../assets/logo.png"
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { logoutThunk } from "../../feature/User/user.thunk";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";

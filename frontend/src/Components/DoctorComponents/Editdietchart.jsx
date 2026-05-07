@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { clearDietchartById, clearUpdateStatus } from "../../feature/Doctor/doctor.slice";
+import {  clearUpdateStatus } from "../../feature/Doctor/doctor.slice";
 import { getdietchartID, updateDietChartbyID } from "../../feature/Doctor/doctor.thunk";
 
 // ─── Constants ────────────────────────────────────────────────────────────────

@@ -27,7 +27,7 @@ const callSlice = createSlice({
       state.isReceivingCall = true;
       state.callerInfo = payload;
     },
-    setCallAccepted(state, { payload }) {
+    setCallAccepted(state) {
       state.callAccepted = true;
       state.isCalling = false;
       state.isReceivingCall = false;

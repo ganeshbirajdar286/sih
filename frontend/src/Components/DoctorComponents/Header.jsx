@@ -1,8 +1,8 @@
 import React from "react";
-import { Stethoscope, Menu } from "lucide-react";
+import {  Menu } from "lucide-react";
 import logo from "../../assets/logo.png"
 
-const Header = ({ sidebarOpen, setSidebarOpen }) => {
+const Header = ({  setSidebarOpen }) => {
   return (
     <header className="bg-white shadow-sm border-b border-emerald-100 sticky top-0 z-50">
       <div className="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">

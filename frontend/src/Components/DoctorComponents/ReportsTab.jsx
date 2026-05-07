@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
+  BarChart, Bar, LineChart, Line, 
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 
@@ -67,7 +67,6 @@ export default function ReportsTab() {
     { patient: 'Sneha Reddy', action: 'Treatment Plan Updated', time: '2 days ago', status: 'updated' },
   ];
 
-  const COLORS = ['#8B5CF6', '#EF4444', '#10B981', '#F59E0B', '#3B82F6'];
   const patientData = patientGrowthDataSets[timeRange];
 
 

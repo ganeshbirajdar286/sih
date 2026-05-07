@@ -3,20 +3,18 @@ import React, { useState, useEffect } from "react";
 
 import Header from "../Components/DoctorComponents/Header.jsx";
 import Sidebar from "../Components/DoctorComponents/Sidebar.jsx";
-import StatCard from "../Components/DoctorComponents/StatCard.jsx";
+
 
 import {
   Users,
   Calendar,
   FileText,
-  Settings,
   Stethoscope,
-  BookOpen,
   ChefHat,
   Leaf,
   User,
   BarChart3,
-  Printer,
+
   TrendingUp,
   Clock,
   MessageSquare,
@@ -26,7 +24,6 @@ import {
   Thermometer,
   Activity,
   Shield,
-  Smartphone,
   Plus,
   ArrowRight,
 } from "lucide-react";

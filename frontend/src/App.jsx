@@ -21,11 +21,9 @@ import DoctorsTab from "./Components/PatientComponents/DoctorsTab.jsx";
 import RescheduleAppointment from "./Components/PatientComponents/RescheduleAppointment.jsx";
 import Appointments from "./Components/PatientDashboard/Appointment.jsx";
 import PrakritiVikritiForm from "./Components/PatientDashboard/DoshaPatientForm.jsx";
-import AppointmentsTab from "./Components/DoctorComponents/AppointmentsTab.jsx";
 import PatientProfile from "./Components/DoctorComponents/PatientProfile.jsx";
 import CreateDietChart from "./Components/DoctorComponents/Createdietchart.jsx";
 import EditDietChart from "./Components/DoctorComponents/Editdietchart.jsx";
-import DietChartsTab from "./Components/DoctorComponents/DietChartsTab.jsx";
 
 import { getSocket } from "./services/socket_init.js";
 import { setIncomingCall, setCallEnded,setOnlineUsers } from "./feature/video_call/call.slice.js";

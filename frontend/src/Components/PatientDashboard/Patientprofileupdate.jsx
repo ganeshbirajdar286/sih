@@ -1,16 +1,13 @@
 import React, { useState } from "react";
-import { User, Phone, Calendar, Ruler, Weight, Camera, Upload, X, Check } from "lucide-react";
+import { User, Phone, Calendar, Ruler, Weight, Camera, Upload, X,  } from "lucide-react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { updateProfile } from "../../feature/Patient/patient.thunk";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+
 
 const PatientProfileUpdate = ({ setActiveTab }) => {
   const dispatch = useDispatch();
-  const navigate=useNavigate()
-
-  const { loading } = useSelector((state) => state.patient);
 
   const storedUser = JSON.parse(localStorage.getItem("user")) || {};
 

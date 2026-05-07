@@ -46,7 +46,7 @@ const PatientSlice = createSlice({
       state.loading = false;
       state.doctor = action.payload?.data || [];
     });
-    builder.addCase(doctor.pending, (state, action) => {
+    builder.addCase(doctor.pending, (state) => {
       console.log("pending");
       state.loading = true;
       state.error = null;
@@ -76,7 +76,7 @@ const PatientSlice = createSlice({
       state.loading = false;
       state.bookedSlot = action.payload?.patient || [];
     });
-    builder.addCase(getDoctorBookedSlots.pending, (state, action) => {
+    builder.addCase(getDoctorBookedSlots.pending, (state) => {
       console.log("pending");
       state.loading = true;
       state.error = null;
@@ -93,7 +93,7 @@ const PatientSlice = createSlice({
       state.loading = false;
       state.BookAppointments.push(action.payload.appointment);
     });
-    builder.addCase(BookingAppointments.pending, (state, action) => {
+    builder.addCase(BookingAppointments.pending, (state) => {
       console.log("pending");
       state.loading = true;
       state.error = null;
@@ -110,7 +110,7 @@ const PatientSlice = createSlice({
       state.loading = false;
       state.getappointmentschedules = action.payload.appointment || [];
     });
-    builder.addCase(getappointmentschedule.pending, (state, action) => {
+    builder.addCase(getappointmentschedule.pending, (state) => {
       console.log("pending");
       state.loading = true;
       state.error = null;
@@ -278,6 +278,5 @@ const PatientSlice = createSlice({
   },
 });
 
-export const {} = PatientSlice.actions;
 
 export default PatientSlice.reducer;

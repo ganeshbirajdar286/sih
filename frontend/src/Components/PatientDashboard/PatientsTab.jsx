@@ -6,8 +6,6 @@ import Alerts from "../PatientComponents/Alerts";
 import WeightTrend from "../PatientComponents/WeightTrend";
 import DietaryTracker from "../PatientComponents/DietaryTracker";
 import ActiveDietPlan from "../PatientComponents/ActiveDietPlan";
-import MedicalRecords from "../PatientComponents/MedicalRecords";
-import Appointments from "../PatientComponents/Appointments";
 import { patientData } from "../data/mockData";
 import { getappointmentschedule } from "../../feature/Patient/patient.thunk";
 import { useEffect } from "react";

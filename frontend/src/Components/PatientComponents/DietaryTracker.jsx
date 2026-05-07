@@ -6,7 +6,6 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell, Resp
 
 const DietaryTracker = ({ analysis }) => {
   const GUNA_COLORS = ['#8884d8', '#82ca9d'];
-  const RASA_COLORS = ['#8884d8', '#82ca9d'];
 
 
   const CustomBarTooltip = ({ active, payload }) => {

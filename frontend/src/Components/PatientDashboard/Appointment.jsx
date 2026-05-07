@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   FaUserMd,
@@ -7,8 +7,6 @@ import {
   FaVideo,
   FaMapMarkerAlt,
   FaPhoneAlt,
-  FaEllipsisV,
-  FaPlus,
   FaChevronDown,
   FaSearch,
   FaFilter,
@@ -34,15 +32,8 @@ const Appointments = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   // State to trigger re-render for time checks every minute
-  const [currentTime, setCurrentTime] = useState(new Date());
 
-  useEffect(() => {
-    dispatch(getappointmentschedule());
-    
-    // Timer to update status every minute without refresh
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
-    return () => clearInterval(timer);
-  }, [dispatch]);
+ 
 
   // Helper to parse "09:00-10:00" and compare with current time
   const getTimingStatus = (dateStr, slotStr) => {

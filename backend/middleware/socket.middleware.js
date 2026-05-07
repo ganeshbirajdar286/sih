@@ -9,7 +9,7 @@ export const socketMiddleware=(socket,next)=>{
     }
 
     try{
-        const decoded=jwt.verify(token,process.env.PRIVATED_KEY)
+        const decoded=jwt.verify(token,process.env.JWT_SECRET)
         socket.user=decoded;
         next();
     } catch (error) {

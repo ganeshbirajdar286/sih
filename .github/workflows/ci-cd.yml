@@ -349,15 +349,15 @@ jobs:
 
       - name: Start services with Docker Compose
         run: |
-          docker-compose up -d
+          docker compose up -d
 
       - name: Wait for services to be healthy
         run: |
-          timeout 180 bash -c 'until docker-compose ps | grep -q "healthy"; do sleep 5; done'
+          timeout 180 bash -c 'until docker compose ps | grep -q "healthy"; do sleep 5; done'
 
       - name: Check service logs
         run: |
-          docker-compose logs
+          docker compose logs
 
       - name: Test backend health endpoint
         run: |
@@ -369,7 +369,7 @@ jobs:
 
       - name: Stop services
         run: |
-          docker-compose down
+          docker compose down
 
   # Job 9: Notify on Failure
   notify-failure:

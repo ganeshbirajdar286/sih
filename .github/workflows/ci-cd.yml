@@ -259,7 +259,7 @@ jobs:
           curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
 
       - name: Wait for Render to deploy
-        run: sleep 60
+        run: sleep 180
 
       - name: Health check
         run: |

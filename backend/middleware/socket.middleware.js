@@ -4,7 +4,7 @@ import  jwt from "jsonwebtoken"
 export const socketMiddleware=(socket,next)=>{
    const token= socket.handshake.auth?.token ||
     socket.handshake.headers["authorization"]?.split(" ")[1]
-
+    console.log("auth_token_socket",token)
     if(!token){
         return next(new Error("Authorization token missing "))
     }

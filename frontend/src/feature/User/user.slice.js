@@ -41,6 +41,7 @@ const userSlice = createSlice({
       // Persist
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("auth_token",token);
+      console.log("auth_token_user",localStorage.getItem("auth_token"))
     });
     builder.addCase(loginThunk.pending, (state) => {
       console.log("pending");

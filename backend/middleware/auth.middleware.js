@@ -8,6 +8,7 @@ export const isLogin = (req, res, next) => {
 
     if (authHeader && authHeader.startsWith("Bearer ")) {
       token = authHeader.split(" ")[1];
+      console.log("auth_token_midd",token)
     } else {
       token = req.cookies?.token;
     }

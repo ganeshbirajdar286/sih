@@ -34,6 +34,9 @@ This platform provides:
 * Chart.js / Recharts
 * Vitest + Testing Library
 * PWA Support (vite-plugin-pwa)
+* React Router DOM 7
+* Lucide React Icons
+* React Hot Toast
 
 ### Backend
 
@@ -50,6 +53,7 @@ This platform provides:
 * Jest Testing Framework
 * Multer File Uploads
 * Express Validator
+* Bcrypt Password Hashing
 
 ### DevOps & Deployment
 
@@ -76,6 +80,7 @@ sih/
 │   │   └── auth.controller.js
 │   ├── middleware/
 │   │   ├── auth.middleware.js
+│   │   ├── socket.middleware.js
 │   │   └── Validate.js
 │   ├── model/
 │   │   ├── appointments.model.js
@@ -96,6 +101,7 @@ sih/
 │   │   └── auth.validator.js
 │   ├── upload/
 │   ├── .env
+│   ├── .env.example
 │   ├── dockerfile
 │   ├── index.js
 │   └── package.json
@@ -112,30 +118,91 @@ sih/
 │   │   ├── logo.png
 │   │   └── manifest.json
 │   ├── src/
-│   │   ├── assets/
 │   │   ├── axios/
+│   │   │   └── url.axios.js
 │   │   ├── Components/
 │   │   │   ├── data/
+│   │   │   │   └── mockData.js
 │   │   │   ├── DoctorComponents/
+│   │   │   │   ├── AppointmentsTab.jsx
+│   │   │   │   ├── AyurvedaTab.jsx
+│   │   │   │   ├── ConsultationsTab.jsx
+│   │   │   │   ├── Createdietchart.jsx
+│   │   │   │   ├── DietChartsTab.jsx
+│   │   │   │   ├── Editdietchart.jsx
+│   │   │   │   ├── Header.jsx
+│   │   │   │   ├── MyPatient.jsx
+│   │   │   │   ├── Parent.jsx
+│   │   │   │   ├── PatientProfile.jsx
+│   │   │   │   ├── PatientsTab.jsx
+│   │   │   │   ├── ProfileTab.jsx
+│   │   │   │   ├── ReportsTab.jsx
+│   │   │   │   ├── Sidebar.jsx
+│   │   │   │   └── StatCard.jsx
 │   │   │   ├── PatientComponents/
-│   │   │   └── PatientDashboard/
+│   │   │   │   ├── ActiveDietPlan.jsx
+│   │   │   │   ├── Alerts.jsx
+│   │   │   │   ├── Appointments.jsx
+│   │   │   │   ├── BookAppointment.jsx
+│   │   │   │   ├── Card.jsx
+│   │   │   │   ├── DashboardHeader.jsx
+│   │   │   │   ├── DietaryTracker.jsx
+│   │   │   │   ├── DoctorProfile.jsx
+│   │   │   │   ├── DoctorsTab.jsx
+│   │   │   │   ├── LifestyleLog.jsx
+│   │   │   │   ├── MedicalRecords.jsx
+│   │   │   │   ├── PrakritiSnapshot.jsx
+│   │   │   │   ├── RescheduleAppointment.jsx
+│   │   │   │   └── WeightTrend.jsx
+│   │   │   ├── PatientDashboard/
+│   │   │   │   ├── Appointment.jsx
+│   │   │   │   ├── DoshaPatientForm.jsx
+│   │   │   │   ├── Header.jsx
+│   │   │   │   ├── Layout.jsx
+│   │   │   │   ├── Patientprofileupdate.jsx
+│   │   │   │   ├── PatientsTab.jsx
+│   │   │   │   ├── Reports.jsx
+│   │   │   │   └── Sidebar.jsx
+│   │   │   ├── CallModal.jsx
+│   │   │   ├── DietChartCard.jsx
+│   │   │   ├── ProtectedRoute.jsx
+│   │   │   └── PublicRoute.jsx
 │   │   ├── feature/
 │   │   │   ├── Doctor/
+│   │   │   │   ├── doctor.slice.js
+│   │   │   │   └── doctor.thunk.js
 │   │   │   ├── Patient/
+│   │   │   │   ├── patient.slice.js
+│   │   │   │   └── patient.thunk.js
 │   │   │   ├── User/
+│   │   │   │   ├── user.slice.js
+│   │   │   │   └── user.thunk.js
 │   │   │   └── video_call/
+│   │   │       └── call.slice.js
 │   │   ├── hook/
+│   │   │   └── useWebRTC.js
 │   │   ├── Pages/
+│   │   │   ├── DoctorDashboard.jsx
+│   │   │   ├── HomePage.jsx
+│   │   │   ├── PatientDashboard.jsx
+│   │   │   ├── SignIn.jsx
+│   │   │   └── SignUp.jsx
 │   │   ├── services/
+│   │   │   └── socket_init.js
 │   │   ├── store/
+│   │   │   └── data.store.js
 │   │   ├── App.jsx
-│   │   └── main.jsx
+│   │   ├── App.test.jsx
+│   │   ├── main.jsx
+│   │   ├── setupTests.js
+│   │   └── test-utils.jsx
 │   ├── .env
 │   ├── dockerfile
 │   ├── package.json
 │   ├── vite.config.js
 │   ├── tailwind.config.js
-│   └── vercel.json
+│   ├── vercel.json
+│   └── eslint.config.js
 │
 └── docker-compose.yml
 ```
@@ -154,7 +221,7 @@ VITE_SOCKET_URL=https://your-backend-url.onrender.com
 ### Backend `.env`
 
 ```env
-PORT=3001
+Port=3001
 MONGODB_URL=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 CLOUDINARY_CLOUD_NAME=your_cloud_name
@@ -198,12 +265,14 @@ npm run dev
 ### Run backend tests:
 
 ```bash
+cd backend
 npm test
 ```
 
 ### Run frontend tests:
 
 ```bash
+cd frontend
 npm run test
 ```
 
@@ -227,7 +296,7 @@ npm run test
 
 ### Docker Support
 
-### Backend Dockerfile
+#### Backend Dockerfile
 
 ```dockerfile
 FROM node:18
@@ -239,7 +308,7 @@ EXPOSE 3001
 CMD ["npm", "start"]
 ```
 
-### Frontend Dockerfile
+#### Frontend Dockerfile
 
 ```dockerfile
 FROM node:18
@@ -252,7 +321,7 @@ EXPOSE 5173
 CMD ["npm", "run", "dev"]
 ```
 
-### Docker Compose
+#### Docker Compose
 
 ```yaml
 version: '3.8'

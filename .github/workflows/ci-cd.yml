@@ -32,14 +32,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: 'npm'  # use for downloading dependencies
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend dependencies
         run: |
           cd frontend
-          npm ci
-
+          npm ci 
+        # ci means clean install dependencies  
+          
       - name: Lint frontend
         run: |
           cd frontend
@@ -88,9 +89,14 @@ jobs:
           cd frontend
           npm run test:run
 
+      - name: Run frontend tests with coverage
+        run: |
+          cd frontend
+          npm run test:coverage
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
-        if: always()
+        if: always()  
+        # Run this step even if tests fail.
         with:
           name: frontend-coverage
           path: frontend/coverage/

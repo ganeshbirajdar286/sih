@@ -107,7 +107,7 @@ jobs:
     name: Test Backend
     runs-on: ubuntu-latest
 
-    services:
+    services:  #Docker containers 
       mongodb:
         image: mongo:7.0
         env:
@@ -145,6 +145,10 @@ jobs:
           MONGODB_URI: mongodb://admin:password@localhost:27017/test?authSource=admin
           NODE_ENV: test
 
+      - name: Run backend  tests with coverage
+        run : |
+         cd backend 
+         npm run test:coverage 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -262,31 +266,36 @@ jobs:
 
       - name: Deploy backend to Render
         run: |
-          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"   // which tells Render:"Start deployment now"
 
       - name: Wait for Render to deploy  
         run: |
-               for i in {1..18}; do
-                echo "Checking deployment... Attempt $i"
-                curl -L -f "${{ secrets.APP_URL }}/health" && exit 0
-               sleep 10
-                done
-                echo "Deployment failed health check"
-                 exit 1
+              for i in {1..18}; do
+              echo "Checking deployment... Attempt $i"
+              if curl -L -f "${{ secrets.APP_URL }}/health"; then 
+              exit 0
+              fi
+              sleep 10
+              done
+              echo "Deployment failed health check"
+              exit 1
+
 
       - name: Health check
         run: |
           curl -f ${{ secrets.APP_URL }}/health || exit 1
 
       - name: Notify deployment success
-        uses: actions/github-script@v7
+        uses: actions/github-script@v7   #This action lets you run JavaScript directly inside GitHub Actions.
         if: success()
+
+        # Creates a comment attached to a commit
         with:
           script: |
-            github.rest.repos.createCommitComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: context.sha,
+            github.rest.repos.createCommitComment({       
+              owner: context.repo.owner,    // Repository owner.
+              repo: context.repo.repo, 
+              commit_sha: context.sha,    // Current commit ID that triggered workflow.
               body: '✅ Deployment to Render production successful!'
             })
 

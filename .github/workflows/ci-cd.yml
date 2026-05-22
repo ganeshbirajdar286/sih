@@ -266,7 +266,7 @@ jobs:
 
       - name: Deploy backend to Render
         run: |
-          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"   // which tells Render:"Start deployment now"
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"  
 
       - name: Wait for Render to deploy  
         run: |
@@ -293,9 +293,9 @@ jobs:
         with:
           script: |
             github.rest.repos.createCommitComment({       
-              owner: context.repo.owner,    // Repository owner.
+              owner: context.repo.owner,    
               repo: context.repo.repo, 
-              commit_sha: context.sha,    // Current commit ID that triggered workflow.
+              commit_sha: context.sha,   
               body: '✅ Deployment to Render production successful!'
             })
 

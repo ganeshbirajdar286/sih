@@ -394,7 +394,19 @@ jobs:
 
       - name: Test frontend is accessible
         run: |
-          curl -f http://localhost:3002 || exit 1
+         for i in {1..20}; do
+         echo "Checking frontend... Attempt $i"
+
+         if curl -f http://localhost:3002; then
+         echo "Frontend is up!"
+         exit 0
+         fi
+
+         sleep 5
+         done
+         echo "Frontend failed to start"
+         docker compose logs web
+         exit 1
 
       - name: Stop services
         run: |

@@ -9,7 +9,7 @@
 **Tech Stack:** OpenAI GPT-4 / Claude API, Whisper (voice-to-text)
 
 ### 2. AI Health Chatbot
-- 24/7 basic health query support
+- 24/7 basic health query supportANTHROPIC_AUTH_TOKEN="freecc"
 - Medication information and interaction warnings
 - Ayurvedic lifestyle recommendations
 - Escalates to human doctor for complex cases

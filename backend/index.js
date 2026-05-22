@@ -6,10 +6,10 @@ import cookieParser from "cookie-parser";
 import  cors from "cors"
 import { createServer } from "http";
 import initializeSocket from "./services/video-call-services.js";
-
-
+import {rateLimitMiddleware} from "./middleware/rate.middleware.js" 
 
 dotenv.config()
+
 
 
 const allowedOrigins = [
@@ -48,6 +48,8 @@ const io = initializeSocket(server);
 
 const port =process.env.Port
 app.use(cors(corsOption))
+
+app.use(rateLimitMiddleware);
 app.use(cookieParser());  
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))

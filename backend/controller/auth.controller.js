@@ -15,10 +15,12 @@ import {
   StateGraph,
 } from "@langchain/langgraph";
 import { ChatGroq } from "@langchain/groq";
-import { threadId } from "node:worker_threads"; 
+import { threadId } from "node:worker_threads";
 import DietChart from "../model/Dietchart.model.js";
 import { populate } from "dotenv";
 import Review from "../model/rating.model.js";
+import mongoose from "mongoose";
+import { CLIENT_RENEG_LIMIT } from "node:tls";
 
 //user
 export const register = async (req, res) => {
@@ -36,8 +38,6 @@ export const register = async (req, res) => {
   } = req.body;
 
   try {
-   
-
     const files = req.files || [];
 
     const profileImageFile = files.find(
@@ -87,7 +87,7 @@ export const register = async (req, res) => {
 
     let doctorProfile = null;
 
-    if (isDoctor === "true" ||  isDoctor===true) {
+    if (isDoctor === "true" || isDoctor === true) {
       doctorProfile = await Doctor.create({
         User_id: user._id,
         Specialization,
@@ -99,26 +99,26 @@ export const register = async (req, res) => {
     user = await User.findByIdAndUpdate(
       user._id,
       { Doctor_id: doctorProfile?._id },
-      { new: true },
+      {returnDocument: "after"}
     );
-    let token; 
+    let token;
     if (doctorProfile) {
-       token = jwtToken(user?.id, doctorProfile?._id);
+      token = jwtToken(user?.id, doctorProfile?._id);
 
-    const isProduction=process.env.NODE_ENV==="production"
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction?"none":"lax",
-      maxAge: 1000 * 60 * 60 * 24 * 365,
-    });
+      const isProduction = process.env.NODE_ENV === "production";
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
+        maxAge: 1000 * 60 * 60 * 24 * 365,
+      });
     }
 
     res.status(201).json({
       message: "Registration successful",
       responseData: user,
       autoLogin: isDoctor === "true",
-      token:token,
+      token: token,
     });
   } catch (error) {
     res.status(500).json({
@@ -131,7 +131,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { Email, Password } = req.body;
-  
+
     const user = await User.findOne({
       Email,
     });
@@ -153,11 +153,11 @@ export const login = async (req, res) => {
 
     const token = jwtToken(user?._id, user?.Doctor_id);
 
-    const isProduction= process.env.NODE_ENV==="production"
+    const isProduction = process.env.NODE_ENV === "production";
     res.cookie("token", token, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction?"none":"lax",
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24 * 365,
     });
 
@@ -165,7 +165,7 @@ export const login = async (req, res) => {
       message: "Login successful",
       role,
       responseData: user,
-      token:token,
+      token: token,
     });
   } catch (error) {
     return res.status(500).json({
@@ -177,16 +177,16 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    const isProduction=process.env.NODE_ENV==="production"
+    const isProduction = process.env.NODE_ENV === "production";
     res.clearCookie("token", {
       httpOnly: true,
-      sameSite: isProduction?"none":"lax",
+      sameSite: isProduction ? "none" : "lax",
       secure: isProduction, // localhost
     });
 
     return res.status(200).json({
       message: "User logout successfully",
-      token:null,
+      token: null,
     });
   } catch (error) {
     console.log(error);
@@ -248,14 +248,13 @@ export const submitDosha = async (req, res) => {
         Dosha: data._id,
         lastFilledAt: new Date(),
       },
-      { new: true }
+      {returnDocument: "after" },
     );
 
     return res.status(201).json({
       message: "Dosha assessment saved successfully",
       data,
     });
-
   } catch (err) {
     console.error("Submit Dosha Error:", err);
 
@@ -556,7 +555,7 @@ export const updatePatientAppointment = async (req, res) => {
         Time_slot,
       },
       {
-        new: true,
+       returnDocument: "after"
       },
     );
 
@@ -578,7 +577,6 @@ export const addOrUpdateReview = async (req, res) => {
     const { rating, comment } = req.body;
     const patientId = req.user.userId;
 
-    
     const doctor = await Doctor.findById(doctorId);
     if (!doctor) {
       return res.status(404).json({
@@ -592,12 +590,10 @@ export const addOrUpdateReview = async (req, res) => {
     });
 
     if (review) {
-   
       review.rating = rating;
       review.comment = comment;
       await review.save();
     } else {
-     
       review = await Review.create({
         Doctor: doctorId,
         Patient: patientId,
@@ -606,7 +602,6 @@ export const addOrUpdateReview = async (req, res) => {
       });
     }
 
-    
     const stats = await Review.aggregate([
       { $match: { Doctor: review.Doctor } },
       {
@@ -621,6 +616,8 @@ export const addOrUpdateReview = async (req, res) => {
     await Doctor.findByIdAndUpdate(doctorId, {
       averageRating: stats[0]?.avgRating,
       totalReviews: stats[0]?.count,
+    },{
+      returnDocument: "after"
     });
 
     return res.status(200).json({
@@ -628,7 +625,6 @@ export const addOrUpdateReview = async (req, res) => {
       message: "Review saved successfully",
       review,
     });
-
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -652,7 +648,6 @@ export const getDoctorReviews = async (req, res) => {
       total: reviews.length,
       reviews,
     });
-
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -716,7 +711,7 @@ export const createReport = async (req, res) => {
       {
         $addToSet: { Medical_records: report._id },
       },
-      { new: true },
+      { returnDocument: "after" },
     );
 
     return res.status(201).json({
@@ -815,13 +810,13 @@ export const getprofile = async (req, res) => {
       });
     }
 
- const doctor = await Doctor.findById(doctorId)
-  .populate({
-    path: "User_id",
-    select: "-password -Medical_records -lastFilledAt -Dosha "
-  })
-  .lean();
-     
+    const doctor = await Doctor.findById(doctorId)
+      .populate({
+        path: "User_id",
+        select: "-password -Medical_records -lastFilledAt -Dosha ",
+      })
+      .lean();
+
     if (!doctor) {
       return res.status(404).json({
         success: false,
@@ -833,7 +828,6 @@ export const getprofile = async (req, res) => {
       success: true,
       doctor,
     });
-
   } catch (error) {
     console.error("Get Profile Error:", error);
     return res.status(500).json({
@@ -917,7 +911,7 @@ export const Doctor_selected_appointment = async (req, res) => {
     const appointment = await Appointment.findByIdAndUpdate(
       appointmentid,
       { Status },
-      { new: true },
+      { returnDocument: "after"},
     );
 
     if (!appointment) {
@@ -1165,9 +1159,10 @@ export const getdietchart = async (req, res) => {
         message: "doctor not  found",
       });
     }
-    const dietchart = await DietChart
-      .find({ Doctor_id: id })
-      .populate("Patient_id", "Name Age Image_url PhoneNumber Email Gender ");
+    const dietchart = await DietChart.find({ Doctor_id: id }).populate(
+      "Patient_id",
+      "Name Age Image_url PhoneNumber Email Gender ",
+    );
     if (!dietchart) {
       return res.status(400).json({
         message: "diet chart  not found",
@@ -1188,22 +1183,20 @@ export const getdietchart = async (req, res) => {
 
 export const updateDietChart = async (req, res) => {
   try {
-    const id= req.params.id;
+    const id = req.params.id;
 
-    const updated = await DietChart.findByIdAndUpdate(
-      id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-    
+    const updated = await DietChart.findByIdAndUpdate(id, req.body, {
+      returnDocument: "after",
+      runValidators: true,
+    });
+
     return res.status(200).json({
-      success:true,
-      dietchart:updated,
-      message:"diet chart updated successfully"
-    })
-
+      success: true,
+      dietchart: updated,
+      message: "diet chart updated successfully",
+    });
   } catch (err) {
-   return res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "An error occurred while updateing the dietchart.",
       error: err.message,
@@ -1220,9 +1213,10 @@ export const getDietchartById = async (req, res) => {
       });
     }
 
-    const dietchart = await DietChart
-      .findById(id)
-      .populate("Patient_id", "Name Age Image_url PhoneNumber Email Gender");
+    const dietchart = await DietChart.findById(id).populate(
+      "Patient_id",
+      "Name Age Image_url PhoneNumber Email Gender",
+    );
 
     if (!dietchart) {
       return res.status(404).json({
@@ -1235,7 +1229,6 @@ export const getDietchartById = async (req, res) => {
       message: "Diet chart fetched successfully",
       dietchart,
     });
-
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -1269,6 +1262,67 @@ export const delete_appointment = async (req, res) => {
       success: false,
       message: "An error occurred while deleting the appointment.",
       error: error.message,
+    });
+  }
+};
+
+export const Appointment_count = async (req, res) => {
+  try {
+
+
+    const data = await Appointment.aggregate([{
+        $match: {
+          Doctor_id: new mongoose.Types.ObjectId(
+        req.user.doctor_id
+      ),
+          Status: "Accepted"
+        }
+      },
+      {
+        $group: {
+          _id: {
+            month: { $month: "$Appointment_Date" },
+            year: { $year: "$Appointment_Date" },
+          },
+          totalAppointments: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1,
+        },
+      },
+    ]);
+    
+    if (!data) {
+      return res.status(404).json({
+        message: "No appointment data found",
+      });
+    }
+
+    const months = [
+  "Jan","Feb","Mar","Apr","May","Jun",
+  "Jul","Aug","Sep","Oct","Nov","Dec"
+];
+
+    const formattedData=data.map(item=>{    
+      return{
+         month:months[item._id.month-1],
+          year:item._id.year,
+          totalAppointments:item.totalAppointments
+      }  
+  })
+   
+    return res.status(200).json({
+      success: true,
+      data:formattedData,
+    });
+  } catch (error) {
+    console.error("Appointment Count Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching appointment data.",
     });
   }
 };

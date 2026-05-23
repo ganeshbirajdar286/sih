@@ -149,3 +149,16 @@ export const updateDietChartbyID = createAsyncThunk(
     }
   }
 );
+
+export const AppointmentCount= createAsyncThunk(
+  "doctor/appointmentCount",async(_,{rejectWithValue})=>{
+      try {
+       const response =await axiosInstance.get("/doctor/appointment_count");
+       ;
+       console.log(response.data,Math.random() * 1000);
+         return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message); 
+    }
+  }
+)

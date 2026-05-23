@@ -28,12 +28,17 @@ const appointment = new Schema(
       ],
       required: true,
     },
-    Status:{
-        type:"String",
-        enum:["Accepted","Rejected",
-          "Pending","completed"
-        ],
-        default:"Pending"
+   Status: {
+      type: String,
+
+      enum: [
+        "Accepted",
+        "Rejected",
+        "Pending",
+        "Completed"
+      ],
+
+      default: "Pending",
     },
     Condition:{
       type:String,

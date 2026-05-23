@@ -5,8 +5,12 @@ import {
   myPatient,
   Cancel_appointments,
   conformationappointment,
+  AppointmentCount
 } from "../../feature/Doctor/doctor.thunk";
 import toast from "react-hot-toast";
+import {
+   incrementAppointmentCount
+} from "../../feature/Doctor/doctor.slice";
 
 import {
   Calendar,
@@ -27,10 +31,6 @@ import {
   Trash2,
   Ban,
 } from "lucide-react";
-
-/* ─────────────────────────────────────────────
-   Helpers  (all defined BEFORE the component)
-───────────────────────────────────────────── */
 
 const formatDate = (iso) => {
   if (!iso) return "—";
@@ -178,21 +178,38 @@ const AppointmentsTab = () => {
   }, [appointments]);
 
   const handleStatusUpdate = async (id, Status) => {
-    const oldData = [...localAppointments];
-    setLocalAppointments((prev) =>
-      prev.map((apt) => (apt._id === id ? { ...apt, Status } : apt)),
-    );
-    try {
-      setConfirmingId(id + Status);
-      await dispatch(conformationappointment({ id, Status })).unwrap();
-    } catch (err) {
-      console.error("Failed → reverting", err);
-      setLocalAppointments(oldData);
-    } finally {
-      setConfirmingId(null);
-      toast.success("status updated");
-    }
-  };
+  const oldData = [...localAppointments];
+
+  setLocalAppointments((prev) =>
+    prev.map((apt) => (apt._id === id ? { ...apt, Status } : apt)),
+  );
+
+  try {
+    setConfirmingId(id + Status);
+
+    await dispatch(
+      conformationappointment({ id, Status })
+    ).unwrap();
+
+if (Status === "Accepted") {
+  const currentMonth = new Date().getMonth() + 1; 
+  dispatch(incrementAppointmentCount(currentMonth));
+}
+
+    toast.success("Status updated");
+
+  } catch (err) {
+
+    console.error("Failed → reverting", err);
+
+    setLocalAppointments(oldData);
+
+    toast.error("Failed to update status");
+
+  } finally {
+    setConfirmingId(null);
+  }
+};
 
   const handleDelete = async (id) => {
     const oldData = [...localAppointments];

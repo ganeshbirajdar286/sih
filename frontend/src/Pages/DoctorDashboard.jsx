@@ -10,20 +10,9 @@ import {
   Calendar,
   FileText,
   Stethoscope,
-  ChefHat,
   Leaf,
   User,
   BarChart3,
-
-  TrendingUp,
-  Clock,
-  MessageSquare,
-  Heart,
-  Brain,
-  Scale,
-  Thermometer,
-  Activity,
-  Shield,
   Plus,
   ArrowRight,
 } from "lucide-react";
@@ -48,21 +37,10 @@ const sidebarItems = [
 
 
 
-const recentActivities = [
-  { time: "2 min ago", action: "New patient registration", patient: "Rahul Sharma", type: "success", icon: Users },
-  { time: "15 min ago", action: "Diet chart created", patient: "Priya Patel", type: "info", icon: FileText },
-  { time: "1 hour ago", action: "Consultation completed", patient: "Amit Kumar", type: "success", icon: Stethoscope },
-  { time: "2 hours ago", action: "Follow-up scheduled", patient: "Neha Singh", type: "warning", icon: Calendar },
-  { time: "3 hours ago", action: "Lab results received", patient: "Vikram Joshi", type: "info", icon: Activity },
-];
 
 
-const healthMetrics = [
-  { icon: Heart, label: "Avg. BP", value: "120/80", status: "normal", trend: "stable" },
-  { icon: Scale, label: "Avg. Weight", value: "68.2kg", status: "good", trend: "down" },
-  { icon: Thermometer, label: "Avg. BMI", value: "23.1", status: "healthy", trend: "stable" },
-  { icon: Brain, label: "Mental Score", value: "8.2/10", status: "excellent", trend: "up" },
-];
+
+
 
 
 const doshaDistribution = [

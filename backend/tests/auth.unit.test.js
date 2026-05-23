@@ -13,6 +13,7 @@ const mockHashPassword = jest.fn().mockResolvedValue("hashed_password_123");
 const mockComparePassword = jest.fn();
 const mockJwtToken = jest.fn().mockReturnValue("mock_jwt_token");
 
+
 jest.unstable_mockModule("../model/users.model.js", () => ({
   default: {
     findOne: mockUserFindOne,
@@ -285,7 +286,7 @@ describe("updateDietChart — successful update", () => {
     expect(mockDietChartFindByIdAndUpdate).toHaveBeenCalledWith(
       "chart_id_123",
       { note: "Updated dietary note" },
-      { new: true, runValidators: true },
+     { returnDocument: "after", runValidators: true }
     );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
@@ -433,7 +434,7 @@ describe("submitDosha", () => {
         Dosha: "dosha_abc", // ← the _id from mockDoshaData
         lastFilledAt: expect.any(Date), // ← we don't know exact time, just check it's a Date
       },
-      { new: true },
+     { returnDocument: "after" },
     );
 
     // 7️⃣ Assert response
@@ -856,7 +857,7 @@ describe("updatePatientAppointment", () => {
     expect(Appointment.findByIdAndUpdate).toHaveBeenCalledWith(
       "appt_123",
       { Appointment_Date: "2025-11-11", Time_slot: "2:00 PM" },
-      { new: true },
+      { returnDocument: "after" },
     );
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
@@ -960,7 +961,7 @@ describe("Doctor_selected_appointment", () => {
     expect(Appointment.findByIdAndUpdate).toHaveBeenCalledWith(
       "appt_123",
       { Status: "Confirmed" },
-      { new: true },
+     { returnDocument: "after" },
     );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({

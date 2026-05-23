@@ -33,6 +33,7 @@ import PatientsTab from "../Components/DoctorComponents/PatientsTab.jsx";
 import AppointmentsTab from "../Components/DoctorComponents/AppointmentsTab.jsx";
 import DietChartsTab from "../Components/DoctorComponents/DietChartsTab.jsx";
 import ProfileTab from "../Components/DoctorComponents/ProfileTab.jsx";
+import AppointmentCount from "../Components/DoctorComponents/AppointmentCount.jsx";
 
 
 const sidebarItems = [
@@ -44,14 +45,7 @@ const sidebarItems = [
 ];
 
 
-const quickStats = [
-  { label: "Active Patients", value: "247", change: "+12", icon: Users, color: "bg-emerald-500", trend: "up" },
-  { label: "Pending Charts", value: "18", change: "-3", icon: FileText, color: "bg-amber-500", trend: "down" },
-  { label: "Today's Consult", value: "8", change: "+2", icon: Stethoscope, color: "bg-blue-500", trend: "up" },
-  { label: "Success Rate", value: "94.2%", change: "+2.1%", icon: TrendingUp, color: "bg-green-500", trend: "up" },
-  { label: "Ayurvedic Plans", value: "156", change: "+8", icon: Leaf, color: "bg-orange-500", trend: "up" },
-  { label: "Recipes Used", value: "89", change: "+15", icon: ChefHat, color: "bg-purple-500", trend: "up" },
-];
+
 
 
 const recentActivities = [
@@ -110,16 +104,6 @@ const EnhancedOverview = ({ currentTime, setActiveTab }) => (
               {currentTime.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 mt-2">
-            <div className="flex items-center space-x-1 bg-white/20 px-2 py-1 rounded-full text-xs">
-              <Clock className="w-3 h-3" />
-              <span>Last login: 08:45 AM</span>
-            </div>
-            <div className="flex items-center space-x-1 bg-white/20 px-2 py-1 rounded-full text-xs">
-              <Shield className="w-3 h-3" />
-              <span>HIPAA Compliant</span>
-            </div>
-          </div>
         </div>
         <div className="flex-shrink-0 text-right space-y-1">
           <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-white to-emerald-100 bg-clip-text text-transparent">18</div>
@@ -149,56 +133,10 @@ const EnhancedOverview = ({ currentTime, setActiveTab }) => (
       ))}
     </div>
 
-    {/* Quick Stats */}
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-      {quickStats.map((stat, index) => (
-        <div key={index} className="bg-white rounded-xl p-4 shadow-md border border-gray-100">
-          <div className="flex items-center justify-between mb-2">
-            <div className={`p-2 rounded-lg ${stat.color}`}>
-              <stat.icon className="w-4 h-4 text-white" />
-            </div>
-            <span className={`text-xs font-medium ${stat.trend === "up" ? "text-green-600" : "text-red-600"}`}>
-              {stat.change}
-            </span>
-          </div>
-          <div className="text-lg font-bold text-gray-900">{stat.value}</div>
-          <div className="text-xs text-gray-600 truncate">{stat.label}</div>
-        </div>
-      ))}
-    </div>
-
     {/* Main Dashboard */}
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
-        {/* Health Metrics */}
-        <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Patient Health Metrics</h3>
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Live</span>
-              <Activity className="w-4 h-4 text-emerald-600" />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {healthMetrics.map((metric, index) => (
-              <div key={index} className="text-center p-3 bg-gray-50 rounded-lg border border-gray-100">
-                <metric.icon className={`w-6 h-6 mx-auto mb-1 ${
-                  metric.status === "excellent" ? "text-green-600" :
-                  metric.status === "good" ? "text-blue-600" :
-                  metric.status === "normal" ? "text-emerald-600" : "text-amber-600"
-                }`} />
-                <div className="font-bold text-gray-900 text-sm">{metric.value}</div>
-                <div className="text-xs text-gray-600">{metric.label}</div>
-                <div className={`text-xs mt-0.5 ${
-                  metric.trend === "up" ? "text-green-600" :
-                  metric.trend === "down" ? "text-red-600" : "text-gray-500"
-                }`}>
-                  {metric.trend === "up" ? "↗ Improving" : metric.trend === "down" ? "↘ Attention" : "→ Stable"}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <AppointmentCount/>
 
         {/* Dosha Distribution */}
         <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100">
@@ -226,46 +164,6 @@ const EnhancedOverview = ({ currentTime, setActiveTab }) => (
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Right Column */}
-      <div className="space-y-6">
-        {/* Recent Activities */}
-        <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Activities</h3>
-            <div className="flex items-center gap-1">
-              <MessageSquare className="w-4 h-4 text-emerald-600" />
-              <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Live</span>
-            </div>
-          </div>
-          <div className="space-y-3">
-            {recentActivities.map((activity, index) => (
-              <div key={index} className="flex items-start space-x-2 p-2 hover:bg-emerald-50 rounded-lg transition-all duration-150 group">
-                <div className={`p-1.5 rounded-md ${
-                  activity.type === "success" ? "bg-green-100 text-green-600" :
-                  activity.type === "warning" ? "bg-amber-100 text-amber-600" : "bg-blue-100 text-blue-600"
-                }`}>
-                  <activity.icon className="w-3 h-3" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-gray-900 text-sm group-hover:text-emerald-700 truncate">{activity.action}</div>
-                  <div className="text-xs text-gray-600 truncate">{activity.patient}</div>
-                  <div className="text-xs text-gray-400 flex items-center gap-0.5">
-                    <Clock className="w-2.5 h-2.5" />
-                    {activity.time}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Placeholder for Upcoming Appointments */}
-        <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Upcoming Appointments</h3>
-          <p className="text-xs text-gray-500">No upcoming appointments</p>
         </div>
       </div>
     </div>

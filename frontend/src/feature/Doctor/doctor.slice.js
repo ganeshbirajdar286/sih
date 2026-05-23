@@ -10,7 +10,8 @@ import {
   profileUpdate, 
   profile,
   getdietchartID,
-  updateDietChartbyID
+  updateDietChartbyID,
+  AppointmentCount
 } from "./doctor.thunk";
 
 const initialState = {
@@ -27,6 +28,8 @@ const initialState = {
     updateLoading: false,
     updateError: null,
   updateSuccess: false,
+  Appointment_count:[],
+  totalAppointments: 0,
 };
 
 const doctorSlice = createSlice({
@@ -41,6 +44,26 @@ const doctorSlice = createSlice({
       state.updateError = null;
       state.updateSuccess = false;
     },
+incrementAppointmentCount: (state, action) => {
+
+   const month = action.payload;
+
+const found = state.Appointment_count.find(
+  (item) => item.month === month && item.year === new Date().getFullYear()
+);
+   if (found) {
+
+      found.totalAppointments += 1;
+
+   } else {
+      state.Appointment_count.push({
+         month,
+         year: new Date().getFullYear(),
+         totalAppointments: 1
+      });
+   }
+   state.totalAppointments += 1;
+},
   },
   extraReducers: (builder) => {
     builder
@@ -192,9 +215,28 @@ const doctorSlice = createSlice({
         state.updateError = action.payload;
         state.updateSuccess = false;
       });
+     
 
+      builder.addCase(AppointmentCount.pending,(state)=>{
+        state.loading=true;
+      })
+      .addCase(AppointmentCount.fulfilled,(state,action)=>{
+        state.loading=false;
+        state.Appointment_count=action.payload.data;
+       
+      state.totalAppointments =
+         action.payload.data.reduce(
+            (acc, item) =>
+               acc + item.totalAppointments,
+            0
+         );
+         
+      })
+      .addCase(AppointmentCount.rejected,(state,action)=>{
+        state.loading=false;
+        state.error=action.payload;})
   },
 });
 
-export const { clearDietchartById, clearUpdateStatus } = doctorSlice.actions;
+export const { clearDietchartById, clearUpdateStatus ,incrementAppointmentCount} = doctorSlice.actions;
 export default doctorSlice.reducer;

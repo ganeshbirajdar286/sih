@@ -36,6 +36,7 @@ const trackers = {
   updateDietChart: makeTracker(),
   getDietchartById: makeTracker(),
   getdietchart: makeTracker(),
+  Appointment_count: makeTracker(),
 };
 
 // Build a mock controller that records calls

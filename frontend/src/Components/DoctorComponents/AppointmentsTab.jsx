@@ -5,7 +5,6 @@ import {
   myPatient,
   Cancel_appointments,
   conformationappointment,
-  AppointmentCount
 } from "../../feature/Doctor/doctor.thunk";
 import toast from "react-hot-toast";
 import {
@@ -76,7 +75,7 @@ const getMeta = (status) => {
   if (!status) return statusMeta.Pending;
   const formatted =
     status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
-  // "accepted" → "Accepted", "rejected" → "Rejected", etc.
+
   return (
     statusMeta[formatted] ||
     statusMeta[status] || {
@@ -89,20 +88,16 @@ const getMeta = (status) => {
   );
 };
 
-/* Maps a raw DB status to which filter pill it belongs to */
 const statusToPill = (status) => {
   if (!status) return "pending";
   const s = status.toLowerCase();
   if (s === "pending") return "pending";
-  if (s === "accepted") return "confirmed"; // Accepted → Confirmed pill
-  if (s === "rejected") return "cancelled"; // Rejected → Cancelled pill
+  if (s === "accepted") return "confirmed"; 
+  if (s === "rejected") return "cancelled"; 
   if (s === "cancelled") return "cancelled";
   return s;
 };
 
-/* ─────────────────────────────────────────────
-   Status Badge
-───────────────────────────────────────────── */
 const StatusBadge = ({ status }) => {
   const m = getMeta(status);
   return (
@@ -126,9 +121,6 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-/* ─────────────────────────────────────────────
-   Small sub-component
-───────────────────────────────────────────── */
 const DetailRow = ({ label, value }) => (
   <div
     style={{

@@ -935,13 +935,15 @@ export const Doctor_selected_appointment = async (req, res) => {
   }
 };
 
-const llm = new ChatGroq({
-  apiKey: process.env.GROQ_APT_KEY,
-  model: "openai/gpt-oss-120b",
-  temperature: 0,
-  maxRetries: 2,
-});
+let llm;
 
+if (process.env.NODE_ENV !== "test") {
+  llm = new ChatGroq({
+    apiKey: process.env.GROQ_API_KEY,
+    model: "openai/gpt-oss-120b",
+    temperature: 0,
+  });
+}
 async function generateDiet(state) {
   console.log("Generating Diet Chart...");
 

@@ -11,7 +11,8 @@ import {
   profile,
   getdietchartID,
   updateDietChartbyID,
-  AppointmentCount
+  AppointmentCount,
+  AllPatientsDosha
 } from "./doctor.thunk";
 
 const initialState = {
@@ -30,6 +31,7 @@ const initialState = {
   updateSuccess: false,
   Appointment_count:[],
   totalAppointments: 0,
+  AllPatientsDosha:[],
 };
 
 const doctorSlice = createSlice({
@@ -235,6 +237,19 @@ const found = state.Appointment_count.find(
       .addCase(AppointmentCount.rejected,(state,action)=>{
         state.loading=false;
         state.error=action.payload;})
+
+      builder
+      .addCase(AllPatientsDosha.pending,(state)=>{
+        state.loading=true;
+      })
+      .addCase(AllPatientsDosha.fulfilled,(state,action)=>{
+        state.loading=false;
+        state.AllPatientsDosha=action.payload.data;
+      })
+      .addCase(AllPatientsDosha.rejected,(state,action)=>{
+        state.loading=false;
+        state.error=action.payload;
+      });
   },
 });
 

@@ -31,6 +31,7 @@ import {
   updateDietChart,
   getDietchartById,
   Appointment_count,
+  AllPatinetDosha,
 } from "../controller/auth.controller.js";
 import { isLogin } from "../middleware/auth.middleware.js";
 import { multerMiddleWare } from "../config/cloudinary.config.js";
@@ -136,5 +137,6 @@ router.get("/doctor/getdietchart/:id",isLogin,getDietchartById);
 router.get("/doctor/profile", isLogin, getprofile);
 router.put("/doctor/updatedietchart/:id", updateDietChart);
 router.get("/doctor/appointment_count",isLogin,Appointment_count);
+router.get("/doctor/AllPatientsDosha",isLogin,AllPatinetDosha)
 
 export default router;

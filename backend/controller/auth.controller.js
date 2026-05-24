@@ -1326,3 +1326,40 @@ export const Appointment_count = async (req, res) => {
     });
   }
 };
+
+export const AllPatinetDosha=async(req,res)=>{
+  try {
+    const data= await Appointment.find({
+      Doctor_id:req.user.doctor_id,
+    }).populate({
+      path:"Patient_id",
+      select:"Dosha",
+      populate:{
+        path:"Dosha",
+        select:"doshaAssessment.dominantPrakriti "
+      }
+    });
+
+    if(!data){
+      return res.status(404).json({
+        message:"No patient data found"
+      })
+    }
+    const doshaData=data.map(item=>{
+      return{
+        patientId:item.Patient_id._id,
+        dosha:item.Patient_id.Dosha.doshaAssessment.dominantPrakriti
+      }
+    })
+    return res.status(200).json({
+      success:true,
+      data:doshaData
+    })
+  } catch (error) {
+    console.error("patient dosha Count Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching dosha  data.",
+    });
+  }
+}

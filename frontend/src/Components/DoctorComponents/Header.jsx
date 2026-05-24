@@ -23,20 +23,7 @@ const Header = ({  setSidebarOpen }) => {
         </div>
 
 
-        {/* Doctor Info */}
-        <div className="flex items-center space-x-3 sm:space-x-4 pl-3 sm:pl-4 border-l border-emerald-100">
-          <div className="w-10 h-10 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
-                      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVXRMrZHp2Vv7XePQtwJZrf0FmbXoUWw53iQ&s" alt="logo" className="w-full h-full object-cover " />
-                    </div>
-          <div className="block">
-            <p className="font-semibold text-gray-900 text-sm sm:text-base">
-              Dr.  Sharma
-            </p>
-            <p className="text-xs sm:text-sm text-emerald-600 font-medium">
-              Ayurvedic Physician
-            </p>
-          </div>
-        </div>
+      
 
 
         {/* Mobile menu icon */}

@@ -1,5 +1,5 @@
 import axios from "axios";
- const apiUrl= `${import.meta.env.VITE_API_URL}/auth`
+const apiUrl = `${import.meta.env?.VITE_API_URL || "http://localhost:3005"}/auth`
  
 const getToken=()=>localStorage.getItem("auth_token")
 

@@ -155,8 +155,19 @@ export const AppointmentCount= createAsyncThunk(
       try {
        const response =await axiosInstance.get("/doctor/appointment_count");
        ;
-       console.log(response.data,Math.random() * 1000);
          return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message); 
+    }
+  }
+)
+
+export const AllPatientsDosha=createAsyncThunk(
+  "doctor/AllPatientsDosha",async(_,{rejectWithValue})=>{
+    try {
+      const response =await axiosInstance.get("/doctor/AllPatientsDosha")
+      console.log(response.data);
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message); 
     }

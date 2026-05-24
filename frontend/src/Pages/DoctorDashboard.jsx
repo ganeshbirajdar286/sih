@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 
 import Header from "../Components/DoctorComponents/Header.jsx";
 import Sidebar from "../Components/DoctorComponents/Sidebar.jsx";
-
+import DoshaDistributionCard from "../Components/DoctorComponents/DoshaDistributionCard.jsx";
 
 import {
   Users,
@@ -23,7 +23,8 @@ import AppointmentsTab from "../Components/DoctorComponents/AppointmentsTab.jsx"
 import DietChartsTab from "../Components/DoctorComponents/DietChartsTab.jsx";
 import ProfileTab from "../Components/DoctorComponents/ProfileTab.jsx";
 import AppointmentCount from "../Components/DoctorComponents/AppointmentCount.jsx";
-
+import { AllPatientsDosha } from "../feature/Doctor/doctor.thunk.js";
+import { useDispatch } from "react-redux";
 
 const sidebarItems = [
   { id: "overview", icon: BarChart3, label: "Dashboard Overview", badge: "New" },
@@ -38,16 +39,6 @@ const sidebarItems = [
 
 
 
-
-
-
-
-
-const doshaDistribution = [
-  { dosha: "Vata", percentage: 35, color: "bg-blue-500", patients: 86 },
-  { dosha: "Pitta", percentage: 45, color: "bg-red-500", patients: 111 },
-  { dosha: "Kapha", percentage: 20, color: "bg-yellow-500", patients: 50 },
-];
 
 
 const quickActions = [
@@ -112,37 +103,12 @@ const EnhancedOverview = ({ currentTime, setActiveTab }) => (
     </div>
 
     {/* Main Dashboard */}
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="lg:col-span-2 space-y-6">
         <AppointmentCount/>
 
-        {/* Dosha Distribution */}
-        <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Dosha Distribution</h3>
-            <Leaf className="w-4 h-4 text-orange-500" />
-          </div>
-          <div className="space-y-3">
-            {doshaDistribution.map((dosha, index) => (
-              <div key={index} className="flex items-center justify-between p-2 hover:bg-orange-50 rounded-lg transition-colors duration-150">
-                <div className="flex items-center space-x-2">
-                  <div className={`w-3 h-3 rounded-full ${dosha.color}`}></div>
-                  <span className="font-medium text-gray-900 text-sm">{dosha.dosha}</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <span className="text-xs text-gray-600">{dosha.patients} patients</span>
-                  <div className="w-24 bg-gray-200 rounded-full h-1.5">
-                    <div 
-                      className={`h-1.5 rounded-full ${dosha.color} transition-all duration-800 ease-out`}
-                      style={{ width: `${dosha.percentage}%` }}
-                    ></div>
-                  </div>
-                  <span className="font-bold text-gray-900 text-xs w-6 text-right">{dosha.percentage}%</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <DoshaDistributionCard />
+
       </div>
     </div>
   </div>
@@ -153,12 +119,16 @@ export default function DoctorDashboard({callPatient}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(()=>{
+   dispatch(AllPatientsDosha())
+  },[])
   const contentMap = {
     overview: <EnhancedOverview currentTime={currentTime} setActiveTab={setActiveTab} />,
     patients: <PatientsTab searchQuery={searchQuery} callPatient={callPatient} />,

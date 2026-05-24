@@ -1,4 +1,5 @@
 import { jest } from "@jest/globals";
+import { AllPatinetDosha}  from "../controller/auth.controller.js";
 
 // ─── Track middleware & controller calls ───────────────────────────────────────
 let isLoginCalled = false;
@@ -37,6 +38,7 @@ const trackers = {
   getDietchartById: makeTracker(),
   getdietchart: makeTracker(),
   Appointment_count: makeTracker(),
+  AllPatinetDosha: makeTracker(),
 };
 
 // Build a mock controller that records calls

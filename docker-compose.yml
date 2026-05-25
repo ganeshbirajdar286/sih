@@ -40,7 +40,7 @@
         interval: 10s
         timeout: 5s
         retries: 5
-        start_period: 10s
+        start_period: 40s
       restart: always
     db:
       image: mongo:latest

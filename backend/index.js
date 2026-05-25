@@ -51,8 +51,8 @@ const io = initializeSocket(server);
 const port =process.env.Port || 3005
 app.use(cors(corsOption))
 
-//app.use(rateLimitMiddleware);
-//app.use(helmet())
+app.use(rateLimitMiddleware);
+app.use(helmet())
 app.use(cookieParser());  
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))

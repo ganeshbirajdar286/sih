@@ -378,7 +378,13 @@ jobs:
 
       - name: Start services with Docker Compose
         run: |
-          docker compose up -d
+           docker compose up -d
+
+      - name: Wait for backend startup
+        run: sleep 25
+
+      - name: Show backend logs               
+        run: docker compose logs backend
 
       - name: Wait for services to be healthy
         run: |

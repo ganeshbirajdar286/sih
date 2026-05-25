@@ -365,7 +365,7 @@ jobs:
       - name: Create backend .env file
         run: |
           cat > backend/.env << EOF
-          PORT=3005
+          PORT=3009
           MONGODB_URL=mongodb://db:27017/swasthya
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
@@ -397,7 +397,7 @@ jobs:
 
       - name: Test backend health endpoint
         run: |
-          curl -f http://localhost:3005/health || exit 1
+          curl -f http://localhost:3009/health || exit 1
 
       - name: Test frontend is accessible
         run: |

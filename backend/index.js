@@ -47,8 +47,8 @@ const corsOption = {
 const app=express();
 const server = createServer(app);
 const io = initializeSocket(server);
-
-const port =process.env.Port
+ 
+const port =process.env.Port  || 3005;
 app.use(cors(corsOption))
 
 //app.use(rateLimitMiddleware);

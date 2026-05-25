@@ -12,7 +12,7 @@ import helmet from "helmet"
 
 dotenv.config()
 
-
+connect_db()
 
 const allowedOrigins = [
   /\.vercel\.app$/,
@@ -47,8 +47,8 @@ const corsOption = {
 const app=express();
 const server = createServer(app);
 const io = initializeSocket(server);
- 
-const port =process.env.Port  || 3005;
+
+const port =process.env.Port || 3005
 app.use(cors(corsOption))
 
 //app.use(rateLimitMiddleware);
@@ -63,8 +63,8 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
 
-server.listen(port,  () => {
-  connect_db();
-  console.log(`Server running on ${port}`);
+
+server.listen(port, "0.0.0.0", () => {
+  console.log(`Server running on port ${port}`); 
 });
  

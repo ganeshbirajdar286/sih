@@ -365,13 +365,13 @@ jobs:
       - name: Create backend .env file
         run: |
           cat > backend/.env << EOF
-          Port=3005
+          PORT=3005
           MONGODB_URL=mongodb://db:27017/swasthya
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
-          GROQ_APT_KEY=${{ secrets.GROQ_API_KEY }}
+          GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
           FRONTEND_URL=http://localhost:3002
           NODE_ENV=production
           EOF
@@ -393,6 +393,7 @@ jobs:
       - name: Check service logs
         run: |
           docker compose logs
+       
 
       - name: Test backend health endpoint
         run: |

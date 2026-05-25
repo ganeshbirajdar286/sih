@@ -371,7 +371,7 @@ jobs:
           CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
-          GROQ_APT_KEY=${{ secrets.GROQ_API_KEY }}
+          GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
           FRONTEND_URL=http://localhost:3002
           NODE_ENV=production
           EOF

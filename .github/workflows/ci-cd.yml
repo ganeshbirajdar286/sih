@@ -378,7 +378,7 @@ jobs:
 
       - name: Start services with Docker Compose
         run: |
-           docker compose up 
+           docker compose up -d
 
       - name: Wait for backend startup
         run: sleep 25

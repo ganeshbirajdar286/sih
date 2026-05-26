@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../Components/DoctorComponents/Header.jsx";
 import Sidebar from "../Components/DoctorComponents/Sidebar.jsx";
 import DoshaDistributionCard from "../Components/DoctorComponents/DoshaDistributionCard.jsx";
-
+import { useSelector } from "react-redux";
 import {
   Users,
   Calendar,
@@ -26,6 +26,7 @@ import AppointmentCount from "../Components/DoctorComponents/AppointmentCount.js
 import { AllPatientsDosha } from "../feature/Doctor/doctor.thunk.js";
 import { useDispatch } from "react-redux";
 
+let doctor;
 const sidebarItems = [
   { id: "overview", icon: BarChart3, label: "Dashboard Overview", badge: "New" },
   { id: "patients", icon: Users, label: "My Patients", badge: "1.2k" },
@@ -63,7 +64,7 @@ const EnhancedOverview = ({ currentTime, setActiveTab }) => (
             </div>
             <span className="text-emerald-100 bg-white/20 px-2 py-0.5 rounded-full text-xs">Ayurvedic Practitioner</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold">Welcome back, Dr. Sharma! 👋</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Welcome back, Dr.{doctor} 👋</h1>
           <p className="text-emerald-100 text-sm">Here's what's happening with your Ayurvedic practice today</p>
           <div className="flex items-center gap-3 mt-2">
             <div className="text-lg font-mono font-bold">
@@ -74,14 +75,9 @@ const EnhancedOverview = ({ currentTime, setActiveTab }) => (
             </div>
           </div>
         </div>
-        <div className="flex-shrink-0 text-right space-y-1">
-          <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-white to-emerald-100 bg-clip-text text-transparent">18</div>
-          <div className="text-emerald-100 text-sm">Appointments Today</div>
-        </div>
       </div>
     </div>
-
-    {/* Quick Actions */}
+    
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {quickActions.map((action, index) => (
         <div 
@@ -119,6 +115,8 @@ export default function DoctorDashboard({callPatient}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
+   doctor=useSelector((state)=>state.user.userProfile.Name)
+
   const dispatch = useDispatch();
 
   useEffect(() => {

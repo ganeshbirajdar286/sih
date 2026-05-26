@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 /* ─── Reusable Field ─── */
-const Field = ({ label, name, type = "text", value, onChange, disabled, textarea, rows = 3, error }) => (
+const Field = ({ label, name, type = "text", value, onChange, onBlur, disabled, textarea, rows = 3, error }) => (
   <div>
     <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
       {label}
@@ -16,6 +16,7 @@ const Field = ({ label, name, type = "text", value, onChange, disabled, textarea
         name={name}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         disabled={disabled}
         rows={rows}
         className={`w-full border rounded-xl px-4 py-3 text-sm text-slate-800
@@ -29,6 +30,7 @@ const Field = ({ label, name, type = "text", value, onChange, disabled, textarea
         name={name}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         disabled={disabled}
         className={`w-full border rounded-xl px-4 py-3 text-sm text-slate-800
                    focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent
@@ -101,7 +103,7 @@ export default function ProfileTab() {
   const [isEditing,    setIsEditing]    = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [imageFile,    setImageFile]    = useState(null);
-  const [errors,       setErrors]       = useState({});         // ← validation errors
+  const [errors,       setErrors]       = useState({});
   const [logoutLoading, setLogoutLoading] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -126,21 +128,29 @@ export default function ProfileTab() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Phone: allow digits only, max 10 chars
+    // Phone: allow digits only, max 10 chars; clear error while typing
     if (name === "PhoneNumber") {
       const digitsOnly = value.replace(/\D/g, "").slice(0, 10);
       setProfile((prev) => ({ ...prev, PhoneNumber: digitsOnly }));
-      setErrors((prev) => ({
-        ...prev,
-        PhoneNumber: digitsOnly.length > 0 && digitsOnly.length < 10
-          ? "Phone number must be exactly 10 digits."
-          : "",
-      }));
+      setErrors((prev) => ({ ...prev, PhoneNumber: "" }));
       return;
     }
 
     setProfile((prev) => ({ ...prev, [name]: value }));
   };
+
+  // Show error only after user leaves the phone field
+ const handlePhoneBlur = (e) => {
+  const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+  if (val.length > 0 && val.length < 10) {
+    setErrors((prev) => ({
+      ...prev,
+      PhoneNumber: "Phone number must be exactly 10 digits.",
+    }));
+  } else {
+    setErrors((prev) => ({ ...prev, PhoneNumber: "" }));
+  }
+};
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -165,19 +175,20 @@ export default function ProfileTab() {
   };
 
   /* ── Validate before save ── */
-  const validate = () => {
-    const newErrors = {};
-    if (profile.PhoneNumber && profile.PhoneNumber.length !== 10) {
-      newErrors.PhoneNumber = "Phone number must be exactly 10 digits.";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+const validate = () => {
+  const newErrors = {};
+  const phone = String(profile.PhoneNumber || "").replace(/\D/g, "");
+  if (phone.length > 0 && phone.length !== 10) {
+    newErrors.PhoneNumber = "Phone number must be exactly 10 digits.";
+  }
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
   const handleSave = async () => {
     if (!validate()) {
       toast.error("Please fix the errors before saving.");
-      setActiveTab("personal"); // jump to the tab that has the error
+      setActiveTab("personal");
       return;
     }
 
@@ -211,7 +222,7 @@ export default function ProfileTab() {
     try {
       await dispatch(logoutThunk());          
       toast.success("Logged out successfully.");
-      navigate("/login");                 // redirect to login page
+      navigate("/login");
     } catch {
       toast.error("Logout failed. Please try again.");
     } finally {
@@ -333,26 +344,27 @@ export default function ProfileTab() {
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-6">
 
               {/* Tabs */}
-              <div className="grid grid-cols-3 gap-1 bg-slate-100 rounded-xl p-1 mb-6 ">
-                <TabBtn id="personal"   active={activeTab === "personal"}     onClick={setActiveTab}>👤 Personal</TabBtn>
+              <div className="grid grid-cols-3 gap-1 bg-slate-100 rounded-xl p-1 mb-6">
+                <TabBtn id="personal"     active={activeTab === "personal"}     onClick={setActiveTab}>👤 Personal</TabBtn>
                 <TabBtn id="professional" active={activeTab === "professional"} onClick={setActiveTab}>💼 Professional</TabBtn>
                 <TabBtn id="settings"     active={activeTab === "settings"}     onClick={setActiveTab}>⚙️ Settings</TabBtn>
               </div>
 
               {/* ── Personal Tab ── */}
               {activeTab === "personal" && (
-                <div className="space-y-5 ">
+                <div className="space-y-5">
                   <h3 className="text-lg font-bold text-slate-800">Personal Information</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Field label="Full Name"          name="Name"        value={profile.Name}        onChange={handleChange} disabled={!isEditing} />
                     <Field label="Email"              name="Email"       value={profile.Email}       onChange={handleChange} disabled={!isEditing} type="email" />
 
-                    {/* ── Phone with 10-digit restriction ── */}
+                    {/* ── Phone with 10-digit restriction + blur validation ── */}
                     <Field
                       label="Phone Number"
                       name="PhoneNumber"
                       value={profile.PhoneNumber}
                       onChange={handleChange}
+                      onBlur={handlePhoneBlur}
                       disabled={!isEditing}
                       type="tel"
                       error={errors.PhoneNumber}
@@ -382,8 +394,6 @@ export default function ProfileTab() {
                 <div className="space-y-5">
                   <h3 className="text-lg font-bold text-slate-800">Account Settings</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-
-                  
 
                     {/* ── Logout ── */}
                     <div className="p-4 bg-red-50 rounded-xl border border-red-200">

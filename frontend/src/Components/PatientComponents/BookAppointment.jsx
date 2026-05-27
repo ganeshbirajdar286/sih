@@ -154,7 +154,7 @@ export default function BookAppointment() {
                     <p className="text-gray-500 mt-4 text-sm sm:text-base">Loading appointments...</p>
                   </div>
                 ) : Object.keys(groupedAppointments).length > 0 ? (
-                  <div className="space-y-4">
+                    <div className="space-y-4 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-green-300 scrollbar-track-green-50">
                     {Object.entries(groupedAppointments)
                       .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
                       .map(([date, appointments]) => (
@@ -208,7 +208,6 @@ export default function BookAppointment() {
                                   }`}>
                                     {apt.status}
                                   </span>
-                                  <FaTimesCircle className="text-red-500 text-sm sm:text-base flex-shrink-0 ml-2" />
                                 </div>
                               </div>
                             ))}

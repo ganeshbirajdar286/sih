@@ -21,6 +21,7 @@ import { populate } from "dotenv";
 import Review from "../model/rating.model.js";
 import mongoose from "mongoose";
 import { CLIENT_RENEG_LIMIT } from "node:tls";
+import { client } from "../config/Dodo_Payment.config.js";
 
 //user
 export const register = async (req, res) => {
@@ -48,7 +49,9 @@ export const register = async (req, res) => {
       (file) => file.fieldname === "certificate",
     );
 
-    const EmailExits = await User.findOne({ Email });
+    const EmailExits = await User.findOne({
+      Email,
+    });
 
     if (EmailExits) {
       return res.status(400).json({
@@ -60,6 +63,7 @@ export const register = async (req, res) => {
 
     if (profileImageFile) {
       const uploadResult = await uploadFileToCloudinary(profileImageFile);
+
       profileImageUrl = uploadResult?.secure_url;
     }
 
@@ -77,57 +81,89 @@ export const register = async (req, res) => {
       Name,
       Age,
       Email,
+
       Password: hashedPassword,
+
       Gender,
       Height,
       Weight,
+
       isDoctor,
+
       Image_url: profileImageUrl,
     });
 
     let doctorProfile = null;
 
     if (isDoctor === "true" || isDoctor === true) {
-      doctorProfile = await Doctor.create({
-        User_id: user._id,
-        Specialization,
-        Certificates: certificateUrl,
-        Experience,
-      });
+      if (isDoctor === "true" || isDoctor === true) {
+
+        //DODO payment 
+        const Dodo_object = await client.products.create({
+          name: `Dr. ${Name}`,
+          description: `${Specialization} Consultation`,
+          image: profileImageUrl,
+          price: {
+            type: "one_time_price", //  this tells dodo that this is onetime payment method
+            currency: "INR",
+            price: 50000,   //price: 500, // ₹5.00 
+             discount: 0, 
+             purchasing_power_parity: false,
+          },
+          tax_category: "saas",
+        });
+      }
     }
 
     user = await User.findByIdAndUpdate(
       user._id,
-      { Doctor_id: doctorProfile?._id },
-      {returnDocument: "after"}
+
+      {
+        Doctor_id: doctorProfile?._id,
+      },
+
+      {
+        returnDocument: "after",
+      },
     );
+
     let token;
+
     if (doctorProfile) {
       token = jwtToken(user?.id, doctorProfile?._id);
 
       const isProduction = process.env.NODE_ENV === "production";
+
       res.cookie("token", token, {
         httpOnly: true,
+
         secure: isProduction,
+
         sameSite: isProduction ? "none" : "lax",
+
         maxAge: 1000 * 60 * 60 * 24 * 365,
       });
     }
 
     res.status(201).json({
       message: "Registration successful",
+
       responseData: user,
+
       autoLogin: isDoctor === "true",
+
       token: token,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       message: "Server error",
+
       error: error.message,
     });
   }
 };
-
 export const login = async (req, res) => {
   try {
     const { Email, Password } = req.body;
@@ -248,7 +284,7 @@ export const submitDosha = async (req, res) => {
         Dosha: data._id,
         lastFilledAt: new Date(),
       },
-      {returnDocument: "after" },
+      { returnDocument: "after" },
     );
 
     return res.status(201).json({
@@ -555,7 +591,7 @@ export const updatePatientAppointment = async (req, res) => {
         Time_slot,
       },
       {
-       returnDocument: "after"
+        returnDocument: "after",
       },
     );
 
@@ -613,12 +649,16 @@ export const addOrUpdateReview = async (req, res) => {
       },
     ]);
 
-    await Doctor.findByIdAndUpdate(doctorId, {
-      averageRating: stats[0]?.avgRating,
-      totalReviews: stats[0]?.count,
-    },{
-      returnDocument: "after"
-    });
+    await Doctor.findByIdAndUpdate(
+      doctorId,
+      {
+        averageRating: stats[0]?.avgRating,
+        totalReviews: stats[0]?.count,
+      },
+      {
+        returnDocument: "after",
+      },
+    );
 
     return res.status(200).json({
       success: true,
@@ -911,7 +951,7 @@ export const Doctor_selected_appointment = async (req, res) => {
     const appointment = await Appointment.findByIdAndUpdate(
       appointmentid,
       { Status },
-      { returnDocument: "after"},
+      { returnDocument: "after" },
     );
 
     if (!appointment) {
@@ -1270,15 +1310,12 @@ export const delete_appointment = async (req, res) => {
 
 export const Appointment_count = async (req, res) => {
   try {
-
-
-    const data = await Appointment.aggregate([{
+    const data = await Appointment.aggregate([
+      {
         $match: {
-          Doctor_id: new mongoose.Types.ObjectId(
-        req.user.doctor_id
-      ),
-          Status: "Accepted"
-        }
+          Doctor_id: new mongoose.Types.ObjectId(req.user.doctor_id),
+          Status: "Accepted",
+        },
       },
       {
         $group: {
@@ -1296,7 +1333,7 @@ export const Appointment_count = async (req, res) => {
         },
       },
     ]);
-    
+
     if (!data) {
       return res.status(404).json({
         message: "No appointment data found",
@@ -1304,21 +1341,31 @@ export const Appointment_count = async (req, res) => {
     }
 
     const months = [
-  "Jan","Feb","Mar","Apr","May","Jun",
-  "Jul","Aug","Sep","Oct","Nov","Dec"
-];
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
 
-    const formattedData=data.map(item=>{    
-      return{
-         month:months[item._id.month-1],
-          year:item._id.year,
-          totalAppointments:item.totalAppointments
-      }  
-  })
-   
+    const formattedData = data.map((item) => {
+      return {
+        month: months[item._id.month - 1],
+        year: item._id.year,
+        totalAppointments: item.totalAppointments,
+      };
+    });
+
     return res.status(200).json({
       success: true,
-      data:formattedData,
+      data: formattedData,
     });
   } catch (error) {
     console.error("Appointment Count Error:", error);
@@ -1329,34 +1376,34 @@ export const Appointment_count = async (req, res) => {
   }
 };
 
-export const AllPatinetDosha=async(req,res)=>{
+export const AllPatinetDosha = async (req, res) => {
   try {
-    const data= await Appointment.find({
-      Doctor_id:req.user.doctor_id,
+    const data = await Appointment.find({
+      Doctor_id: req.user.doctor_id,
     }).populate({
-      path:"Patient_id",
-      select:"Dosha",
-      populate:{
-        path:"Dosha",
-        select:"doshaAssessment.dominantPrakriti "
-      }
+      path: "Patient_id",
+      select: "Dosha",
+      populate: {
+        path: "Dosha",
+        select: "doshaAssessment.dominantPrakriti ",
+      },
     });
 
-    if(!data){
+    if (!data) {
       return res.status(404).json({
-        message:"No patient data found"
-      })
+        message: "No patient data found",
+      });
     }
-    const doshaData=data.map(item=>{
-      return{
-        patientId:item.Patient_id._id,
-        dosha:item.Patient_id.Dosha.doshaAssessment.dominantPrakriti
-      }
-    })
+    const doshaData = data.map((item) => {
+      return {
+        patientId: item.Patient_id._id,
+        dosha: item.Patient_id.Dosha.doshaAssessment.dominantPrakriti,
+      };
+    });
     return res.status(200).json({
-      success:true,
-      data:doshaData
-    })
+      success: true,
+      data: doshaData,
+    });
   } catch (error) {
     console.error("patient dosha Count Error:", error);
     return res.status(500).json({
@@ -1364,4 +1411,4 @@ export const AllPatinetDosha=async(req,res)=>{
       message: "An error occurred while fetching dosha  data.",
     });
   }
-}
+};

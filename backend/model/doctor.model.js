@@ -64,6 +64,10 @@ const doctorSchema = new Schema(
     Consultation: {
       type: Number,
     },
+    dodo_product_id:{
+      type:String,
+      require:true,
+    }
   },
   { timestamps: true },
 );

@@ -24,7 +24,8 @@ const userSchema=new Schema({
         // Basic regex for email format validation
         return /^[^@]+@[^@]+\.[^@]+$/.test(value); 
       },
-      message: 'Please enter a valid email address.'
+      message: 'Please enter a valid email address.',
+      required:true
     }
     },
     Password:{

@@ -411,7 +411,7 @@ export default function DoctorsTab() {
       <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-800">Find Your Doctor</h2>
 
       {/* Search + Controls */}
-      <div className="mb-4 sm:mb-6 space-y-3">
+      <div className="mb-4 sm:mb-6 space-y-3">Find Your Doctor
         <div className="relative w-full">
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
           <input

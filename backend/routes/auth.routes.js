@@ -33,6 +33,7 @@ import {
   Appointment_count,
   AllPatinetDosha,
 } from "../controller/auth.controller.js";
+import { One_Time_Payment,Payment_Cancel,Payment_Success } from "../controller/payment.controller.js";
 import { isLogin } from "../middleware/auth.middleware.js";
 import { multerMiddleWare } from "../config/cloudinary.config.js";
 import {
@@ -138,5 +139,10 @@ router.get("/doctor/profile", isLogin, getprofile);
 router.put("/doctor/updatedietchart/:id", updateDietChart);
 router.get("/doctor/appointment_count",isLogin,Appointment_count);
 router.get("/doctor/AllPatientsDosha",isLogin,AllPatinetDosha)
+
+//payment
+router.post("/checkout/one_time_payment",isLogin,One_Time_Payment)
+router.post("/checkout/payment-success",isLogin, Payment_Success);
+router.post("/checkout/payment-cancel",isLogin, Payment_Cancel);
 
 export default router;

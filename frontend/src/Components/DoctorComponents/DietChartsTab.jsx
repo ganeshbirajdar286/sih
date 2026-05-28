@@ -120,16 +120,120 @@ const styles = `
     border-color: #d97706;
     background: linear-gradient(135deg, #fffbeb, #fef3c7);
   }
+
+  /* ── CHANGE 1: Mobile padding & header stacking ── */
+  @media (max-width: 768px) {
+    .diet-mobile-padding {
+      padding: 16px 16px 0 !important;
+    }
+    .diet-mobile-header {
+      flex-direction: column !important;
+      gap: 16px !important;
+      align-items: flex-start !important;
+    }
+    .diet-mobile-header > button {
+      width: 100%;
+      justify-content: center;
+    }
+    .diet-mobile-stats {
+      grid-template-columns: 1fr !important;
+    }
+    .diet-mobile-meals {
+      grid-template-columns: 1fr !important;
+    }
+    .diet-mobile-actions {
+      flex-direction: column !important;
+    }
+    .diet-mobile-actions button {
+      width: 100% !important;
+      justify-content: center !important;
+    }
+    .diet-mobile-title {
+      font-size: 30px !important;
+    }
+    .diet-mobile-search {
+      width: 100% !important;
+    }
+    /* ── CHANGE 2: card list padding ── */
+    .diet-card-list {
+      padding: 0 16px 24px !important;
+    }
+  }
+
+  /* ── CHANGE 3: patient meta row ── */
+  .diet-patient-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* ── CHANGE 4: lifestyle badge row lives inside info column ── */
+  .diet-lifestyle-badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+
+  .diet-avatar {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .diet-avatar {
+      width: 44px !important;
+      height: 44px !important;
+    }
+  }
+
+  /* ── CHANGE 5: card header row — avatar | info | chevron, always in a row ── */
+  .diet-card-header-row {
+    padding: 18px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  /* info column grows, min-width 0 prevents overflow */
+  .diet-card-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  /* chevron always stays top-right */
+  .diet-chevron {
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 4px;
+  }
 `;
 
 const NutritionBar = ({ label, value, max, color }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
     <div style={{ display: "flex", justifyContent: "space-between" }}>
-      <span style={{ fontSize: 10, color: "#9ca3af", fontWeight: 500 }}>{label}</span>
-      <span style={{ fontSize: 10, color: "#6b7280", fontWeight: 600 }}>{value}</span>
+      <span style={{ fontSize: 10, color: "#9ca3af", fontWeight: 500 }}>
+        {label}
+      </span>
+      <span style={{ fontSize: 10, color: "#6b7280", fontWeight: 600 }}>
+        {value}
+      </span>
     </div>
     <div className="nutrition-bar">
-      <div className="nutrition-bar-fill" style={{ width: `${Math.min((value / max) * 100, 100)}%`, background: color }} />
+      <div
+        className="nutrition-bar-fill"
+        style={{
+          width: `${Math.min((value / max) * 100, 100)}%`,
+          background: color,
+        }}
+      />
     </div>
   </div>
 );
@@ -137,7 +241,11 @@ const NutritionBar = ({ label, value, max, color }) => (
 const DietChartsTab = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { getdietchart: dietCharts = [], loading, error } = useSelector((state) => state.doctor);
+  const {
+    getdietchart: dietCharts = [],
+    loading,
+    error,
+  } = useSelector((state) => state.doctor);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus] = useState("all");
@@ -148,18 +256,17 @@ const DietChartsTab = () => {
     dispatch(getDietchart());
   }, [dispatch]);
 
-  
-
   const getStatusStyle = (status) => {
     const map = {
-      active: { bg: "#dcfce7", color: "#166534", dot: "#16a34a" },
-      pending: { bg: "#fef9c3", color: "#854d0e", dot: "#ca8a04" },
+      active:    { bg: "#dcfce7", color: "#166534", dot: "#16a34a" },
+      pending:   { bg: "#fef9c3", color: "#854d0e", dot: "#ca8a04" },
       completed: { bg: "#dbeafe", color: "#1e40af", dot: "#2563eb" },
     };
     return map[status] || { bg: "#f3f4f6", color: "#374151", dot: "#9ca3af" };
   };
 
-  const toggleChart = (id) => setExpandedChart(expandedChart === id ? null : id);
+  const toggleChart = (id) =>
+    setExpandedChart(expandedChart === id ? null : id);
 
   const latestPerPatient = useMemo(() => {
     const map = new Map();
@@ -176,49 +283,101 @@ const DietChartsTab = () => {
     return latestPerPatient.filter((chart) => {
       const patientName = chart.Patient_id?.Name?.toLowerCase() || "";
       const matchesSearch = patientName.includes(searchQuery.toLowerCase());
-      const matchesStatus = selectedStatus === "all" || chart.status === selectedStatus;
+      const matchesStatus =
+        selectedStatus === "all" || chart.status === selectedStatus;
       return matchesSearch && matchesStatus;
     });
   }, [latestPerPatient, searchQuery, selectedStatus]);
 
   const sortedCharts = useMemo(() => {
     let sorted = [...filteredCharts];
-    if (sortOption === "recent") sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    if (sortOption === "duration") sorted.sort((a, b) => b.duration_days - a.duration_days);
+    if (sortOption === "recent")
+      sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    if (sortOption === "duration")
+      sorted.sort((a, b) => b.duration_days - a.duration_days);
     return sorted;
   }, [filteredCharts, sortOption]);
 
   const avgDuration = dietCharts.length
-    ? Math.round(dietCharts.reduce((acc, c) => acc + (c.duration_days || 0), 0) / dietCharts.length)
+    ? Math.round(
+        dietCharts.reduce((acc, c) => acc + (c.duration_days || 0), 0) /
+          dietCharts.length,
+      )
     : 0;
-
-   
 
   if (loading) {
     return (
-      <div className="diet-root" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
+      <div
+        className="diet-root"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "60vh",
+        }}
+      >
         <style>{styles}</style>
         <div style={{ textAlign: "center" }}>
-          <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, #fef3c7, #fde68a)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #fef3c7, #fde68a)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 16px",
+            }}
+          >
             <ChefHat style={{ width: 28, height: 28, color: "#d97706" }} />
           </div>
-          <div className="shimmer" style={{ height: 12, width: 160, borderRadius: 6, margin: "0 auto 8px" }} />
-          <div className="shimmer" style={{ height: 8, width: 100, borderRadius: 6, margin: "0 auto" }} />
+          <div
+            className="shimmer"
+            style={{ height: 12, width: 160, borderRadius: 6, margin: "0 auto 8px" }}
+          />
+          <div
+            className="shimmer"
+            style={{ height: 8, width: 100, borderRadius: 6, margin: "0 auto" }}
+          />
         </div>
       </div>
     );
   }
 
-  
   if (error) {
     return (
-      <div className="diet-root" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
+      <div
+        className="diet-root"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "60vh",
+        }}
+      >
         <style>{styles}</style>
         <div style={{ textAlign: "center", padding: 32 }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}>🌿</div>
-          <p style={{ color: "#b91c1c", fontWeight: 600, marginBottom: 6 }}>Unable to load diet charts</p>
-          <p style={{ color: "#9ca3af", fontSize: 13, marginBottom: 20 }}>{error}</p>
-          <button className="btn-primary" onClick={() => dispatch(getDietchart())} style={{ color: "#fff", border: "none", padding: "10px 24px", borderRadius: 12, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}>
+          <p style={{ color: "#b91c1c", fontWeight: 600, marginBottom: 6 }}>
+            Unable to load diet charts
+          </p>
+          <p style={{ color: "#9ca3af", fontSize: 13, marginBottom: 20 }}>
+            {error}
+          </p>
+          <button
+            className="btn-primary"
+            onClick={() => dispatch(getDietchart())}
+            style={{
+              color: "#fff",
+              border: "none",
+              padding: "10px 24px",
+              borderRadius: 12,
+              cursor: "pointer",
+              fontFamily: "'DM Sans', sans-serif",
+              fontWeight: 500,
+            }}
+          >
             Try Again
           </button>
         </div>
@@ -230,206 +389,293 @@ const DietChartsTab = () => {
     <div className="diet-root">
       <style>{styles}</style>
 
-      <div style={{ padding: "32px 32px 0" }}>
-        
-        <div style={{ background: "linear-gradient(135deg, #fffbeb 0%, #fef9f0 50%, #faf8f4 100%)", borderRadius: 24, padding: "32px 36px", marginBottom: 28, border: "1px solid #fde68a", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: -20, right: -20, width: 160, height: 160, borderRadius: "50%", background: "radial-gradient(circle, rgba(251,191,36,0.15) 0%, transparent 70%)" }} />
-          <div style={{ position: "absolute", bottom: -30, left: "30%", width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle, rgba(217,119,6,0.1) 0%, transparent 70%)" }} />
+      {/* ─── Top section ─── */}
+      <div className="diet-mobile-padding" style={{ padding: "32px 32px 0" }}>
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative" }}>
+        {/* Hero banner — unchanged */}
+        <div
+          style={{
+            background: "linear-gradient(135deg, #fffbeb 0%, #fef9f0 50%, #faf8f4 100%)",
+            borderRadius: 24,
+            padding: "32px 36px",
+            marginBottom: 28,
+            border: "1px solid #fde68a",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <div style={{ position:"absolute", top:-20, right:-20, width:160, height:160, borderRadius:"50%", background:"radial-gradient(circle, rgba(251,191,36,0.15) 0%, transparent 70%)" }} />
+          <div style={{ position:"absolute", bottom:-30, left:"30%", width:120, height:120, borderRadius:"50%", background:"radial-gradient(circle, rgba(217,119,6,0.1) 0%, transparent 70%)" }} />
+
+          <div
+            className="diet-mobile-header"
+            style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", position:"relative" }}
+          >
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #d97706, #b45309)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(180,83,9,0.3)" }}>
-                  <Leaf style={{ width: 18, height: 18, color: "#fff" }} />
+              <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:8 }}>
+                <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg, #d97706, #b45309)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 12px rgba(180,83,9,0.3)" }}>
+                  <Leaf style={{ width:18, height:18, color:"#fff" }} />
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 600, color: "#b45309", letterSpacing: "0.12em", textTransform: "uppercase" }}>Ayurvedic Wellness</span>
+                <span style={{ fontSize:12, fontWeight:600, color:"#b45309", letterSpacing:"0.12em", textTransform:"uppercase" }}>
+                  Ayurvedic Wellness
+                </span>
               </div>
-              <h1 className="diet-display-font" style={{ fontSize: 42, fontWeight: 600, color: "#1c1008", lineHeight: 1.1, marginBottom: 8 }}>
+              <h1
+                className="diet-display-font diet-mobile-title"
+                style={{ fontSize:42, fontWeight:600, color:"#1c1008", lineHeight:1.1, marginBottom:8 }}
+              >
                 Diet Charts
               </h1>
-              <p style={{ color: "#78716c", fontSize: 15, fontWeight: 400 }}>Personalized plans rooted in ancient wisdom</p>
+              <p style={{ color:"#78716c", fontSize:15, fontWeight:400 }}>
+                Personalized plans rooted in ancient wisdom
+              </p>
             </div>
-            <button onClick={()=>{navigate("/doctor/createDietChart")}} className="btn-primary" style={{ display: "flex", alignItems: "center", gap: 8, color: "#fff", border: "none", padding: "12px 22px", borderRadius: 14, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 14, whiteSpace: "nowrap", flexShrink: 0 }}>
-              <Plus style={{ width: 16, height: 16 }}  />
+            <button
+              onClick={() => navigate("/doctor/createDietChart")}
+              className="btn-primary"
+              style={{ display:"flex", alignItems:"center", gap:8, color:"#fff", border:"none", padding:"12px 22px", borderRadius:14, cursor:"pointer", fontFamily:"'DM Sans', sans-serif", fontWeight:500, fontSize:14, whiteSpace:"nowrap", flexShrink:0 }}
+            >
+              <Plus style={{ width:16, height:16 }} />
               New Chart
             </button>
           </div>
 
-         
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginTop: 28 }}>
+          <div
+            className="diet-mobile-stats"
+            style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:16, marginTop:28 }}
+          >
             {[
-              { label: "Total Charts", value: dietCharts.length, icon: <FileText style={{ width: 14, height: 14 }} />, color: "#d97706" },
-              { label: "Active Plans", value: dietCharts.filter(c => c.status === "active").length, icon: <Activity style={{ width: 14, height: 14 }} />, color: "#059669" },
-              { label: "Avg Duration", value: `${avgDuration}d`, icon: <Clock style={{ width: 14, height: 14 }} />, color: "#7c3aed" },
+              { label:"Total Charts", value:dietCharts.length,                                  icon:<FileText  style={{width:14,height:14}}/>, color:"#d97706" },
+              { label:"Active Plans", value:dietCharts.filter(c=>c.status==="active").length,   icon:<Activity  style={{width:14,height:14}}/>, color:"#059669" },
+              { label:"Avg Duration", value:`${avgDuration}d`,                                  icon:<Clock     style={{width:14,height:14}}/>, color:"#7c3aed" },
             ].map((s, i) => (
-              <div key={i} style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(8px)", borderRadius: 14, padding: "14px 18px", border: "1px solid rgba(255,255,255,0.9)", display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 32, height: 32, borderRadius: 8, background: `${s.color}18`, display: "flex", alignItems: "center", justifyContent: "center", color: s.color }}>
+              <div
+                key={i}
+                style={{ background:"rgba(255,255,255,0.7)", backdropFilter:"blur(8px)", borderRadius:14, padding:"14px 18px", border:"1px solid rgba(255,255,255,0.9)", display:"flex", alignItems:"center", gap:12 }}
+              >
+                <div style={{ width:32, height:32, borderRadius:8, background:`${s.color}18`, display:"flex", alignItems:"center", justifyContent:"center", color:s.color }}>
                   {s.icon}
                 </div>
                 <div>
-                  <div style={{ fontSize: 22, fontWeight: 700, color: "#1c1008", lineHeight: 1 }}>{s.value}</div>
-                  <div style={{ fontSize: 11, color: "#9ca3af", fontWeight: 500, marginTop: 2 }}>{s.label}</div>
+                  <div style={{ fontSize:22, fontWeight:700, color:"#1c1008", lineHeight:1 }}>{s.value}</div>
+                  <div style={{ fontSize:11, color:"#9ca3af", fontWeight:500, marginTop:2 }}>{s.label}</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-       
-
-      
-        <div style={{ display: "flex", gap: 12, marginBottom: 24, alignItems: "center", flexWrap: "wrap" }}>
-          <div style={{ position: "relative", flex: 1, minWidth: 220 }}>
-            <Search style={{ width: 15, height: 15, position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#d97706" }} />
+        {/* Toolbar — unchanged */}
+        <div
+          className="diet-mobile-header"
+          style={{ display:"flex", gap:12, marginBottom:24, alignItems:"center", flexWrap:"wrap" }}
+        >
+          <div style={{ position:"relative", flex:1, minWidth:220 }}>
+            <Search style={{ width:15, height:15, position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", color:"#d97706" }} />
             <input
               className="search-input"
               type="text"
               placeholder="Search patients..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: "100%", paddingLeft: 40, paddingRight: 16, paddingTop: 10, paddingBottom: 10, border: "1.5px solid #e5e7eb", borderRadius: 12, fontFamily: "'DM Sans', sans-serif", fontSize: 13, background: "#fff", color: "#374151", boxSizing: "border-box" }}
+              style={{ width:"100%", paddingLeft:40, paddingRight:16, paddingTop:10, paddingBottom:10, border:"1.5px solid #e5e7eb", borderRadius:12, fontFamily:"'DM Sans', sans-serif", fontSize:13, background:"#fff", color:"#374151", boxSizing:"border-box" }}
             />
           </div>
           <select
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}
-            style={{ padding: "10px 14px", border: "1.5px solid #e5e7eb", borderRadius: 12, fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#374151", background: "#fff", cursor: "pointer", outline: "none" }}
+            style={{ padding:"10px 14px", border:"1.5px solid #e5e7eb", borderRadius:12, fontFamily:"'DM Sans', sans-serif", fontSize:13, color:"#374151", background:"#fff", cursor:"pointer", outline:"none" }}
           >
             <option value="recent">Most Recent</option>
             <option value="duration">By Duration</option>
           </select>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#d97706", fontSize: 13 }}>
-            <Leaf style={{ width: 14, height: 14 }} />
-            <span style={{ fontWeight: 500 }}>{sortedCharts.length} charts</span>
+          <div style={{ display:"flex", alignItems:"center", gap:6, color:"#d97706", fontSize:13 }}>
+            <Leaf style={{ width:14, height:14 }} />
+            <span style={{ fontWeight:500 }}>{sortedCharts.length} charts</span>
           </div>
         </div>
       </div>
 
-    
-      <div style={{ padding: "0 32px 32px", display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* ─── Card list ─── */}
+      {/* CHANGE: added diet-card-list class for responsive padding */}
+      <div
+        className="diet-card-list"
+        style={{ padding:"0 32px 32px", display:"flex", flexDirection:"column", gap:16 }}
+      >
         {sortedCharts.map((chart) => {
-          const patient = chart.Patient_id;
-          const dailyPlan = chart.daily_plan || {};
-          const lifestyle = chart.lifestyle || {};
-          const isExpanded = expandedChart === chart._id;
+          const patient     = chart.Patient_id;
+          const dailyPlan   = chart.daily_plan || {};
+          const lifestyle   = chart.lifestyle  || {};
+          const isExpanded  = expandedChart === chart._id;
           const statusStyle = getStatusStyle(chart.status);
-          const meals = Object.entries(dailyPlan);
+          const meals       = Object.entries(dailyPlan);
+
           return (
-            <div key={chart._id} className="card-hover" style={{ background: "#fff", borderRadius: 20, border: "1.5px solid #f3f0e8", overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
-          
-              <div style={{ height: 3, background: "linear-gradient(90deg, #d97706, #f59e0b, #fcd34d)" }} />
+            <div
+              key={chart._id}
+              className="card-hover"
+              style={{ background:"#fff", borderRadius:20, border:"1.5px solid #f3f0e8", overflow:"hidden", boxShadow:"0 2px 12px rgba(0,0,0,0.04)" }}
+            >
+              {/* colour bar */}
+              <div style={{ height:3, background:"linear-gradient(90deg, #d97706, #f59e0b, #fcd34d)" }} />
 
-              <div style={{ padding: "20px 24px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }} onClick={() => toggleChart(chart._id)}>
-                <div style={{ display: "flex", alignItems: "center", gap: 16, flex: 1, minWidth: 0 }}>
-                  {patient?.Image_url ? (
-                    <div className="avatar-ring" style={{ flexShrink: 0, width: 52, height: 52 }}>
-                      <img src={patient.Image_url} alt={patient.Name} style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover", display: "block" }} />
-                    </div>
-                  ) : (
-                    <div style={{ flexShrink: 0, width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg, #fef3c7, #fde68a)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <User style={{ width: 22, height: 22, color: "#d97706" }} />
-                    </div>
-                  )}
+              {/*
+               * ── CHANGE: card header restructured ──
+               * Old: [avatar+info column] [badges div] [chevron]
+               *      On mobile, info column became column so badges floated weirdly.
+               * New: [avatar] [info column (name + meta + badges)] [chevron]
+               *      Badges now live INSIDE the info column, so they always sit
+               *      naturally below the meta row on any screen width.
+               */}
+              <div
+                className="diet-card-header-row"
+                onClick={() => toggleChart(chart._id)}
+              >
+                {/* Avatar */}
+                {patient?.Image_url ? (
+                  <div className="avatar-ring diet-avatar">
+                    <img
+                      src={patient.Image_url}
+                      alt={patient.Name}
+                      style={{ width:"calc(100% - 4px)", height:"calc(100% - 4px)", borderRadius:"50%", objectFit:"cover", display:"block", margin:"2px" }}
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className="diet-avatar"
+                    style={{ borderRadius:"50%", background:"linear-gradient(135deg, #fef3c7, #fde68a)", display:"flex", alignItems:"center", justifyContent:"center" }}
+                  >
+                    <User style={{ width:22, height:22, color:"#d97706" }} />
+                  </div>
+                )}
 
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 5, flexWrap: "wrap" }}>
-                      <h3 className="diet-display-font" style={{ fontSize: 20, fontWeight: 600, color: "#1c1008", margin: 0 }}>
-                        {patient?.Name}
-                      </h3>
-                      {chart.status && (
-                        <span style={{ background: statusStyle.bg, color: statusStyle.color, padding: "3px 10px", borderRadius: 50, fontSize: 11, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 5 }}>
-                          <span style={{ width: 5, height: 5, borderRadius: "50%", background: statusStyle.dot, display: "inline-block" }} />
-                          {chart.status}
-                        </span>
+                {/* Info column */}
+                <div className="diet-card-info">
+                  {/* Name + status badge */}
+                  <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
+                    <h3
+                      className="diet-display-font"
+                      style={{ fontSize:20, fontWeight:600, color:"#1c1008", margin:0 }}
+                    >
+                      {patient?.Name}
+                    </h3>
+                    {chart.status && (
+                      <span
+                        style={{ background:statusStyle.bg, color:statusStyle.color, padding:"3px 10px", borderRadius:50, fontSize:11, fontWeight:600, display:"inline-flex", alignItems:"center", gap:5 }}
+                      >
+                        <span style={{ width:5, height:5, borderRadius:"50%", background:statusStyle.dot, display:"inline-block" }} />
+                        {chart.status}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Age / duration / date */}
+                  <div className="diet-patient-meta">
+                    <span style={{ fontSize:12, color:"#9ca3af" }}>
+                      {patient?.Age} yrs · {patient?.Gender}
+                    </span>
+                    <span style={{ width:1, height:12, background:"#e5e7eb" }} />
+                    <span style={{ fontSize:12, color:"#d97706", fontWeight:500, display:"inline-flex", alignItems:"center", gap:4 }}>
+                      <Clock style={{ width:11, height:11 }} />
+                      {chart.duration_days} day plan
+                    </span>
+                    <span style={{ width:1, height:12, background:"#e5e7eb" }} />
+                    <span style={{ fontSize:12, color:"#9ca3af" }}>
+                      {new Date(chart.createdAt).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" })}
+                    </span>
+                  </div>
+
+                  {/* Lifestyle badges — now inside info column */}
+                  {(lifestyle.Water_Intake || lifestyle.Meal_Frequency) && (
+                    <div className="diet-lifestyle-badges">
+                      {lifestyle.Water_Intake && (
+                        <div style={{ display:"inline-flex", alignItems:"center", gap:4, background:"#eff6ff", color:"#1d4ed8", padding:"4px 10px", borderRadius:50, fontSize:11, fontWeight:500 }}>
+                          <Droplets style={{ width:11, height:11 }} />
+                          {lifestyle.Water_Intake}
+                        </div>
+                      )}
+                      {lifestyle.Meal_Frequency && (
+                        <div style={{ display:"inline-flex", alignItems:"center", gap:4, background:"#f0fdf4", color:"#166534", padding:"4px 10px", borderRadius:50, fontSize:11, fontWeight:500 }}>
+                          <ChefHat style={{ width:11, height:11 }} />
+                          {lifestyle.Meal_Frequency}
+                        </div>
                       )}
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 12, color: "#9ca3af" }}>{patient?.Age} yrs · {patient?.Gender}</span>
-                      <span style={{ width: 1, height: 12, background: "#e5e7eb" }} />
-                      <span style={{ fontSize: 12, color: "#d97706", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 4 }}>
-                        <Clock style={{ width: 11, height: 11 }} />{chart.duration_days} day plan
-                      </span>
-                      <span style={{ width: 1, height: 12, background: "#e5e7eb" }} />
-                      <span style={{ fontSize: 12, color: "#9ca3af" }}>
-                        {new Date(chart.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-         
-                <div style={{ display: "flex", gap: 8, flexShrink: 0, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                  {lifestyle.Water_Intake && (
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#eff6ff", color: "#1d4ed8", padding: "5px 10px", borderRadius: 50, fontSize: 11, fontWeight: 500 }}>
-                      <Droplets style={{ width: 11, height: 11 }} />{lifestyle.Water_Intake}
-                    </div>
-                  )}
-                  {lifestyle.Meal_Frequency && (
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#f0fdf4", color: "#166534", padding: "5px 10px", borderRadius: 50, fontSize: 11, fontWeight: 500 }}>
-                      <ChefHat style={{ width: 11, height: 11 }} />{lifestyle.Meal_Frequency}
-                    </div>
                   )}
                 </div>
 
-                <ChevronDown className={`rotate-icon ${isExpanded ? "open" : ""}`} style={{ width: 18, height: 18, color: "#d97706", flexShrink: 0 }} />
+                {/* Chevron — sole trailing item, always top-right */}
+                <ChevronDown
+                  className={`rotate-icon diet-chevron ${isExpanded ? "open" : ""}`}
+                  style={{ width:18, height:18, color:"#d97706" }}
+                />
               </div>
 
-         
+              {/* Collapsed meal pills — unchanged */}
               {!isExpanded && meals.length > 0 && (
-                <div style={{ padding: "0 24px 20px", display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <div style={{ padding:"0 24px 20px", display:"flex", gap:8, flexWrap:"wrap" }}>
                   {meals.map(([mealKey, mealData]) => (
-                    <div key={mealKey} style={{ background: "#faf8f4", border: "1px solid #f3f0e8", borderRadius: 10, padding: "6px 12px", display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontSize: 11, color: "#d97706", fontWeight: 600, textTransform: "capitalize" }}>{mealKey}</span>
-                      <span style={{ width: 1, height: 10, background: "#e5e7eb" }} />
-                      <span style={{ fontSize: 11, color: "#6b7280" }}>{mealData.recipe_name}</span>
+                    <div
+                      key={mealKey}
+                      style={{ background:"#faf8f4", border:"1px solid #f3f0e8", borderRadius:10, padding:"6px 12px", display:"flex", alignItems:"center", gap:6 }}
+                    >
+                      <span style={{ fontSize:11, color:"#d97706", fontWeight:600, textTransform:"capitalize" }}>{mealKey}</span>
+                      <span style={{ width:1, height:10, background:"#e5e7eb" }} />
+                      <span style={{ fontSize:11, color:"#6b7280" }}>{mealData.recipe_name}</span>
                     </div>
                   ))}
                 </div>
               )}
 
-             
+              {/* Expanded detail — unchanged */}
               {isExpanded && (
-                <div className="expand-content" style={{ borderTop: "1px solid #f3f0e8" }}>
-                
-                  <div style={{ padding: "24px 24px 16px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: 8, background: "#fef3c7", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <FileText style={{ width: 13, height: 13, color: "#d97706" }} />
+                <div className="expand-content" style={{ borderTop:"1px solid #f3f0e8" }}>
+                  <div style={{ padding:"24px 24px 16px" }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
+                      <div style={{ width:28, height:28, borderRadius:8, background:"#fef3c7", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                        <FileText style={{ width:13, height:13, color:"#d97706" }} />
                       </div>
-                      <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "#374151" }}>Daily Meal Plan</h4>
+                      <h4 style={{ margin:0, fontSize:14, fontWeight:600, color:"#374151" }}>Daily Meal Plan</h4>
                     </div>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
+                    <div
+                      className="diet-mobile-meals"
+                      style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))", gap:14 }}
+                    >
                       {meals.map(([mealKey, mealData]) => {
                         const n = mealData.nutrition || {};
                         const effects = mealData.ayurveda_effects || {};
                         return (
-                          <div key={mealKey} className="meal-section" style={{ background: "#faf8f4", borderRadius: 14, padding: "16px 16px 16px 20px", border: "1px solid #f3f0e8" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                          <div
+                            key={mealKey}
+                            className="meal-section"
+                            style={{ background:"#faf8f4", borderRadius:14, padding:"16px 16px 16px 20px", border:"1px solid #f3f0e8" }}
+                          >
+                            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:12 }}>
                               <div>
-                                <span style={{ fontSize: 11, fontWeight: 700, color: "#d97706", textTransform: "uppercase", letterSpacing: "0.08em" }}>{mealKey}</span>
-                                <p style={{ margin: "3px 0 0", fontSize: 13, fontWeight: 600, color: "#1c1008" }}>{mealData.recipe_name}</p>
+                                <span style={{ fontSize:11, fontWeight:700, color:"#d97706", textTransform:"uppercase", letterSpacing:"0.08em" }}>{mealKey}</span>
+                                <p style={{ margin:"3px 0 0", fontSize:13, fontWeight:600, color:"#1c1008" }}>{mealData.recipe_name}</p>
                               </div>
                               {n.calories && (
-                                <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#fff", border: "1px solid #fde68a", borderRadius: 8, padding: "4px 8px" }}>
-                                  <Flame style={{ width: 11, height: 11, color: "#f59e0b" }} />
-                                  <span style={{ fontSize: 11, fontWeight: 700, color: "#d97706" }}>{n.calories} cal</span>
+                                <div style={{ display:"inline-flex", alignItems:"center", gap:4, background:"#fff", border:"1px solid #fde68a", borderRadius:8, padding:"4px 8px" }}>
+                                  <Flame style={{ width:11, height:11, color:"#f59e0b" }} />
+                                  <span style={{ fontSize:11, fontWeight:700, color:"#d97706" }}>{n.calories} cal</span>
                                 </div>
                               )}
                             </div>
 
                             {(n.protein_g || n.carbs_g || n.fat_g) && (
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
-                                {n.protein_g && <NutritionBar label="Protein" value={n.protein_g} max={50} color="#10b981" />}
-                                {n.carbs_g && <NutritionBar label="Carbs" value={n.carbs_g} max={100} color="#f59e0b" />}
-                                {n.fat_g && <NutritionBar label="Fat" value={n.fat_g} max={40} color="#ef4444" />}
+                              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:12 }}>
+                                {n.protein_g && <NutritionBar label="Protein" value={n.protein_g} max={50}  color="#10b981" />}
+                                {n.carbs_g   && <NutritionBar label="Carbs"   value={n.carbs_g}   max={100} color="#f59e0b" />}
+                                {n.fat_g     && <NutritionBar label="Fat"     value={n.fat_g}     max={40}  color="#ef4444" />}
                               </div>
                             )}
 
                             {mealData.ingredients && (
-                              <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 10 }}>
+                              <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:10 }}>
                                 {mealData.ingredients.map((ing, i) => (
-                                  <span key={i} className="tag-pill" style={{ background: "#ecfdf5", color: "#059669", padding: "3px 8px", borderRadius: 50, fontSize: 10, fontWeight: 500, border: "1px solid #a7f3d0" }}>
+                                  <span key={i} className="tag-pill" style={{ background:"#ecfdf5", color:"#059669", padding:"3px 8px", borderRadius:50, fontSize:10, fontWeight:500, border:"1px solid #a7f3d0" }}>
                                     {ing}
                                   </span>
                                 ))}
@@ -437,14 +683,14 @@ const DietChartsTab = () => {
                             )}
 
                             {mealData.instructions && (
-                              <p style={{ fontSize: 11, color: "#9ca3af", fontStyle: "italic", margin: "0 0 10px", lineHeight: 1.5 }}>{mealData.instructions}</p>
+                              <p style={{ fontSize:11, color:"#9ca3af", fontStyle:"italic", margin:"0 0 10px", lineHeight:1.5 }}>{mealData.instructions}</p>
                             )}
 
                             {Object.keys(effects).length > 0 && (
-                              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                              <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
                                 {Object.entries(effects).map(([dosha, effect]) => (
-                                  <span key={dosha} className="tag-pill" style={{ background: "#f5f3ff", color: "#6d28d9", padding: "3px 8px", borderRadius: 50, fontSize: 10, fontWeight: 500, border: "1px solid #ddd6fe" }}>
-                                    <span style={{ textTransform: "capitalize", fontWeight: 700 }}>{dosha}</span>: {effect}
+                                  <span key={dosha} className="tag-pill" style={{ background:"#f5f3ff", color:"#6d28d9", padding:"3px 8px", borderRadius:50, fontSize:10, fontWeight:500, border:"1px solid #ddd6fe" }}>
+                                    <span style={{ textTransform:"capitalize", fontWeight:700 }}>{dosha}</span>: {effect}
                                   </span>
                                 ))}
                               </div>
@@ -455,39 +701,44 @@ const DietChartsTab = () => {
                     </div>
                   </div>
 
-                 
                   {chart.note && (
-                    <div style={{ margin: "0 24px 20px", background: "linear-gradient(135deg, #fffbeb, #fef9f0)", border: "1px solid #fde68a", borderRadius: 14, padding: "14px 16px", display: "flex", gap: 10 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: 8, background: "#fde68a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
-                        <Zap style={{ width: 13, height: 13, color: "#d97706" }} />
+                    <div style={{ margin:"0 24px 20px", background:"linear-gradient(135deg, #fffbeb, #fef9f0)", border:"1px solid #fde68a", borderRadius:14, padding:"14px 16px", display:"flex", gap:10 }}>
+                      <div style={{ width:28, height:28, borderRadius:8, background:"#fde68a", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:1 }}>
+                        <Zap style={{ width:13, height:13, color:"#d97706" }} />
                       </div>
                       <div>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: "#d97706", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 3 }}>Clinical Notes</div>
-                        <p style={{ margin: 0, fontSize: 13, color: "#78716c", lineHeight: 1.6 }}>{chart.note}</p>
+                        <div style={{ fontSize:11, fontWeight:700, color:"#d97706", letterSpacing:"0.06em", textTransform:"uppercase", marginBottom:3 }}>Clinical Notes</div>
+                        <p style={{ margin:0, fontSize:13, color:"#78716c", lineHeight:1.6 }}>{chart.note}</p>
                       </div>
                     </div>
                   )}
 
-                  
-                  <div style={{ padding: "16px 24px 22px", borderTop: "1px solid #f9f7f2", display: "flex", gap: 10, flexWrap: "wrap" }}>
-                    <button onClick={()=>{navigate(`/EditDietChart/${chart._id}`)}} className="btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: 7, color: "#fff", border: "none", padding: "9px 18px", borderRadius: 11, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 13 }}>
-                      <Edit3 style={{ width: 13, height: 13 }} />
+                  <div
+                    className="diet-mobile-actions"
+                    style={{ padding:"16px 24px 22px", borderTop:"1px solid #f9f7f2", display:"flex", gap:10, flexWrap:"wrap" }}
+                  >
+                    <button
+                      onClick={() => navigate(`/EditDietChart/${chart._id}`)}
+                      className="btn-primary"
+                      style={{ display:"inline-flex", alignItems:"center", gap:7, color:"#fff", border:"none", padding:"9px 18px", borderRadius:11, cursor:"pointer", fontFamily:"'DM Sans', sans-serif", fontWeight:500, fontSize:13 }}
+                    >
+                      <Edit3 style={{ width:13, height:13 }} />
                       Edit Chart
                     </button>
                     <button
-                      style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "#fff", color: "#374151", border: "1.5px solid #e5e7eb", padding: "9px 18px", borderRadius: 11, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 13, transition: "all 0.2s ease" }}
-                      onMouseEnter={e => { e.currentTarget.style.background = "#f9fafb"; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "#fff"; }}
+                      style={{ display:"inline-flex", alignItems:"center", gap:7, background:"#fff", color:"#374151", border:"1.5px solid #e5e7eb", padding:"9px 18px", borderRadius:11, cursor:"pointer", fontFamily:"'DM Sans', sans-serif", fontWeight:500, fontSize:13, transition:"all 0.2s ease" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background="#f9fafb"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background="#fff"; }}
                     >
-                      <Send style={{ width: 13, height: 13 }} />
+                      <Send style={{ width:13, height:13 }} />
                       Send to Patient
                     </button>
                     <button
-                      style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "#fff5f5", color: "#dc2626", border: "1.5px solid #fecaca", padding: "9px 18px", borderRadius: 11, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 13, marginLeft: "auto", transition: "all 0.2s ease" }}
-                      onMouseEnter={e => { e.currentTarget.style.background = "#fee2e2"; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "#fff5f5"; }}
+                      style={{ display:"inline-flex", alignItems:"center", gap:7, background:"#fff5f5", color:"#dc2626", border:"1.5px solid #fecaca", padding:"9px 18px", borderRadius:11, cursor:"pointer", fontFamily:"'DM Sans', sans-serif", fontWeight:500, fontSize:13, marginLeft:"auto", transition:"all 0.2s ease" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background="#fee2e2"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background="#fff5f5"; }}
                     >
-                      <Trash2 style={{ width: 13, height: 13 }} />
+                      <Trash2 style={{ width:13, height:13 }} />
                       Delete
                     </button>
                   </div>
@@ -497,18 +748,23 @@ const DietChartsTab = () => {
           );
         })}
 
-      
         {sortedCharts.length === 0 && (
-          <div style={{ textAlign: "center", padding: "64px 32px", background: "#fff", borderRadius: 20, border: "1.5px dashed #fde68a" }}>
-            <div style={{ width: 72, height: 72, borderRadius: "50%", background: "linear-gradient(135deg, #fef3c7, #fde68a)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-              <ChefHat style={{ width: 30, height: 30, color: "#d97706" }} />
+          <div style={{ textAlign:"center", padding:"64px 32px", background:"#fff", borderRadius:20, border:"1.5px dashed #fde68a" }}>
+            <div style={{ width:72, height:72, borderRadius:"50%", background:"linear-gradient(135deg, #fef3c7, #fde68a)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px" }}>
+              <ChefHat style={{ width:30, height:30, color:"#d97706" }} />
             </div>
-            <h3 className="diet-display-font" style={{ fontSize: 24, fontWeight: 600, color: "#1c1008", marginBottom: 8 }}>No charts found</h3>
-            <p style={{ color: "#9ca3af", fontSize: 14, marginBottom: 24 }}>
+            <h3 className="diet-display-font" style={{ fontSize:24, fontWeight:600, color:"#1c1008", marginBottom:8 }}>
+              No charts found
+            </h3>
+            <p style={{ color:"#9ca3af", fontSize:14, marginBottom:24 }}>
               {searchQuery ? `No charts match "${searchQuery}"` : "Begin your journey with a new diet chart."}
             </p>
-            <button onClick={()=>{navigate("/doctor/createDietChart")}} className="btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "#fff", border: "none", padding: "12px 24px", borderRadius: 13, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 14 }}>
-              <Plus style={{ width: 15, height: 15 }} />
+            <button
+              onClick={() => navigate("/doctor/createDietChart")}
+              className="btn-primary"
+              style={{ display:"inline-flex", alignItems:"center", gap:8, color:"#fff", border:"none", padding:"12px 24px", borderRadius:13, cursor:"pointer", fontFamily:"'DM Sans', sans-serif", fontWeight:500, fontSize:14 }}
+            >
+              <Plus style={{ width:15, height:15 }} />
               Create New Chart
             </button>
           </div>

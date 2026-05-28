@@ -344,7 +344,7 @@ const validate = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sm:p-6">
 
               {/* Tabs */}
-              <div className="grid grid-cols-3 gap-1 bg-slate-100 rounded-xl p-1 mb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-1 bg-slate-100 rounded-xl p-1 mb-6">
                 <TabBtn id="personal"     active={activeTab === "personal"}     onClick={setActiveTab}>👤 Personal</TabBtn>
                 <TabBtn id="professional" active={activeTab === "professional"} onClick={setActiveTab}>💼 Professional</TabBtn>
                 <TabBtn id="settings"     active={activeTab === "settings"}     onClick={setActiveTab}>⚙️ Settings</TabBtn>

@@ -150,7 +150,7 @@ export const updateDietChartbyID = createAsyncThunk(
   }
 );
 
-export const AppointmentCount= createAsyncThunk(
+export const ALLAppointmentCount= createAsyncThunk(
   "doctor/appointmentCount",async(_,{rejectWithValue})=>{
       try {
        const response =await axiosInstance.get("/doctor/appointment_count");
@@ -166,7 +166,6 @@ export const AllPatientsDosha=createAsyncThunk(
   "doctor/AllPatientsDosha",async(_,{rejectWithValue})=>{
     try {
       const response =await axiosInstance.get("/doctor/AllPatientsDosha")
-      console.log(response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message); 

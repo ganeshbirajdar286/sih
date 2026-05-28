@@ -9,6 +9,7 @@
   import SignUp from "./Pages/SignUp.jsx";
   import DoctorDashboard from "./Pages/DoctorDashboard";
   import PatientDashboard from "./Pages/PatientDashboard";
+  import Success from "./Components/PatientComponents/Success.jsx";
 
   import ProtectedRoute from "./Components/ProtectedRoute.jsx";
   import PublicRoute from "./Components/PublicRoute.jsx";
@@ -28,6 +29,7 @@
   import { getSocket } from "./services/socket_init.js";
   import { setIncomingCall, setCallEnded,setOnlineUsers } from "./feature/video_call/call.slice.js";
   import { useWebRTC } from "./hook/useWebRTC";
+import Cancel from "./Components/PatientComponents/Cancel.jsx";
 
   function App() {
     const dispatch = useDispatch();
@@ -140,7 +142,9 @@
               </ProtectedRoute>
             }
           />
-
+  
+  <Route path="/success" element={<Success />} />
+  <Route path="/cancel" element={<Cancel />} />
           <Route
             path="/book-appointment/:id"
             element={

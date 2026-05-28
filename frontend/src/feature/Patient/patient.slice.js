@@ -13,7 +13,7 @@ import {
   DietChart,
   updateProfile,
   addOrUpdateReview,
-  getReview
+  getReview,
 } from "./patient.thunk";
 
 const initialState = {
@@ -40,12 +40,19 @@ const PatientSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    //all doctor
-    builder.addCase(doctor.fulfilled, (state, action) => {
-      console.log("fulfilled");
-      state.loading = false;
-      state.doctor = action.payload?.data || [];
-    });
+
+builder.addCase(doctor.fulfilled, (state, action) => {
+  state.loading = false;
+
+  const newDoctors = action.payload?.data || [];
+  const existingIds = new Set(state.doctor.map((doc) => doc._id));
+
+  newDoctors.forEach((doc) => {
+    if (!existingIds.has(doc._id)) {
+      state.doctor.push(doc);
+    }
+  });
+});
     builder.addCase(doctor.pending, (state) => {
       console.log("pending");
       state.loading = true;
@@ -239,7 +246,7 @@ const PatientSlice = createSlice({
       state.error = action.payload;
     });
 
-     // ── Get Reviews ──
+    // ── Get Reviews ──
     builder
       .addCase(getReview.pending, (state) => {
         state.reviewLoading = true;
@@ -277,6 +284,5 @@ const PatientSlice = createSlice({
       });
   },
 });
-
 
 export default PatientSlice.reducer;

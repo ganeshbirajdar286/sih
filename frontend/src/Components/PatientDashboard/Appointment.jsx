@@ -26,7 +26,7 @@ const Appointments = () => {
   const { getappointmentschedules, loading, error } = useSelector(
     (state) => state.patient,
   );
-
+console.log(getappointmentschedules)
   const [activeTab, setActiveTab] = useState("upcoming");
   const [sortBy, setSortBy] = useState("date");
   const [showFilters, setShowFilters] = useState(false);

@@ -11,7 +11,7 @@ import {
   profile,
   getdietchartID,
   updateDietChartbyID,
-  AppointmentCount,
+  ALLAppointmentCount,
   AllPatientsDosha
 } from "./doctor.thunk";
 
@@ -219,10 +219,10 @@ const found = state.Appointment_count.find(
       });
      
 
-      builder.addCase(AppointmentCount.pending,(state)=>{
+      builder.addCase(ALLAppointmentCount.pending,(state)=>{
         state.loading=true;
       })
-      .addCase(AppointmentCount.fulfilled,(state,action)=>{
+      .addCase(ALLAppointmentCount.fulfilled,(state,action)=>{
         state.loading=false;
         state.Appointment_count=action.payload.data;
        
@@ -234,7 +234,7 @@ const found = state.Appointment_count.find(
          );
          
       })
-      .addCase(AppointmentCount.rejected,(state,action)=>{
+      .addCase(ALLAppointmentCount.rejected,(state,action)=>{
         state.loading=false;
         state.error=action.payload;})
 

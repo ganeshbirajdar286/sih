@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
 import {
   FaCalendarAlt,
   FaClock,
@@ -11,10 +12,8 @@ import {
   FaArrowLeft,
   FaUser,
 } from "react-icons/fa";
-import { 
-  BookingAppointments, 
-  getDoctorBookedSlots 
-} from "../../feature/Patient/patient.thunk";
+import { getDoctorBookedSlots } from "../../feature/Patient/patient.thunk";
+import { Paymentgateway } from "../../feature/Payment/Payment.thunk";
 
 export default function BookAppointment() {
   const { id } = useParams();
@@ -22,6 +21,8 @@ export default function BookAppointment() {
   const navigate = useNavigate();
 
   const { loading, bookedSlot } = useSelector((state) => state.patient);
+  const patient = useSelector((state) => state.user);
+  const Alldoctor = useSelector((state) => state.patient);
 
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
@@ -45,16 +46,14 @@ export default function BookAppointment() {
     "20:15-21:15",
   ];
 
- 
   useEffect(() => {
     if (id) {
       dispatch(getDoctorBookedSlots(id));
     }
   }, [id, dispatch]);
 
-
   const transformedAppointments = bookedSlot.map((apt) => ({
-    date: new Date(apt.Appointment_Date).toISOString().split('T')[0],
+    date: new Date(apt.Appointment_Date).toISOString().split("T")[0],
     timeSlot: apt.Time_slot,
     patientName: apt.Patient_id?.Name || "Patient",
     status: apt.Status,
@@ -66,7 +65,6 @@ export default function BookAppointment() {
       .map((apt) => apt.timeSlot);
   };
 
- 
   const getAvailableSlots = (date) => {
     const bookedSlots = getBookedSlotsForDate(date);
     return allTimeSlots.filter((slot) => !bookedSlots.includes(slot));
@@ -79,10 +77,9 @@ export default function BookAppointment() {
       [name]: value,
     });
 
-  
     if (name === "Appointment_Date") {
       setSelectedDate(value);
-      setFormData(prev => ({ ...prev, Time_slot: "" }));
+      setFormData((prev) => ({ ...prev, Time_slot: "" }));
     }
   };
 
@@ -90,24 +87,31 @@ export default function BookAppointment() {
     e.preventDefault();
 
     dispatch(
-      BookingAppointments({
-        id,
-        data: formData,
-      })
+      Paymentgateway({
+        product_id: Alldoctor.doctor[0].dodo_product_id,
+        Name: patient.userProfile.Name,
+        Email: patient.userProfile.Email,
+        frontend_url: window.location.origin,
+      }),
     ).then((result) => {
-      if (result.meta.requestStatus === 'fulfilled') {
-        dispatch(getDoctorBookedSlots(id));
-        setShowBookingForm(false);
-        setFormData({
-          Appointment_Date: "",
-          Time_slot: "",
-          Condition: "",
-        });
-        setSelectedDate("");
+      if (result.meta.requestStatus === "fulfilled") {
+        // save booking data before leaving page
+        localStorage.setItem(
+          "pending_booking",
+          JSON.stringify({
+            id,
+            formData,
+            session_id: result.payload.session_id,
+          }),
+        );
+
+        toast.success("Redirecting to payment...");
+
+        // redirect AFTER saving
+        window.location.assign(result.payload.checkout_url);
       }
     });
   };
-
 
   const groupedAppointments = transformedAppointments.reduce((acc, apt) => {
     if (!acc[apt.date]) {
@@ -122,7 +126,6 @@ export default function BookAppointment() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-4 px-2 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
-    
         <button
           onClick={() => navigate("/patient-dashboard")}
           className="mb-4 flex items-center text-green-700 hover:text-green-900 transition-colors cursor-pointer"
@@ -132,9 +135,7 @@ export default function BookAppointment() {
         </button>
 
         {!showBookingForm ? (
-      
           <div className="space-y-4 sm:space-y-6">
-        
             <div className="bg-white/90 backdrop-blur-lg shadow-xl rounded-xl sm:rounded-2xl overflow-hidden">
               <div className="bg-gradient-to-r from-green-600 to-emerald-500 p-4 sm:p-6 text-white text-center">
                 <FaUserMd className="text-3xl sm:text-4xl mx-auto mb-2" />
@@ -146,28 +147,32 @@ export default function BookAppointment() {
                 </p>
               </div>
 
-  
               <div className="p-4 sm:p-6">
                 {loading ? (
                   <div className="text-center py-8 sm:py-12">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-                    <p className="text-gray-500 mt-4 text-sm sm:text-base">Loading appointments...</p>
+                    <p className="text-gray-500 mt-4 text-sm sm:text-base">
+                      Loading appointments...
+                    </p>
                   </div>
                 ) : Object.keys(groupedAppointments).length > 0 ? (
-                    <div className="space-y-4 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-green-300 scrollbar-track-green-50">
+                  <div className="space-y-4 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-green-300 scrollbar-track-green-50">
                     {Object.entries(groupedAppointments)
-                      .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
+                      .sort(
+                        ([dateA], [dateB]) => new Date(dateA) - new Date(dateB),
+                      )
                       .map(([date, appointments]) => (
                         <div
                           key={date}
                           className="border border-gray-200 rounded-lg overflow-hidden"
                         >
-                        
                           <div className="bg-green-50 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
                             <div className="flex items-center">
                               <FaCalendarAlt className="text-green-600 mr-2 text-sm sm:text-base " />
                               <span className="font-semibold text-gray-800 text-sm sm:text-base">
-                                {new Date(date + 'T00:00:00').toLocaleDateString("en-US", {
+                                {new Date(
+                                  date + "T00:00:00",
+                                ).toLocaleDateString("en-US", {
                                   weekday: "long",
                                   year: "numeric",
                                   month: "long",
@@ -180,7 +185,6 @@ export default function BookAppointment() {
                             </span>
                           </div>
 
-                      
                           <div className="divide-y divide-gray-100">
                             {appointments.map((apt, idx) => (
                               <div
@@ -192,20 +196,24 @@ export default function BookAppointment() {
                                   <span className="font-medium text-gray-700 text-sm sm:text-base">
                                     {apt.timeSlot}
                                   </span>
-                                  <span className="text-xs text-gray-400 hidden sm:inline">•</span>
+                                  <span className="text-xs text-gray-400 hidden sm:inline">
+                                    •
+                                  </span>
                                   <div className="flex items-center text-xs sm:text-sm text-gray-600">
                                     <FaUser className="mr-1 text-xs" />
                                     {apt.patientName}
                                   </div>
                                 </div>
                                 <div className="flex items-center ml-6 sm:ml-0">
-                                  <span className={`text-xs px-2 py-1 rounded-full ${
-                                    apt.status === 'Pending' 
-                                      ? 'bg-yellow-100 text-yellow-700' 
-                                      : apt.status === 'Confirmed'
-                                      ? 'bg-green-100 text-green-700'
-                                      : 'bg-gray-100 text-gray-700'
-                                  }`}>
+                                  <span
+                                    className={`text-xs px-2 py-1 rounded-full ${
+                                      apt.status === "Pending"
+                                        ? "bg-yellow-100 text-yellow-700"
+                                        : apt.status === "Confirmed"
+                                          ? "bg-green-100 text-green-700"
+                                          : "bg-gray-100 text-gray-700"
+                                    }`}
+                                  >
                                     {apt.status}
                                   </span>
                                 </div>
@@ -213,11 +221,11 @@ export default function BookAppointment() {
                             ))}
                           </div>
 
-                          
                           {getAvailableSlots(date).length > 0 && (
                             <div className="bg-emerald-50 px-3 sm:px-4 py-2 sm:py-3 border-t border-gray-200">
                               <p className="text-xs sm:text-sm text-emerald-700 font-medium mb-2">
-                                Available Slots ({getAvailableSlots(date).length}):
+                                Available Slots (
+                                {getAvailableSlots(date).length}):
                               </p>
                               <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                 {getAvailableSlots(date).map((slot) => (
@@ -247,7 +255,6 @@ export default function BookAppointment() {
                   </div>
                 )}
 
-                
                 <button
                   onClick={() => setShowBookingForm(true)}
                   className="w-full mt-4 sm:mt-6 bg-gradient-to-r from-green-600 to-emerald-500 text-white py-3 sm:py-4 rounded-lg font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-200 text-sm sm:text-base cursor-pointer"
@@ -262,14 +269,18 @@ export default function BookAppointment() {
             {/* Header */}
             <div className="bg-gradient-to-r from-green-600 to-emerald-500 p-4 sm:p-6 text-white text-center">
               <FaUserMd className="text-3xl sm:text-4xl mx-auto mb-2" />
-              <h2 className="text-xl sm:text-2xl font-bold">Book Appointment</h2>
+              <h2 className="text-xl sm:text-2xl font-bold">
+                Book Appointment
+              </h2>
               <p className="text-xs sm:text-sm opacity-90 mt-1">
                 Schedule your visit with the doctor
               </p>
             </div>
 
-          
-            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+            <form
+              onSubmit={handleSubmit}
+              className="p-4 sm:p-6 space-y-4 sm:space-y-5"
+            >
               <div>
                 <label className="font-medium text-gray-700 flex items-center mb-2 text-sm sm:text-base">
                   <FaCalendarAlt className="mr-2 text-green-600 text-sm sm:text-base " />
@@ -321,13 +332,15 @@ export default function BookAppointment() {
                     ))}
                 </select>
 
-                {selectedDate && getAvailableSlots(selectedDate).length === 0 && (
-                  <p className="text-xs sm:text-sm text-red-600 mt-2 flex items-center">
-                    <FaTimesCircle className="mr-1" />
-                    No available slots for this date. Please choose another date.
-                  </p>
-                )}
-                
+                {selectedDate &&
+                  getAvailableSlots(selectedDate).length === 0 && (
+                    <p className="text-xs sm:text-sm text-red-600 mt-2 flex items-center">
+                      <FaTimesCircle className="mr-1" />
+                      No available slots for this date. Please choose another
+                      date.
+                    </p>
+                  )}
+
                 {selectedDate && getAvailableSlots(selectedDate).length > 0 && (
                   <p className="text-xs sm:text-sm text-emerald-600 mt-2 flex items-center">
                     <FaCheckCircle className="mr-1" />
@@ -374,7 +387,11 @@ export default function BookAppointment() {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading || (selectedDate && getAvailableSlots(selectedDate).length === 0)}
+                  disabled={
+                    loading ||
+                    (selectedDate &&
+                      getAvailableSlots(selectedDate).length === 0)
+                  }
                   className="w-full sm:w-2/3 bg-gradient-to-r from-green-600 to-emerald-500 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 text-sm sm:text-base cursor-pointer"
                 >
                   {loading ? "Booking..." : "Confirm Booking"}

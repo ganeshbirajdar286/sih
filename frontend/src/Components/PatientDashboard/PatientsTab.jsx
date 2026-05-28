@@ -16,7 +16,7 @@ export default function PatientsTab() {
 
   useEffect(() => {
     dispatch(getappointmentschedule());
-  }, [dispatch]);
+  }, []);
   return (
     <div className="w-full p-4 md:p-6 lg:p-8 bg-gray-50 min-h-screen font-sans">
       

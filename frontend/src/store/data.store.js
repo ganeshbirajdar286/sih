@@ -3,12 +3,14 @@ import userReducer  from '../feature/User/user.slice'
 import patientReducer from "../feature/Patient/patient.slice"
 import doctorReducer from "../feature/Doctor/doctor.slice"
 import callReducer from "../feature/video_call/call.slice"
+import paymentReducer from "../feature/Payment/Payment.slice"
 
 export const store = configureStore({
   reducer: {
    user:userReducer,
    patient:patientReducer,
    doctor:doctorReducer,
-   call: callReducer,                                  
+   call: callReducer, 
+   payment:paymentReducer,                           
   },
 })

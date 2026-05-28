@@ -9,6 +9,7 @@ import Reports from "../model/report.model.js";
 import { cloudinary } from "../config/cloudinary.config.js";
 import { HumanMessage } from "@langchain/core/messages";
 import Dosha from "../model/dosha.model.js";
+import { client } from "../config/Dodo_Payment.config.js";
 import {
   MemorySaver,
   MessagesAnnotation,
@@ -21,7 +22,6 @@ import { populate } from "dotenv";
 import Review from "../model/rating.model.js";
 import mongoose from "mongoose";
 import { CLIENT_RENEG_LIMIT } from "node:tls";
-import { client } from "../config/Dodo_Payment.config.js";
 
 //user
 export const register = async (req, res) => {
@@ -96,23 +96,73 @@ export const register = async (req, res) => {
     let doctorProfile = null;
 
     if (isDoctor === "true" || isDoctor === true) {
-      if (isDoctor === "true" || isDoctor === true) {
+      console.log(profileImageUrl)
+      //DODO payment
+const Dodo_object = await client.products.create({
+  name: `Dr. ${Name}`,
+  description: `${Specialization} Consultation`,
+  price: {
+    type: "one_time_price",
+    currency: "INR",
+    price: 50000,
+    discount: 0,
+    purchasing_power_parity: false,
+  },
+  tax_category: "saas",
+});
 
-        //DODO payment 
-        const Dodo_object = await client.products.create({
-          name: `Dr. ${Name}`,
-          description: `${Specialization} Consultation`,
-          image: profileImageUrl,
-          price: {
-            type: "one_time_price", //  this tells dodo that this is onetime payment method
-            currency: "INR",
-            price: 50000,   //price: 500, // ₹5.00 
-             discount: 0, 
-             purchasing_power_parity: false,
-          },
-          tax_category: "saas",
-        });
+if (profileImageUrl) {
+  try {
+    // Step 1 - Get presigned S3 URL from Dodo
+    const imageResponse = await fetch(profileImageUrl);
+    const arrayBuffer = await imageResponse.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const imageResult = await client.products.images.update(
+      Dodo_object.product_id,
+      {
+        image: new Blob([buffer], { type: "image/jpeg" }),
       }
+    );
+
+    console.log("Presigned URL:", imageResult.url);
+
+    // Step 2 - PUT image buffer directly to S3 presigned URL
+    if (imageResult.url) {
+      const s3Upload = await fetch(imageResult.url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "image/jpeg",
+        },
+        body: buffer,
+      });
+
+      console.log("S3 upload status:", s3Upload.status); // should be 200
+      
+      if (s3Upload.ok) {
+        console.log("✅ Image uploaded successfully to Dodo!");
+      } else {
+        console.log("❌ S3 upload failed:", s3Upload.status);
+      }
+    }
+  } catch (imgError) {
+    console.log("Image upload error:", imgError.message);
+  }
+}
+
+
+
+      doctorProfile = await Doctor.create({
+        User_id: user._id,
+
+        Specialization,
+
+        Certificates: certificateUrl,
+
+        Experience,
+
+        dodo_product_id: Dodo_object.product_id || Dodo_object.id,
+      });
     }
 
     user = await User.findByIdAndUpdate(
@@ -1324,8 +1374,21 @@ export const Appointment_count = async (req, res) => {
             year: { $year: "$Appointment_Date" },
           },
           totalAppointments: { $sum: 1 },
+          uniquePatients: {
+        $addToSet: "$Patient_id",
+      },
         },
       },
+        {
+    $project: {
+      _id: 1,
+      totalAppointments: 1,
+
+      uniquePatients: {
+        $size: "$uniquePatients",
+      },
+    },
+  },
       {
         $sort: {
           "_id.year": 1,
@@ -1360,6 +1423,7 @@ export const Appointment_count = async (req, res) => {
         month: months[item._id.month - 1],
         year: item._id.year,
         totalAppointments: item.totalAppointments,
+         uniquePatients: item.uniquePatients,
       };
     });
 

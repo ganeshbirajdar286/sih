@@ -449,19 +449,7 @@ console.log(getappointmentschedules)
                         </div>
                       )}
                       
-                      <button 
-                        disabled={!isLive}
-                        className={`w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 shadow-md flex items-center justify-center gap-2 transform cursor-pointer ${
-                          isLive 
-                            ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:scale-105" 
-                            : "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        }`}
-                      >
-                        {isLive ? <FaCheckCircle /> : <FaPhoneAlt />}
-                        <span>
-                          {isLive ? "Accept & Join Call" : "View Details"}
-                        </span>
-                      </button>
+                    
                     </div>
                   </div>
                 </div>

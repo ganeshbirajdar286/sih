@@ -1,7 +1,12 @@
-import DodoPayments from 'dodopayments';
+import DodoPayments from "dodopayments";
 
-export const client = new DodoPayments({
-  bearerToken: process.env.DODO_PAYMENTS_API_KEY, 
-  environment: 'test_mode', // defaults to 'live_mode'
-});
+let client = null;
 
+if (process.env.DODO_PAYMENTS_API_KEY) {
+  client = new DodoPayments({
+    bearerToken: process.env.DODO_PAYMENTS_API_KEY,
+    environment: "test_mode",
+  });
+}
+
+export { client };

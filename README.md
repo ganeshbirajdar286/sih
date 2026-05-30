@@ -229,6 +229,7 @@ CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 GROQ_APT_KEY=your_groq_api_key
 FRONTEND_URL=https://your-frontend-url.vercel.app
+DODO_PAYMENTS_API_KEY=your_test_api_key
 ```
 
 ---
@@ -346,6 +347,46 @@ services:
 ```bash
 docker-compose up --build
 ```
+
+---
+
+## 💳 Payment Gateway Integration
+
+The platform supports secure online consultation payments using **Dodo Payments** in test mode.
+
+### Features
+
+* Secure payment processing for appointments
+* Test-mode payment workflow integration
+* Backend payment verification
+* Consultation booking payment support
+* Payment success & failure handling
+* Environment-based payment configuration
+
+### Payment Stack
+
+* Dodo Payments
+* React.js Frontend Integration
+* Node.js & Express Backend APIs
+
+### Environment Variables
+
+Add the following variable in your backend `.env`:
+
+```env
+DODO_PAYMENTS_API_KEY=your_test_api_key
+```
+
+### Current Status
+
+> ⚠️ The payment gateway is currently running in **test mode** for development and testing purposes.
+
+### Future Improvements
+
+* Live payment deployment
+* Refund management
+* Payment history dashboard
+* Automated invoice generation
 
 ---
 

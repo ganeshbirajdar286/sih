@@ -345,80 +345,113 @@ jobs:
 
   # Job 8: Docker Compose Integration Test
   docker-compose-test:
-    name: Docker Compose Test
-    runs-on: ubuntu-latest
-    needs: [docker-build]
+   name: Docker Compose Test
+   runs-on: ubuntu-latest
+   needs: [docker-build]
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+   steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Create backend .env file
-        run: |
-          cat > backend/.env << EOF
-          PORT=3009
-          MONGODB_URL=mongodb://db:27017/swasthya
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
-          CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
-          CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
-          GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
-          FRONTEND_URL=http://localhost:3002
-          NODE_ENV=production
-          EOF
+    - name: Create backend .env file
+      run: |
+        cat > backend/.env << EOF
+        PORT=3009
+        MONGODB_URL=mongodb://db:27017/swasthya
+        JWT_SECRET=${{ secrets.JWT_SECRET }}
+        CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+        CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+        CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+        GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+        FRONTEND_URL=http://localhost:3002
+        NODE_ENV=production
+        EOF
 
-      - name: Start services with Docker Compose
-        run: |
-           docker compose up -d
+    - name: Start services with Docker Compose
+      run: |
+        docker compose up -d
 
-      - name: Wait for backend startup
-        run: sleep 25
+    - name: Wait for backend startup
+      run: sleep 25
 
-      - name: Show backend logs               
-        run: docker compose logs backend
+    - name: Show container status
+      if: always()
+      run: |
+        docker ps -a
 
-      - name: Wait for services to be healthy
-        run: |
-          timeout 180 bash -c 'until docker compose ps | grep -q "healthy"; do sleep 5; done'
+    - name: Show compose logs
+      if: always()
+      run: |
+        docker compose logs
 
-      - name: Check service logs
-        run: |
-          docker compose logs
-       
+    - name: Show backend logs
+      if: always()
+      run: |
+        docker logs sih-backend-1 || true
 
-      - name: Test backend health endpoint
-        run: |
-          curl -f http://localhost:3009/health || exit 1
+    - name: Show database logs
+      if: always()
+      run: |
+        docker logs sih-db-1 || true
 
-      - name: Test frontend is accessible
-        run: |
-         for i in {1..20}; do
-         echo "Checking frontend... Attempt $i"
+    - name: Show backend health details
+      if: always()
+      run: |
+        docker inspect --format='{{json .State.Health}}' sih-backend-1 || true
 
-         if curl -f http://localhost:3002; then
-         echo "Frontend is up!"
-         exit 0
-         fi
+    - name: Show backend container details
+      if: always()
+      run: |
+        docker inspect sih-backend-1 || true
 
-         sleep 5
-         done
-         echo "Frontend failed to start"
-         docker compose logs web
-         exit 1
+    - name: Wait for services to be healthy
+      run: |
+        timeout 180 bash -c 'until docker compose ps | grep -q "healthy"; do sleep 5; done'
 
-      - name: Stop services
-        run: |
-          docker compose down
+    - name: Check service logs
+      run: |
+        docker compose logs
 
+    - name: Test backend health endpoint
+      run: |
+        curl -f http://localhost:3009/health || exit 1
+
+    - name: Test frontend is accessible
+      run: |
+        for i in {1..20}; do
+          echo "Checking frontend... Attempt $i"
+
+          if curl -f http://localhost:3002; then
+            echo "Frontend is up!"
+            exit 0
+          fi
+
+          sleep 5
+        done
+
+        echo "Frontend failed to start"
+        docker compose logs web
+        exit 1
+
+    - name: Cleanup and Final Logs
+      if: always()
+      run: |
+        echo "=== FINAL CONTAINER STATUS ==="
+        docker ps -a
+
+        echo "=== FINAL COMPOSE LOGS ==="
+        docker compose logs
+
+        docker compose down
   # Job 9: Notify on Failure
   notify-failure:
     name: Notify on Failure

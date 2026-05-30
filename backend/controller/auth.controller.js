@@ -40,7 +40,7 @@ export const register = async (req, res) => {
 
   try {
     const files = req.files || [];
-
+    
     const profileImageFile = files.find(
       (file) => file.fieldname === "profileImage",
     );
@@ -96,7 +96,7 @@ export const register = async (req, res) => {
     let doctorProfile = null;
 
     if (isDoctor === "true" || isDoctor === true) {
-      console.log(profileImageUrl)
+      
       //DODO payment
 const Dodo_object = await client.products.create({
   name: `Dr. ${Name}`,
@@ -125,7 +125,6 @@ if (profileImageUrl) {
       }
     );
 
-    console.log("Presigned URL:", imageResult.url);
 
     // Step 2 - PUT image buffer directly to S3 presigned URL
     if (imageResult.url) {
@@ -136,18 +135,12 @@ if (profileImageUrl) {
         },
         body: buffer,
       });
-
-      console.log("S3 upload status:", s3Upload.status); // should be 200
-      
-      if (s3Upload.ok) {
-        console.log("✅ Image uploaded successfully to Dodo!");
-      } else {
-        console.log("❌ S3 upload failed:", s3Upload.status);
-      }
     }
   } catch (imgError) {
     console.log("Image upload error:", imgError.message);
   }
+
+  
 }
 
 
@@ -163,9 +156,8 @@ if (profileImageUrl) {
 
         dodo_product_id: Dodo_object.product_id || Dodo_object.id,
       });
-    }
 
-    user = await User.findByIdAndUpdate(
+      user = await User.findByIdAndUpdate(
       user._id,
 
       {
@@ -176,6 +168,8 @@ if (profileImageUrl) {
         returnDocument: "after",
       },
     );
+    }
+
 
     let token;
 

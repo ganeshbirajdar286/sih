@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt"
 
-export const hash_Password=(Password)=>{
+export const hash_Password=async(Password)=>{
     try {
-        const hashPassword=bcrypt.hash(Password,12)
+        const hashPassword=await bcrypt.hash(Password,12)
         return hashPassword;
     } catch (error) {
         console.log("password is not hash "+error);

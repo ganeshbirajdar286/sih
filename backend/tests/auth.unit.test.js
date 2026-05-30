@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, jest } from "@jest/globals";
+import { json, response } from "express";
+import { uploadFileToCloudinary } from "../config/cloudinary.config.js";
 
-// ---------------------------------------------------------------------------
-// Mock function declarations (must be in scope before jest.unstable_mockModule)
-// ---------------------------------------------------------------------------
+
 const mockUserFindOne = jest.fn();
 const mockUserCreate = jest.fn();
 const mockUserFindByIdAndUpdate = jest.fn();
@@ -12,7 +12,6 @@ const mockUploadFileToCloudinary = jest.fn();
 const mockHashPassword = jest.fn().mockResolvedValue("hashed_password_123");
 const mockComparePassword = jest.fn();
 const mockJwtToken = jest.fn().mockReturnValue("mock_jwt_token");
-
 
 jest.unstable_mockModule("../model/users.model.js", () => ({
   default: {
@@ -83,6 +82,14 @@ jest.unstable_mockModule("../config/password_hash.js", () => ({
   comparePassword: mockComparePassword,
 }));
 
+jest.unstable_mockModule("../config/Dodo_Payment.config.js", () => ({
+  client: {
+    products: {
+      create: jest.fn(),
+    },
+  },
+}));
+
 jest.unstable_mockModule("../config/jwt.js", () => ({
   jwtToken: mockJwtToken,
 }));
@@ -93,8 +100,7 @@ jest.unstable_mockModule("../config/cloudinary.config.js", () => ({
   multerMiddleWare: jest.fn((req, res, next) => next()),
 }));
 
-// Stub the LangChain packages to prevent any real API calls and allow the
-// module-level workflow initialisation in auth.controller.js to run safely.
+
 jest.unstable_mockModule("@langchain/core/messages", () => ({
   HumanMessage: jest.fn().mockImplementation((content) => ({ content })),
 }));
@@ -118,8 +124,29 @@ jest.unstable_mockModule("dotenv", () => ({
   config: jest.fn(),
 }));
 
+jest.unstable_mockModule("../model/report.model.js", () => ({
+  default: {
+    find: jest.fn(),
+    findById: jest.fn(),
+  },
+}));
+
+const { register } = await import("../controller/auth.controller.js");
 const {
-  register,
+  getDoctorBookedSlots,
+  patient,
+  patient_appoinment_detail,
+  getReport,
+  getdosha,
+  patient_diet_chart,
+  getDoctorReviews,
+  createReport,
+  DoctorUpdateProfile,
+  myPatient,
+  dietChart,
+  getDietchartById,
+  getdietchart,
+  all_patient_report,
   login,
   updateDietChart,
   getDoshaStatus,
@@ -139,16 +166,21 @@ const {
 
 const { validate } = await import("../middleware/Validate.js");
 const { registerValidator } = await import("../validator/auth.validator.js");
-
+const { comparePassword } = await import("../config/password_hash.js");
 const { default: Doctor } = await import("../model/doctor.model.js");
 const { default: Appointment } = await import("../model/appointments.model.js");
 const { default: Review } = await import("../model/rating.model.js");
 const { default: Dosha } = await import("../model/dosha.model.js");
 const { default: User } = await import("../model/users.model.js");
+const { default: Report } = await import("../model/report.model.js");
+const { default: DietChart } = await import("../model/Dietchart.model.js");
+const { default: Reports } = await import("../model/report.model.js");
+
+const { client } = await import("../config/Dodo_Payment.config.js");
 
 const runValidators = async (req, validators) => {
-  for (const validator of validators) {
-    await new Promise((resolve) => validator(req, {}, resolve));
+  for (const validator of registerValidator) {
+    await validator.run(req);
   }
 };
 
@@ -165,14 +197,12 @@ describe("register — required fields validation", () => {
   });
 
   it("should return 400 if required fields are missing", async () => {
-    // An empty body triggers all registerValidator rules to fail.
     const req = { body: {}, files: [] };
 
-    // Run the same validators that are applied on the register route so that
-    // express-validator populates the request with validation errors.
+    
     await runValidators(req, registerValidator);
 
-    // The validate middleware reads those errors and short-circuits with 400.
+ 
     validate(req, res, jest.fn());
 
     expect(res.status).toHaveBeenCalledWith(400);
@@ -196,7 +226,7 @@ describe("register — duplicate email", () => {
     };
   });
 
-  it("should return 400 if a user with the given email already exists", async () => {
+  it("should return 400 ication is still untested.f a user with the given email already exists", async () => {
     const req = {
       body: {
         Name: "Jane Doe",
@@ -210,7 +240,7 @@ describe("register — duplicate email", () => {
       files: [],
     };
 
-    // Simulate an existing user being found in the database.
+  
     mockUserFindOne.mockResolvedValue({
       _id: "existing_user_id",
       Email: "jane@example.com",
@@ -224,76 +254,590 @@ describe("register — duplicate email", () => {
   });
 });
 
-describe("login — user not found", () => {
+describe("register - patient register without profileImage", () => {
   let res;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    res = {
+      cookie: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+  });
+
+  it("should return 201 when patient is registered", async () => {
+    const req = {
+      body: {
+        Name: "Jane Doe",
+        Email: "jane@example.com",
+        Password: "StrongPass@1",
+        Age: 28,
+        Gender: "Female",
+        Height: 160,
+        Weight: 55,
+        isDoctor: false,
+      },
+      files: [],
+    };
+
+    mockUserFindOne.mockResolvedValue(null);
+
+    mockHashPassword.mockResolvedValue("hashed-password");
+
+    mockUserCreate.mockResolvedValue({
+      _id: "user123",
+      Name: "Jane Doe",
+      Email: "jane@example.com",
+      Password: "StrongPass@1",
+      Age: 28,
+      Gender: "Female",
+      Height: 160,
+      Weight: 55,
+      isDoctor: false,
+    });
+
+    await register(req, res);
+
+    expect(mockHashPassword).toHaveBeenCalledWith("StrongPass@1");
+
+    expect(client.products.create).not.toHaveBeenCalled();
+
+    expect(Doctor.create).not.toHaveBeenCalled();
+
+    expect(res.status).toHaveBeenCalledWith(201);
+
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Registration successful",
+        autoLogin: false,
+        responseData: expect.objectContaining({
+          _id: "user123",
+          Name: "Jane Doe",
+          Email: "jane@example.com",
+          Password: "StrongPass@1",
+          Age: 28,
+          Gender: "Female",
+          Height: 160,
+          Weight: 55,
+          isDoctor: false,
+        }),
+      }),
+    );
+  });
+});
+
+describe("register -patient register with profileImage", () => {
+  let req;
+  let res;
+  beforeEach(() => {
+    jest.clearAllMocks();
+    res = {
+      cookie: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+  });
+
+  it("should register Patient with  profileImage", async () => {
+    req = {
+      body: {
+        Name: "Jane Doe",
+        Email: "jane@example.com",
+        Password: "StrongPass@1",
+        Age: 28,
+        Gender: "Female",
+        Height: 160,
+        Weight: 55,
+        isDoctor: false,
+      },
+      files: [
+        {
+          fieldname: "profileImage",
+          path: "/tmp/profile.jpg",
+          filename: "profile.jpg",
+        },
+      ],
+    };
+
+    mockUserFindOne.mockResolvedValue(null);
+    mockHashPassword.mockResolvedValue("hashed-password");
+    mockUploadFileToCloudinary.mockResolvedValue({
+      secure_url: "https://cloudinary.com/profile.jpg",
+    });
+    mockUserCreate.mockResolvedValue({
+      _id: "user123",
+      Name: "Jane Doe",
+      Email: "jane@example.com",
+      Password: "hashed-password",
+      Age: 28,
+      Gender: "Female",
+      Height: 160,
+      Weight: 55,
+      isDoctor: false,
+      Image_url: "https://cloudinary.com/profile.jpg",
+    });
+
+    await register(req, res);
+
+    expect(mockUserFindOne).toHaveBeenCalled();
+    console.log(mockUploadFileToCloudinary.mock.calls);
+    expect(mockUploadFileToCloudinary).toHaveBeenCalledWith({
+      fieldname: "profileImage",
+      path: "/tmp/profile.jpg",
+      filename: "profile.jpg",
+    });
+    expect(mockHashPassword).toBeCalledWith("StrongPass@1");
+    expect(res.status).toBeCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Registration successful",
+        autoLogin: false,
+        responseData: expect.objectContaining({
+          _id: "user123",
+          Name: "Jane Doe",
+          Email: "jane@example.com",
+          Password: "hashed-password",
+          Age: 28,
+          Gender: "Female",
+          Height: 160,
+          Weight: 55,
+          isDoctor: false,
+          Image_url: "https://cloudinary.com/profile.jpg",
+        }),
+      }),
+    );
+  });
+});
+
+describe("register - doctor  register without profilImage", () => {
+  let req, res;
 
   beforeEach(() => {
     jest.clearAllMocks();
     res = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockReturnThis(),
+      json: jest.fn(),
       cookie: jest.fn(),
     };
   });
 
-  it("should return 401 if the user is not found", async () => {
-    const req = {
-      body: { Email: "ghost@example.com", Password: "StrongPass@1" },
+  it("should register a doctor without ProfileImage", async () => {
+    req = {
+      body: {
+        Name: "Jane Doe",
+        Email: "jane@example.com",
+        Password: "StrongPass@1",
+        Age: 28,
+        Gender: "Female",
+        Height: 160,
+        Weight: 55,
+        isDoctor: true,
+        Specialization: "Obstetrics and Gynaecology",
+        Experience: 3,
+      },
+      files: [
+        {
+          fieldname: "certificate",
+          path: "/tmp/certificate.jpg",
+          filename: "certificate.jpg",
+        },
+      ],
     };
 
-    // No user found in the database.
     mockUserFindOne.mockResolvedValue(null);
 
-    await login(req, res);
-
-    expect(mockUserFindOne).toHaveBeenCalledWith({
-      Email: "ghost@example.com",
+    mockHashPassword.mockResolvedValue("hashed-password");
+    mockUploadFileToCloudinary.mockResolvedValue({
+      secure_url: "https://cloudinary.com/certificate.jpg",
     });
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ message: "User not found" });
+
+    mockUserCreate.mockResolvedValue({
+      _id: "user123",
+      Name: "Jane Doe",
+      Email: "jane@example.com",
+      Password: "StrongPass@1",
+      Age: 28,
+      Gender: "Female",
+      Height: 160,
+      Weight: 55,
+      isDoctor: true,
+      Image_url: null,
+    });
+
+    client.products.create.mockResolvedValue({
+      product_id: "dodo1",
+    });
+
+    mockUserFindByIdAndUpdate.mockResolvedValue({
+      _id: "user123",
+      Name: "Jane Doe",
+      Email: "jane@example.com",
+      Password: "StrongPass@1",
+      Age: 28,
+      Gender: "Female",
+      Height: 160,
+      Weight: 55,
+      isDoctor: true,
+      Doctor_id: "doctor123",
+      Image_url: null,
+    });
+
+    Doctor.create.mockResolvedValue({
+      _id: "doctor123",
+      User_id: "user123",
+      Specialization: "Obstetrics and Gynaecology",
+      Certificates: "https://cloudinary.com/certificate.jpg",
+      Experience: 3,
+      dodo_product_id: "dodo1",
+    });
+
+    await register(req, res);
+
+    expect(mockHashPassword).toHaveBeenCalledWith("StrongPass@1");
+
+    expect(client.products.create).toHaveBeenCalled();
+
+    expect(Doctor.create).toHaveBeenCalledWith({
+      User_id: "user123",
+      Specialization: "Obstetrics and Gynaecology",
+      Certificates: "https://cloudinary.com/certificate.jpg",
+      Experience: 3,
+      dodo_product_id: "dodo1",
+    });
+
+    expect(mockUserFindByIdAndUpdate).toHaveBeenCalledWith(
+      "user123",
+      { Doctor_id: "doctor123" },
+      { returnDocument: "after" },
+    );
+    expect(res.status).toHaveBeenCalledWith(201);
+
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Registration successful",
+        autoLogin: false,
+        responseData: expect.objectContaining({
+          _id: "user123",
+          isDoctor: true,
+          Doctor_id: "doctor123",
+        }),
+      }),
+    );
   });
 });
 
-describe("updateDietChart — successful update", () => {
-  let res;
+describe("register - doctor register with profileImage", () => {
+  let res, req;
 
   beforeEach(() => {
     jest.clearAllMocks();
     res = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+      cookie: jest.fn(),
     };
   });
 
-  it("should update an existing diet chart and return 200 with the updated document", async () => {
-    const mockUpdatedChart = {
-      _id: "chart_id_123",
-      Patient_id: "patient_id_456",
-      Doctor_id: "doctor_id_789",
-      note: "Updated dietary note",
-      duration_days: 90,
+  it("should register doctor with profileImage", async () => {
+    req = {
+      body: {
+        Name: "Jane Doe",
+        Email: "jane@example.com",
+        Password: "StrongPass@1",
+        Age: 28,
+        Gender: "Female",
+        Height: 160,
+        Weight: 55,
+        isDoctor: true,
+        Specialization: "Obstetrics and Gynaecology",
+        Experience: 3,
+      },
+      files: [
+        {
+          fieldname: "certificate",
+          path: "/tmp/certificate.jpg",
+          filename: "certificate.jpg",
+        },
+        {
+          fieldname: "profileImage",
+          path: "/tmp/profile.jpg",
+          filename: "profile.jpg",
+        },
+      ],
     };
 
-    const req = {
-      params: { id: "chart_id_123" },
-      body: { note: "Updated dietary note" },
+    mockUserFindOne.mockResolvedValue(null);
+    mockHashPassword.mockResolvedValue("hashed-password");
+    mockUploadFileToCloudinary
+      .mockResolvedValueOnce({
+        secure_url: "https://cloudinary.com/profile.jpg",
+      })
+      .mockResolvedValueOnce({
+        secure_url: "https://cloudinary.com/certificate.jpg",
+      });
+
+    mockUserCreate.mockResolvedValue({
+      _id: "user123",
+      Name: "Jane Doe",
+      Email: "jane@example.com",
+      Password: "hashed-password",
+      Age: 28,
+      Gender: "Female",
+      Height: 160,
+      Weight: 55,
+      isDoctor: true,
+      Image_url: "https://cloudinary.com/profile.jpg",
+    });
+
+    client.products.create.mockResolvedValue({
+      product_id: "dodo1",
+    });
+
+    Doctor.create.mockResolvedValue({
+      _id: "doctor123",
+      User_id: "user123",
+      Specialization: "Obstetrics and Gynaecology",
+      Certificates: "https://cloudinary.com/certificate.jpg",
+      Experience: 3,
+      dodo_product_id: "dodo1",
+    });
+
+    mockUserFindByIdAndUpdate.mockResolvedValue({
+      _id: "user123",
+      Name: "Jane Doe",
+      Email: "jane@example.com",
+      Password: "hashed-password",
+      Age: 28,
+      Gender: "Female",
+      Height: 160,
+      Weight: 55,
+      isDoctor: true,
+      Doctor_id: "doctor123",
+      Image_url: "https://cloudinary.com/profile.jpg",
+    });
+    await register(req, res);
+
+    expect(mockUserFindOne).toHaveBeenCalledWith({
+      Email: "jane@example.com",
+    });
+    expect(mockHashPassword).toHaveBeenCalledWith("StrongPass@1");
+    expect(mockUserCreate).toHaveBeenCalledWith({
+      Name: "Jane Doe",
+      Email: "jane@example.com",
+      Password: "hashed-password",
+      Age: 28,
+      Gender: "Female",
+      Height: 160,
+      Weight: 55,
+      isDoctor: true,
+      Image_url: "https://cloudinary.com/profile.jpg",
+    });
+    expect(client.products.create).toHaveBeenCalled();
+    expect(Doctor.create).toHaveBeenCalledWith({
+      User_id: "user123",
+      Specialization: "Obstetrics and Gynaecology",
+      Certificates: "https://cloudinary.com/certificate.jpg",
+      Experience: 3,
+      dodo_product_id: "dodo1",
+    });
+    expect(mockUserFindByIdAndUpdate).toHaveBeenCalledWith(
+      "user123",
+      { Doctor_id: "doctor123" },
+      { returnDocument: "after" },
+    );
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Registration successful",
+        autoLogin: false,
+        responseData: expect.objectContaining({
+          _id: "user123",
+          isDoctor: true,
+          Doctor_id: "doctor123",
+        }),
+      }),
+    );
+  });
+});
+
+describe("login", () => {
+  let req, res;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    req = { body: { Email: "ghost@example.com", Password: "StrongPass@1" } };
+
+    res = {
+      cookie: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
     };
 
-    mockDietChartFindByIdAndUpdate.mockResolvedValue(mockUpdatedChart);
+    mockUserFindOne.mockResolvedValue({
+      _id: "user123",
+      Email: "ghost@example.com",
+    });
+    Doctor.findOne.mockResolvedValue(null); // patient by default
+    mockComparePassword.mockResolvedValue(true);
+    mockJwtToken.mockReturnValue("mock-jwt-token");
+  });
+
+  it("should return 200 and role USER for a valid patient", async () => {
+    await login(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Login successful",
+        role: "USER",
+        token: "mock-jwt-token",
+      }),
+    );
+  });
+
+  it("should return role DOCTOR when user is a doctor", async () => {
+    Doctor.findOne.mockResolvedValue({ User_id: "user123" });
+
+    await login(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ role: "DOCTOR" }),
+    );
+  });
+
+  it("should set the token cookie with correct options", async () => {
+    await login(req, res);
+
+    expect(res.cookie).toHaveBeenCalledWith(
+      "token",
+      "mock-jwt-token",
+      expect.objectContaining({
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 365,
+      }),
+    );
+  });
+
+  it("should return 401 if user is not found", async () => {
+    mockUserFindOne.mockResolvedValue(null);
+
+    await login(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "User not found" }),
+    );
+  });
+
+  it("should return 401 if password does not match", async () => {
+    mockComparePassword.mockResolvedValue(false);
+
+    await login(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Invalid Email or password" }),
+    );
+  });
+
+  it("should return 500 on unexpected errors", async () => {
+    mockUserFindOne.mockRejectedValue(new Error("DB crashed"));
+
+    await login(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Server error",
+        error: "DB crashed",
+      }),
+    );
+  });
+});
+
+describe("updateDietChart", () => {
+  let req, res;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    req = {
+      params: { id: "chart123" },
+      body: { calories: 2000, protein: 50 },
+    };
+
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+  });
+
+  it("should return 200 and updated diet chart", async () => {
+    const mockUpdated = { _id: "chart123", calories: 2000, protein: 50 };
+    mockDietChartFindByIdAndUpdate.mockResolvedValue(mockUpdated);
 
     await updateDietChart(req, res);
 
     expect(mockDietChartFindByIdAndUpdate).toHaveBeenCalledWith(
-      "chart_id_123",
-      { note: "Updated dietary note" },
-     { returnDocument: "after", runValidators: true }
+      "chart123",
+      req.body,
+      { returnDocument: "after", runValidators: true },
     );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
-      dietchart: mockUpdatedChart,
+      dietchart: mockUpdated,
       message: "diet chart updated successfully",
     });
+  });
+
+  
+  it("should return 200 with null dietchart if ID does not exist", async () => {
+    mockDietChartFindByIdAndUpdate.mockResolvedValue(null);
+
+    await updateDietChart(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      success: true,
+      dietchart: null,
+      message: "diet chart updated successfully",
+    });
+  });
+
+  
+  it("should return 500 if DB throws an error", async () => {
+    mockDietChartFindByIdAndUpdate.mockRejectedValue(new Error("DB failure"));
+
+    await updateDietChart(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      message: "An error occurred while updateing the dietchart.",
+      error: "DB failure",
+    });
+  });
+
+
+  it("should return 500 if validator rejects the update", async () => {
+    mockDietChartFindByIdAndUpdate.mockRejectedValue(
+      new Error("Validation failed: calories must be a number"),
+    );
+
+    await updateDietChart(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        error: "Validation failed: calories must be a number",
+      }),
+    );
   });
 });
 
@@ -434,7 +978,7 @@ describe("submitDosha", () => {
         Dosha: "dosha_abc", // ← the _id from mockDoshaData
         lastFilledAt: expect.any(Date), // ← we don't know exact time, just check it's a Date
       },
-     { returnDocument: "after" },
+      { returnDocument: "after" },
     );
 
     // 7️⃣ Assert response
@@ -568,9 +1112,6 @@ describe("patient update profile", () => {
   });
 });
 
-// ===========================================================================
-// logout
-// ===========================================================================
 describe("logout", () => {
   let res;
 
@@ -602,9 +1143,7 @@ describe("logout", () => {
   });
 });
 
-// ===========================================================================
-// alldoctor
-// ===========================================================================
+
 describe("alldoctor", () => {
   let res;
 
@@ -623,8 +1162,6 @@ describe("alldoctor", () => {
       { _id: "doc_1", User_id: { Name: "Dr. John", Image_url: "url1" } },
       { _id: "doc_2", User_id: { Name: "Dr. Jane", Image_url: "url2" } },
     ];
-
-    // Doctor.find().populate() chains — mock the chain
     Doctor.find.mockReturnValue({
       populate: jest.fn().mockResolvedValue(mockDoctors),
     });
@@ -657,9 +1194,7 @@ describe("alldoctor", () => {
   });
 });
 
-// ===========================================================================
-// getSingleDoctor
-// ===========================================================================
+
 describe("getSingleDoctor", () => {
   let res;
 
@@ -718,9 +1253,7 @@ describe("getSingleDoctor", () => {
   });
 });
 
-// ===========================================================================
-// patientAppointment
-// ===========================================================================
+
 describe("patientAppointment", () => {
   let res;
 
@@ -807,9 +1340,6 @@ describe("patientAppointment", () => {
   });
 });
 
-// ===========================================================================
-// updatePatientAppointment
-// ===========================================================================
 describe("updatePatientAppointment", () => {
   let res;
 
@@ -867,9 +1397,6 @@ describe("updatePatientAppointment", () => {
   });
 });
 
-// ===========================================================================
-// delete_appointment
-// ===========================================================================
 describe("delete_appointment", () => {
   let res;
 
@@ -929,9 +1456,7 @@ describe("delete_appointment", () => {
   });
 });
 
-// ===========================================================================
-// Doctor_selected_appointment
-// ===========================================================================
+
 describe("Doctor_selected_appointment", () => {
   let res;
 
@@ -961,7 +1486,7 @@ describe("Doctor_selected_appointment", () => {
     expect(Appointment.findByIdAndUpdate).toHaveBeenCalledWith(
       "appt_123",
       { Status: "Confirmed" },
-     { returnDocument: "after" },
+      { returnDocument: "after" },
     );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
@@ -989,9 +1514,7 @@ describe("Doctor_selected_appointment", () => {
   });
 });
 
-// ===========================================================================
-// single_Patient
-// ===========================================================================
+
 describe("single_Patient", () => {
   let res;
 
@@ -1012,7 +1535,7 @@ describe("single_Patient", () => {
       Age: 25,
     };
 
-    // findById().select().populate() chain
+   
     mockUserFindById.mockReturnValue({
       select: jest.fn().mockReturnValue({
         populate: jest.fn().mockResolvedValue(mockPatient),
@@ -1048,9 +1571,7 @@ describe("single_Patient", () => {
   });
 });
 
-// ===========================================================================
-// getprofile
-// ===========================================================================
+
 describe("getprofile", () => {
   let res;
 
@@ -1083,7 +1604,7 @@ describe("getprofile", () => {
       User_id: { Name: "Dr. John" },
     };
 
-    // findById().populate().lean() chain
+   
     Doctor.findById.mockReturnValue({
       populate: jest.fn().mockReturnValue({
         lean: jest.fn().mockResolvedValue(mockDoctor),
@@ -1119,9 +1640,7 @@ describe("getprofile", () => {
   });
 });
 
-// ===========================================================================
-// addOrUpdateReview
-// ===========================================================================
+
 describe("addOrUpdateReview", () => {
   let res;
 
@@ -1165,13 +1684,13 @@ describe("addOrUpdateReview", () => {
 
     Doctor.findById.mockResolvedValue({ _id: "doc_123" });
 
-    // no existing review
+    
     Review.findOne.mockResolvedValue(null);
 
-    // create new review
+    
     Review.create.mockResolvedValue(mockReview);
 
-    // aggregate for avg rating
+    
     Review.aggregate.mockResolvedValue([
       { _id: "doc_123", avgRating: 5, count: 1 },
     ]);

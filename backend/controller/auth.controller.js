@@ -22,6 +22,7 @@ import { populate } from "dotenv";
 import Review from "../model/rating.model.js";
 import mongoose from "mongoose";
 import { CLIENT_RENEG_LIMIT } from "node:tls";
+import { getOrSetCache, deleteCache, deleteCachePattern, setCache, getCache, acquireLock, releaseLock } from "../utils/redis.utils.js";
 
 //user
 export const register = async (req, res) => {
@@ -233,6 +234,10 @@ export const login = async (req, res) => {
 
     const token = jwtToken(user?._id, user?.Doctor_id);
 
+    // Create session in Redis for both users and doctors
+    const sessionKey = `session:${user._id}`;
+    await setCache(sessionKey, { userId: user._id, role, loginTime: new Date().toISOString() }, 60 * 60 * 24 * 7); // 7 days expiry
+
     const isProduction = process.env.NODE_ENV === "production";
     res.cookie("token", token, {
       httpOnly: true,
@@ -257,6 +262,11 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
+    // Invalidate session in Redis if stored
+    if (req.user?.userId) {
+      await deleteCache(`session:${req.user.userId}`);
+    }
+
     const isProduction = process.env.NODE_ENV === "production";
     res.clearCookie("token", {
       httpOnly: true,
@@ -387,7 +397,16 @@ export const PatientUpdateProfile = async (req, res) => {
 
 export const alldoctor = async (req, res) => {
   try {
-    const doctors = await Doctor.find().populate("User_id", "Name Image_url");
+    // Cache doctor list for 5 minutes (300 seconds)
+    const doctors = await getOrSetCache(
+      "doctors:all",
+      async () => {
+        const docs = await Doctor.find().populate("User_id", "Name Image_url");
+        return docs;
+      },
+      300
+    );
+
     res.status(200).json({
       success: true,
       count: doctors.length,
@@ -406,7 +425,17 @@ export const alldoctor = async (req, res) => {
 
 export const getSingleDoctor = async (req, res) => {
   try {
-    const doctor = await Doctor.findById(req.params.id).populate("User_id");
+    const doctorId = req.params.id;
+
+    // Cache individual doctor for 5 minutes
+    const doctor = await getOrSetCache(
+      `doctor:${doctorId}`,
+      async () => {
+        const doc = await Doctor.findById(doctorId).populate("User_id");
+        return doc;
+      },
+      300
+    );
 
     if (!doctor) {
       return res.status(404).json({
@@ -425,11 +454,20 @@ export const getSingleDoctor = async (req, res) => {
 export const getDoctorBookedSlots = async (req, res) => {
   try {
     const doctor = req.params.id;
-    const patient = await Appointment.find({
-      Doctor_id: doctor,
-    }).populate(
-      "Patient_id",
-      "Name Age Image_url Email PhoneNumber Condition Dosha",
+
+    // Cache booked slots for 1 minute (shorter TTL since appointments change frequently)
+    const patient = await getOrSetCache(
+      `doctor:${doctor}:appointments`,
+      async () => {
+        const appts = await Appointment.find({
+          Doctor_id: doctor,
+        }).populate(
+          "Patient_id",
+          "Name Age Image_url Email PhoneNumber Condition Dosha"
+        );
+        return appts;
+      },
+      60
     );
 
     if (!patient) {
@@ -568,11 +606,16 @@ export const patient_diet_chart = async (req, res) => {
         message: "Patient not found",
       });
     }
-
-    const latestDietChart = await DietChart.findOne({
+// cached the diet chart for 5 min
+  const latestDietChart = await getOrSetCache(
+  `dietchart:${patientId}`,
+  async () => {
+    return await DietChart.findOne({
       Patient_id: patientId,
-    }).sort({ createdAt: -1 }); // Latest first
-
+    }).sort({ createdAt: -1 });
+  },
+  300
+);
     res.status(200).json({
       success: true,
       dietChart: latestDietChart,
@@ -597,18 +640,38 @@ export const patientAppointment = async (req, res) => {
         message: "All fields are required",
       });
     }
-    const appointment = await Appointment.create({
-      Appointment_Date,
-      Time_slot,
-      Doctor_id: DOCTOR,
-      Patient_id: Patient,
-      Condition,
-    });
 
-    return res.status(201).json({
-      message: "Appointment booked successfully",
-      appointment,
-    });
+    // Acquire lock to prevent double-booking
+    const lockKey = `slot:${DOCTOR}:${Appointment_Date}:${Time_slot}`;
+    const gotLock = await acquireLock(lockKey, 10);
+
+    if (!gotLock) {
+      return res.status(409).json({
+        success: false,
+        message: "This slot is being booked by another user. Please try again.",
+      });
+    }
+
+    try {
+      const appointment = await Appointment.create({
+        Appointment_Date,
+        Time_slot,
+        Doctor_id: DOCTOR,
+        Patient_id: Patient,
+        Condition,
+      });
+
+      // Invalidate doctor's appointments cache
+      await deleteCache(`doctor:${DOCTOR}:appointments`);
+
+      return res.status(201).json({
+        message: "Appointment booked successfully",
+        appointment,
+      });
+    } finally {
+      // Always release the lock
+      await releaseLock(lockKey);
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -870,6 +933,10 @@ export const DoctorUpdateProfile = async (req, res) => {
 
     await user.save();
     await user.Doctor_id.save();
+
+    // Invalidate doctor-related caches
+    await deleteCache(`doctor:${doctor.doctor_id}`);
+    await deleteCache("doctors:all");
 
     return res.status(200).json({
       message: "User profile updated successfully",

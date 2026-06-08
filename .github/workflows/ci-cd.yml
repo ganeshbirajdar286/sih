@@ -364,12 +364,13 @@ jobs:
 
     - name: Create backend .env file
       run: |
-        cat > backend/.env << EOF
+        cat > backend/.env.docker << EOF
         PORT=3009
-        MONGODB_URL=mongodb://db:27017/swasthya
+        MONGODB_URL=${{secrets.MONGODB_URI}}
         JWT_SECRET=${{ secrets.JWT_SECRET }}
         CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
         CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+        REDIS_URL=redis://redis:6379
         CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
         GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
         FRONTEND_URL=http://localhost:3002

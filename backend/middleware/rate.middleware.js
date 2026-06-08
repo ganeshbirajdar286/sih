@@ -3,9 +3,7 @@ import redis from "ioredis";
 import RedisStore from "rate-limit-redis";
 
 // Redis client for rate limiting (separate from app's redis client)
-const redisClient = new redis(process.env.REDIS_URL||"redis://localhost:6379",{
-  enableOfflineQueue: false, // is an ioredis option that controls what happens when Redis is unavailable.
-});
+const redisClient = new Redis(process.env.REDIS_URL);
 
 // Handle Redis connection errors silently
 redisClient.on("error", () => {});

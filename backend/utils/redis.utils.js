@@ -1,12 +1,5 @@
 import redis from "../config/redis.config.js";
 
-/**
- * Redis Cache Helper Utilities
- */
-
-/**
- * Get cached data or execute callback and cache result
- */
 export async function getOrSetCache(key, callback, ttlSeconds = 300) {
   try {
     const cached = await redis.get(key);
@@ -24,9 +17,7 @@ export async function getOrSetCache(key, callback, ttlSeconds = 300) {
   return data;
 }
 
-/**
- * Set a value in cache with optional TTL
- */
+
 export async function setCache(key, value, ttlSeconds = 300) {
   try {
      await redis.setex(key, ttlSeconds, JSON.stringify(value));
@@ -37,9 +28,6 @@ export async function setCache(key, value, ttlSeconds = 300) {
 //SET + EXPIRE =It stores a value and sets an expiration time in one command.
 
 
-/**
- * Get value from cache
- */
 export async function getCache(key) {
   try {
     const cached = await redis.get(key);
@@ -50,9 +38,6 @@ export async function getCache(key) {
   }
 }
 
-/**
- * Delete a specific key
- */
 export async function deleteCache(key) {
   try {
     await redis.del(key);
@@ -62,9 +47,7 @@ export async function deleteCache(key) {
   }
 }
 
-/**
- * Delete keys matching a pattern
- */
+
 export async function deleteCachePattern(pattern) {
   try {
     const keys = await redis.keys(pattern);
@@ -77,9 +60,7 @@ export async function deleteCachePattern(pattern) {
   }
 }
 
-/**
- * Session Management
- */
+
 export async function setSession(userId, sessionData, ttlSeconds = 86400) {
   try {
     await redis.setex(`session:${userId}`, ttlSeconds, JSON.stringify(sessionData));
@@ -106,9 +87,7 @@ export async function deleteSession(userId) {
   }
 }
 
-/**
- * Distributed Lock for appointment slot booking
- */
+
 export async function acquireLock(key, ttlSeconds = 10) {
   try {
     const result = await redis.set(key, "1", "EX", ttlSeconds, "NX");

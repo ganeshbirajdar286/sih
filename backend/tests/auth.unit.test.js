@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, jest } from "@jest/globals";
 import { json, response } from "express";
 import { uploadFileToCloudinary } from "../config/cloudinary.config.js";
 
-
 const mockUserFindOne = jest.fn();
 const mockUserCreate = jest.fn();
 const mockUserFindByIdAndUpdate = jest.fn();
@@ -12,6 +11,15 @@ const mockUploadFileToCloudinary = jest.fn();
 const mockHashPassword = jest.fn().mockResolvedValue("hashed_password_123");
 const mockComparePassword = jest.fn();
 const mockJwtToken = jest.fn().mockReturnValue("mock_jwt_token");
+
+// Redis utilities mock
+const mockGetOrSetCache = jest.fn();
+const mockDeleteCache = jest.fn();
+const mockDeleteCachePattern = jest.fn();
+const mockSetCache = jest.fn();
+const mockGetCache = jest.fn();
+const mockAcquireLock = jest.fn();
+const mockReleaseLock = jest.fn();
 
 jest.unstable_mockModule("../model/users.model.js", () => ({
   default: {
@@ -58,6 +66,7 @@ jest.unstable_mockModule("../model/report.model.js", () => ({
     create: jest.fn(),
     find: jest.fn(),
     findById: jest.fn(),
+    findByIdAndDelete: jest.fn(),
   },
 }));
 
@@ -100,6 +109,15 @@ jest.unstable_mockModule("../config/cloudinary.config.js", () => ({
   multerMiddleWare: jest.fn((req, res, next) => next()),
 }));
 
+jest.unstable_mockModule("../utils/redis.utils.js", () => ({
+  getOrSetCache: mockGetOrSetCache,
+  deleteCache: mockDeleteCache,
+  deleteCachePattern: mockDeleteCachePattern,
+  setCache: mockSetCache,
+  getCache: mockGetCache,
+  acquireLock: mockAcquireLock,
+  releaseLock: mockReleaseLock,
+}));
 
 jest.unstable_mockModule("@langchain/core/messages", () => ({
   HumanMessage: jest.fn().mockImplementation((content) => ({ content })),
@@ -199,10 +217,8 @@ describe("register — required fields validation", () => {
   it("should return 400 if required fields are missing", async () => {
     const req = { body: {}, files: [] };
 
-    
     await runValidators(req, registerValidator);
 
- 
     validate(req, res, jest.fn());
 
     expect(res.status).toHaveBeenCalledWith(400);
@@ -240,7 +256,6 @@ describe("register — duplicate email", () => {
       files: [],
     };
 
-  
     mockUserFindOne.mockResolvedValue({
       _id: "existing_user_id",
       Email: "jane@example.com",
@@ -683,6 +698,7 @@ describe("login", () => {
     Doctor.findOne.mockResolvedValue(null); // patient by default
     mockComparePassword.mockResolvedValue(true);
     mockJwtToken.mockReturnValue("mock-jwt-token");
+    mockSetCache.mockResolvedValue("OK");
   });
 
   it("should return 200 and role USER for a valid patient", async () => {
@@ -795,7 +811,6 @@ describe("updateDietChart", () => {
     });
   });
 
-  
   it("should return 200 with null dietchart if ID does not exist", async () => {
     mockDietChartFindByIdAndUpdate.mockResolvedValue(null);
 
@@ -809,7 +824,6 @@ describe("updateDietChart", () => {
     });
   });
 
-  
   it("should return 500 if DB throws an error", async () => {
     mockDietChartFindByIdAndUpdate.mockRejectedValue(new Error("DB failure"));
 
@@ -822,7 +836,6 @@ describe("updateDietChart", () => {
       error: "DB failure",
     });
   });
-
 
   it("should return 500 if validator rejects the update", async () => {
     mockDietChartFindByIdAndUpdate.mockRejectedValue(
@@ -1122,10 +1135,11 @@ describe("logout", () => {
       json: jest.fn(),
       clearCookie: jest.fn().mockReturnThis(),
     };
+    mockDeleteCache.mockResolvedValue(1);
   });
 
   it("should clear cookie and return 200", async () => {
-    const req = {};
+    const req = { user: { userId: "user_123" } };
 
     await logout(req, res);
 
@@ -1135,6 +1149,7 @@ describe("logout", () => {
       sameSite: "lax",
       secure: false,
     });
+    expect(mockDeleteCache).toHaveBeenCalledWith("session:user_123");
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
       message: "User logout successfully",
@@ -1143,31 +1158,35 @@ describe("logout", () => {
   });
 });
 
-
 describe("alldoctor", () => {
   let res;
-
+  let mockDoctors;
   beforeEach(() => {
     jest.clearAllMocks();
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
+    mockDoctors = [
+      { _id: "doc_1", User_id: { Name: "Dr. John", Image_url: "url1" } },
+      { _id: "doc_2", User_id: { Name: "Dr. Jane", Image_url: "url2" } },
+    ];
   });
 
   it("should return 200 with all doctors", async () => {
     const req = {};
 
-    const mockDoctors = [
-      { _id: "doc_1", User_id: { Name: "Dr. John", Image_url: "url1" } },
-      { _id: "doc_2", User_id: { Name: "Dr. Jane", Image_url: "url2" } },
-    ];
-    Doctor.find.mockReturnValue({
-      populate: jest.fn().mockResolvedValue(mockDoctors),
+    mockGetOrSetCache.mockImplementation(async (key, fetcher, ttl) => {
+      return mockDoctors;
     });
 
     await alldoctor(req, res);
 
+    expect(mockGetOrSetCache).toHaveBeenCalledWith(
+      "doctors:all",
+      expect.any(Function),
+      300,
+    );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
@@ -1179,9 +1198,7 @@ describe("alldoctor", () => {
   it("should return 500 if DB throws error", async () => {
     const req = {};
 
-    Doctor.find.mockReturnValue({
-      populate: jest.fn().mockRejectedValue(new Error("DB failed")),
-    });
+    mockGetOrSetCache.mockRejectedValue(new Error("DB failed"));
 
     await alldoctor(req, res);
 
@@ -1192,8 +1209,32 @@ describe("alldoctor", () => {
       error: "DB failed",
     });
   });
-});
 
+  it("should fetch doctors from DB when cache misses", async () => {
+    const req = {};
+
+    Doctor.find.mockReturnValue({
+      populate: jest.fn().mockResolvedValue(mockDoctors),
+    });
+
+    mockGetOrSetCache.mockImplementation(async (key, fetcher, ttl) => {
+      return await fetcher();
+    });
+
+    await alldoctor(req, res);
+    expect(mockGetOrSetCache).toHaveBeenCalledWith(
+      "doctors:all",
+      expect.any(Function),
+      300,
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      success: true,
+      count: 2,
+      data: mockDoctors,
+    });
+  });
+});
 
 describe("getSingleDoctor", () => {
   let res;
@@ -1215,13 +1256,15 @@ describe("getSingleDoctor", () => {
       User_id: { Name: "Dr. John" },
     };
 
-    Doctor.findById.mockReturnValue({
-      populate: jest.fn().mockResolvedValue(mockDoctor),
-    });
+    mockGetOrSetCache.mockResolvedValue(mockDoctor);
 
     await getSingleDoctor(req, res);
 
-    expect(Doctor.findById).toHaveBeenCalledWith("doc_123");
+    expect(mockGetOrSetCache).toHaveBeenCalledWith(
+      "doctor:doc_123",
+      expect.any(Function),
+      300,
+    );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(mockDoctor);
   });
@@ -1229,9 +1272,7 @@ describe("getSingleDoctor", () => {
   it("should return 404 if doctor not found", async () => {
     const req = { params: { id: "doc_999" } };
 
-    Doctor.findById.mockReturnValue({
-      populate: jest.fn().mockResolvedValue(null),
-    });
+    mockGetOrSetCache.mockResolvedValue(null);
 
     await getSingleDoctor(req, res);
 
@@ -1242,9 +1283,7 @@ describe("getSingleDoctor", () => {
   it("should return 500 if DB throws error", async () => {
     const req = { params: { id: "doc_123" } };
 
-    Doctor.findById.mockReturnValue({
-      populate: jest.fn().mockRejectedValue(new Error("DB failed")),
-    });
+    mockGetOrSetCache.mockRejectedValue(new Error("DB failed"));
 
     await getSingleDoctor(req, res);
 
@@ -1252,7 +1291,6 @@ describe("getSingleDoctor", () => {
     expect(res.json).toHaveBeenCalledWith({ message: "Server error" });
   });
 });
-
 
 describe("patientAppointment", () => {
   let res;
@@ -1263,6 +1301,9 @@ describe("patientAppointment", () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
+    mockAcquireLock.mockResolvedValue(true);
+    mockReleaseLock.mockResolvedValue(null);
+    mockDeleteCache.mockResolvedValue(1);
   });
 
   it("should return 400 if required fields are missing", async () => {
@@ -1304,6 +1345,10 @@ describe("patientAppointment", () => {
 
     await patientAppointment(req, res);
 
+    expect(mockAcquireLock).toHaveBeenCalledWith(
+      "slot:doc_123:2025-10-10:10:00 AM",
+      10,
+    );
     expect(Appointment.create).toHaveBeenCalledWith({
       Appointment_Date: "2025-10-10",
       Time_slot: "10:00 AM",
@@ -1311,10 +1356,36 @@ describe("patientAppointment", () => {
       Patient_id: "user_123",
       Condition: "Fever",
     });
+    expect(mockDeleteCache).toHaveBeenCalledWith("doctor:doc_123:appointments");
+    expect(mockReleaseLock).toHaveBeenCalledWith(
+      "slot:doc_123:2025-10-10:10:00 AM",
+    );
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
       message: "Appointment booked successfully",
       appointment: mockAppointment,
+    });
+  });
+
+  it("should return 409 if slot lock cannot be acquired", async () => {
+    const req = {
+      params: { id: "doc_123" },
+      user: { userId: "user_123" },
+      body: {
+        Appointment_Date: "2025-10-10",
+        Time_slot: "10:00 AM",
+        Condition: "Fever",
+      },
+    };
+
+    mockAcquireLock.mockResolvedValue(false);
+
+    await patientAppointment(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(409);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      message: "This slot is being booked by another user. Please try again.",
     });
   });
 
@@ -1333,6 +1404,7 @@ describe("patientAppointment", () => {
 
     await patientAppointment(req, res);
 
+    expect(mockReleaseLock).toHaveBeenCalled(); // Lock should still be released on error
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
       message: "Internal server error",
@@ -1456,7 +1528,6 @@ describe("delete_appointment", () => {
   });
 });
 
-
 describe("Doctor_selected_appointment", () => {
   let res;
 
@@ -1514,7 +1585,6 @@ describe("Doctor_selected_appointment", () => {
   });
 });
 
-
 describe("single_Patient", () => {
   let res;
 
@@ -1535,7 +1605,6 @@ describe("single_Patient", () => {
       Age: 25,
     };
 
-   
     mockUserFindById.mockReturnValue({
       select: jest.fn().mockReturnValue({
         populate: jest.fn().mockResolvedValue(mockPatient),
@@ -1571,7 +1640,6 @@ describe("single_Patient", () => {
   });
 });
 
-
 describe("getprofile", () => {
   let res;
 
@@ -1604,7 +1672,6 @@ describe("getprofile", () => {
       User_id: { Name: "Dr. John" },
     };
 
-   
     Doctor.findById.mockReturnValue({
       populate: jest.fn().mockReturnValue({
         lean: jest.fn().mockResolvedValue(mockDoctor),
@@ -1639,7 +1706,6 @@ describe("getprofile", () => {
     });
   });
 });
-
 
 describe("addOrUpdateReview", () => {
   let res;
@@ -1684,13 +1750,10 @@ describe("addOrUpdateReview", () => {
 
     Doctor.findById.mockResolvedValue({ _id: "doc_123" });
 
-    
     Review.findOne.mockResolvedValue(null);
 
-    
     Review.create.mockResolvedValue(mockReview);
 
-    
     Review.aggregate.mockResolvedValue([
       { _id: "doc_123", avgRating: 5, count: 1 },
     ]);

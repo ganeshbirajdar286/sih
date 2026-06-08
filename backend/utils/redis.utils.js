@@ -21,6 +21,7 @@ export async function getOrSetCache(key, callback, ttlSeconds = 300) {
 export async function setCache(key, value, ttlSeconds = 300) {
   try {
      await redis.setex(key, ttlSeconds, JSON.stringify(value));
+     console.log("REDIS WRITE SUCCESS");
   } catch (err) {
     console.error(`Redis SET error: ${err.message}`);
   }

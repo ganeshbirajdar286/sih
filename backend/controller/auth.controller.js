@@ -246,6 +246,10 @@ export const login = async (req, res) => {
       maxAge: 1000 * 60 * 60 * 24 * 365,
     });
 
+
+    console.log("LOGIN SUCCESS");
+console.log("Session Key:", sessionKey);
+
     return res.status(200).json({
       message: "Login successful",
       role,

@@ -26,16 +26,17 @@
         context: ./backend
         dockerfile: Dockerfile
       depends_on:
-        db:
-          condition: service_healthy
+        # db:
+        #   condition: service_healthy
         redis:
           condition:  service_healthy
       ports:
         - "3009:3009"
       env_file:
-        - ./backend/.env
+        - ./backend/.env.docker
       networks:
         - app-network
+      command: sh -c "printenv REDIS_URL && node index.js"
 
       healthcheck:
         test: ["CMD", "node", "-e", "require('http').get('http://localhost:3009/health', res => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
@@ -44,21 +45,22 @@
         retries: 5
         start_period: 40s
       restart: always
-    db:
-      image: mongo:latest
-      ports:
-        - "27018:27017"
-      volumes:
-        - anime:/data/db
-      networks:
-        - app-network
 
-      healthcheck:
-        test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-        interval: 10s
-        timeout: 5s
-        retries: 5
-      restart: always
+    # db:
+    #   image: mongo:latest
+    #   ports:
+    #     - "27018:27017"
+    #   volumes:
+    #     - anime:/data/db
+    #   networks:
+    #     - app-network
+
+    #   healthcheck:
+    #     test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+    #     interval: 10s
+    #     timeout: 5s
+    #     retries: 5
+    #   restart: always
 
     redis:
        image: redis:alpine
@@ -67,6 +69,8 @@
        networks:
          - app-network
        restart: always
+       volumes:
+         - redis_data:/data
        healthcheck:
           test: ["CMD", "redis-cli", "ping"]
           interval: 10s
@@ -76,7 +80,7 @@
 
       
   volumes:
-    anime:
+    redis_data:
 
   networks:
     app-network:

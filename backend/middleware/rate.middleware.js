@@ -1,13 +1,8 @@
 import rateLimit from "express-rate-limit";
-import redis from "ioredis";
+import redisClient from "../config/redis.config.js";
 import RedisStore from "rate-limit-redis";
 
-// Redis client for rate limiting (separate from app's redis client)
-const redisClient = new Redis(process.env.REDIS_URL);
 
-// Handle Redis connection errors silently
-redisClient.on("error", () => {});
-redisClient.on("connect", () => {});
 
 export const rateLimitMiddleware = rateLimit({
   windowMs: 60 * 1000, // 1 minute

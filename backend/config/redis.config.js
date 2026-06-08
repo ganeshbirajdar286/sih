@@ -4,10 +4,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const redis = new Redis(
-process.env.REDIS_URL || "redis://localhost:6379",{
+process.env.REDIS_URL ,{
   retryStrategy: (times) => {
     const delay = Math.min(times * 50, 2000);
-    return delay;z
+    return delay;
   }, //This function tells ioredis how long to wait before reconnecting when the Redis connection is lost.
   maxRetriesPerRequest: 3, // controls how many times a Redis command is retried before failing.
 });

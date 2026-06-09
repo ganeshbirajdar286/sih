@@ -8,7 +8,7 @@ const Header = ({  setSidebarOpen }) => {
       <div className="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
 
         {/* Left Branding */}
-        <div className="flex items-center space-x-3 flex-shrink-0">
+        <div className="flex items-center space-x-3 shrink-0">
           <div className="w-10 h-10 mr-2 rounded-full shadow-md overflow-hidden bg-green-700 flex items-center justify-center">
                       <img src={logo} alt="logo" className="w-full h-full object-cover" />
                     </div>

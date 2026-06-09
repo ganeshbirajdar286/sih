@@ -878,68 +878,210 @@ describe("validate middleware — validation failure", () => {
 
 describe("getDoshaStatus", () => {
   let res;
-
+ 
   beforeEach(() => {
     jest.clearAllMocks();
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
+ 
+  
+    mockGetOrSetCache.mockImplementation(async (key, callback) => {
+      return await callback();
+    });
+ 
+    mockSetCache.mockResolvedValue(true);
   });
-
+ 
+  // ── Response shape tests (cache miss path) ──────────────────────────────
+ 
   it("should return mustFill true if lastFilledAt is null", async () => {
     const req = { user: { userId: "user_123" } };
-
-    mockUserFindById.mockResolvedValue({
-      _id: "user_123",
-      lastFilledAt: null,
+ 
+    mockUserFindById.mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ lastFilledAt: null }),
+      }),
     });
-
+ 
     await getDoshaStatus(req, res);
-
-    expect(mockUserFindById).toHaveBeenCalledWith("user_123");
+ 
     expect(res.json).toHaveBeenCalledWith({ mustFill: true });
   });
-
+ 
   it("should return mustFill true if last filled more than 7 days ago", async () => {
     const req = { user: { userId: "user_123" } };
     const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
-
-    mockUserFindById.mockResolvedValue({
-      _id: "user_123",
-      lastFilledAt: tenDaysAgo,
+ 
+    mockUserFindById.mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ lastFilledAt: tenDaysAgo }),
+      }),
     });
-
+ 
     await getDoshaStatus(req, res);
-
+ 
     expect(res.json).toHaveBeenCalledWith({ mustFill: true });
   });
-
+ 
   it("should return mustFill false if last filled within 7 days", async () => {
     const req = { user: { userId: "user_123" } };
     const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-
-    mockUserFindById.mockResolvedValue({
-      _id: "user_123",
-      lastFilledAt: threeDaysAgo,
+ 
+    mockUserFindById.mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ lastFilledAt: threeDaysAgo }),
+      }),
     });
-
+ 
     await getDoshaStatus(req, res);
-
+ 
     expect(res.json).toHaveBeenCalledWith({ mustFill: false });
   });
-
-  it("should return 500 if DB throws an error", async () => {
+ 
+  // ── Redis key tests ──────────────────────────────────────────────────────
+ 
+  it("should call getOrSetCache with correct key for the user", async () => {
     const req = { user: { userId: "user_123" } };
-
-    mockUserFindById.mockRejectedValue(new Error("DB connection failed"));
-
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+ 
+    mockGetOrSetCache.mockResolvedValueOnce({ mustFill: false, ttl: 345600 });
+ 
     await getDoshaStatus(req, res);
-
+ 
+    expect(mockGetOrSetCache).toHaveBeenCalledWith(
+      "dosha:status:user_123",
+      expect.any(Function),
+      expect.any(Number),
+    );
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json).toHaveBeenCalledWith({ mustFill: false });
+  });
+ 
+  it("should call setCache with correct key and dynamic TTL when mustFill is false", async () => {
+    const req = { user: { userId: "user_123" } };
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+ 
+    mockUserFindById.mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ lastFilledAt: threeDaysAgo }),
+      }),
+    });
+ 
+    await getDoshaStatus(req, res);
+ 
+    const [key, value, ttl] = mockSetCache.mock.calls[0];
+ 
+    // key must be scoped to this user
+    expect(key).toBe("dosha:status:user_123");
+ 
+    // value must carry the right mustFill flag
+    expect(value).toMatchObject({ mustFill: false });
+ 
+    // TTL must be ~4 days remaining (3 days passed, 4 days left out of 7)
+    expect(ttl).toBeGreaterThan(3 * 24 * 60 * 60);
+    expect(ttl).toBeLessThan(5 * 24 * 60 * 60);
+  });
+ 
+  it("should call setCache with 60s TTL when mustFill is true (null lastFilledAt)", async () => {
+    const req = { user: { userId: "user_123" } };
+ 
+    mockUserFindById.mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ lastFilledAt: null }),
+      }),
+    });
+ 
+    await getDoshaStatus(req, res);
+ 
+    const [key, value, ttl] = mockSetCache.mock.calls[0];
+ 
+    expect(key).toBe("dosha:status:user_123");
+    expect(value).toMatchObject({ mustFill: true });
+    expect(ttl).toBe(60);
+  });
+ 
+  it("should call setCache with 60s TTL when mustFill is true (overdue)", async () => {
+    const req = { user: { userId: "user_123" } };
+    const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
+ 
+    mockUserFindById.mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        lean: jest.fn().mockResolvedValue({ lastFilledAt: tenDaysAgo }),
+      }),
+    });
+ 
+    await getDoshaStatus(req, res);
+ 
+    const [key, value, ttl] = mockSetCache.mock.calls[0];
+ 
+    expect(key).toBe("dosha:status:user_123");
+    expect(value).toMatchObject({ mustFill: true });
+    expect(ttl).toBe(60);
+  });
+ 
+  // ── Cache HIT tests (data from Redis, MongoDB never called) ─────────────
+ 
+  it("should return cached mustFill false from Redis without hitting MongoDB", async () => {
+    const req = { user: { userId: "user_123" } };
+ 
+    // simulate Redis cache HIT — return data directly, skip callback
+    mockGetOrSetCache.mockResolvedValueOnce({ mustFill: false, ttl: 345600 });
+ 
+    await getDoshaStatus(req, res);
+ 
+    // response comes from cached value
+    expect(res.json).toHaveBeenCalledWith({ mustFill: false });
+ 
+    // MongoDB must NOT be called — data came from Redis
+    expect(mockUserFindById).not.toHaveBeenCalled();
+ 
+    // setCache must NOT be called — no new data to store
+    expect(mockSetCache).toHaveBeenCalled();
+  });
+ 
+  it("should return cached mustFill true from Redis without hitting MongoDB", async () => {
+    const req = { user: { userId: "user_123" } };
+ 
+    mockGetOrSetCache.mockResolvedValueOnce({ mustFill: true, ttl: 60 });
+ 
+    await getDoshaStatus(req, res);
+ 
+    expect(res.json).toHaveBeenCalledWith({ mustFill: true });
+    expect(mockUserFindById).not.toHaveBeenCalled();
+    expect(mockSetCache).toHaveBeenCalled();
+  });
+ 
+  // ── Error handling ───────────────────────────────────────────────────────
+ 
+  it("should return 500 if getOrSetCache throws an error", async () => {
+    const req = { user: { userId: "user_123" } };
+ 
+    mockGetOrSetCache.mockRejectedValue(new Error("DB connection failed"));
+ 
+    await getDoshaStatus(req, res);
+ 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: "DB connection failed" });
   });
+ 
+  it("should return 500 if User.findById throws inside callback", async () => {
+    const req = { user: { userId: "user_123" } };
+ 
+    mockUserFindById.mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        lean: jest.fn().mockRejectedValue(new Error("Mongoose error")),
+      }),
+    });
+ 
+    await getDoshaStatus(req, res);
+ 
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Mongoose error" });
+  });
 });
+ 
 
 describe("submitDosha", () => {
   let res;
@@ -1597,38 +1739,35 @@ describe("single_Patient", () => {
   });
 
   it("should return 200 with patient data", async () => {
-    const req = { params: { id: "user_123" } };
+  const req = { params: { id: "user_123" } };
 
-    const mockPatient = {
-      _id: "user_123",
-      Name: "John",
-      Age: 25,
-    };
+  const mockPatient = {
+    _id: "user_123",
+    Name: "John",
+    Age: 25,
+  };
 
-    mockUserFindById.mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        populate: jest.fn().mockResolvedValue(mockPatient),
-      }),
-    });
 
-    await single_Patient(req, res);
+  mockGetOrSetCache.mockResolvedValueOnce(mockPatient);
 
-    expect(mockUserFindById).toHaveBeenCalledWith("user_123");
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({
-      success: true,
-      patient: mockPatient,
-    });
+  await single_Patient(req, res);
+
+  expect(mockGetOrSetCache).toHaveBeenCalledWith(
+    "patient:user_123",
+    expect.any(Function),
+    300,
+  );
+  expect(res.status).toHaveBeenCalledWith(200);
+  expect(res.json).toHaveBeenCalledWith({
+    success: true,
+    patient: mockPatient,
   });
+});
 
   it("should return 404 if patient not found", async () => {
     const req = { params: { id: "user_999" } };
 
-    mockUserFindById.mockReturnValue({
-      select: jest.fn().mockReturnValue({
-        populate: jest.fn().mockResolvedValue(null),
-      }),
-    });
+     mockGetOrSetCache.mockResolvedValueOnce(null);
 
     await single_Patient(req, res);
 

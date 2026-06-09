@@ -40,7 +40,7 @@ export default function DoshaDistributionCard() {
 
       <div className="flex flex-col sm:flex-row items-center gap-4">
         {/* Pie chart */}
-        <div className="relative w-32 h-32 flex-shrink-0">
+        <div className="relative w-32 h-32 shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -81,7 +81,7 @@ export default function DoshaDistributionCard() {
             >
               <div className="flex items-center gap-2">
                 <div
-                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
                   style={{ background: d.color }}
                 />
                 <span className="text-sm font-medium text-gray-900">{d.label}</span>

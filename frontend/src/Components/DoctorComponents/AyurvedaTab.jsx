@@ -118,7 +118,7 @@ export default function DoctorAyurvedaDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50 to-blue-50/30 p-4">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-amber-50 to-blue-50/30 p-4">
       <div className="max-w-7xl mx-auto">
         
         {/* Enhanced Header */}
@@ -189,9 +189,9 @@ export default function DoctorAyurvedaDashboard() {
                     <div className="w-full bg-slate-100 rounded-full h-2.5">
                       <div
                         className={`h-2.5 rounded-full transition-all duration-700 ${
-                          dosha === "vata" ? "bg-gradient-to-r from-purple-400 to-purple-600" :
-                          dosha === "pitta" ? "bg-gradient-to-r from-red-400 to-red-600" : 
-                          "bg-gradient-to-r from-green-400 to-green-600"
+                          dosha === "vata" ? "bg-linear-to-r from-purple-400 to-purple-600" :
+                          dosha === "pitta" ? "bg-linear-to-r from-red-400 to-red-600" : 
+                          "bg-linear-to-r from-green-400 to-green-600"
                         }`}
                         style={{ width: `${value}%` }}
                       ></div>
@@ -202,7 +202,7 @@ export default function DoctorAyurvedaDashboard() {
             </div>
 
             {/* Seasonal Advice */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl shadow-sm border border-green-200 p-6">
+            <div className="bg-linear-to-br from-green-50 to-emerald-100 rounded-2xl shadow-sm border border-green-200 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
                   <span className="text-xl">🌤️</span>
@@ -231,7 +231,7 @@ export default function DoctorAyurvedaDashboard() {
               <div className="grid gap-3">
                 {patientData.recommendations.map((rec, idx) => (
                   <div key={idx} className="flex items-start gap-3 p-3 bg-amber-50/50 rounded-xl border border-amber-100">
-                    <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                       <span className="text-white text-xs">✓</span>
                     </div>
                     <p className="text-slate-700 leading-relaxed">{rec}</p>
@@ -314,7 +314,7 @@ export default function DoctorAyurvedaDashboard() {
                     <div className="grid gap-3">
                       {patientData.lifestyleTips.map((tip, idx) => (
                         <div key={idx} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200">
-                          <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
+                          <div className="w-2 h-2 bg-green-500 rounded-full shrink-0"></div>
                           <span className="text-slate-700">{tip}</span>
                         </div>
                       ))}
@@ -348,7 +348,7 @@ export default function DoctorAyurvedaDashboard() {
                     <div className="space-y-4">
                       {patientData.dailyRoutine.map((item, idx) => (
                         <div key={idx} className="flex items-center gap-4 p-3 bg-white rounded-xl border border-slate-200">
-                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm flex-shrink-0">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm shrink-0">
                             {idx + 1}
                           </div>
                           <span className="text-slate-700 leading-relaxed">{item}</span>
@@ -374,7 +374,7 @@ export default function DoctorAyurvedaDashboard() {
                 </div>
               </div>
 
-              <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+              <div className="space-y-4 max-h-150 overflow-y-auto pr-2">
                 {ayurvedaComponents.map((item, idx) => (
                   <div key={idx} className={`rounded-xl p-4 border-2 ${getColorClass(item.color)} transition-transform hover:scale-[1.02]`}>
                     <div className="flex items-start justify-between mb-3">
@@ -421,8 +421,8 @@ export default function DoctorAyurvedaDashboard() {
         </div>
 
         {/* Enhanced Footer */}
-        <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-8 text-center text-white relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-orange-400"></div>
+        <div className="bg-linear-to-r from-slate-800 to-slate-900 rounded-2xl p-8 text-center text-white relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-amber-400 to-orange-400"></div>
           <p className="text-lg font-light italic mb-2">
             "When diet is wrong, medicine is of no use. When diet is correct, medicine is of no need."
           </p>

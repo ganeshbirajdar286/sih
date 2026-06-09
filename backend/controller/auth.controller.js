@@ -22,7 +22,15 @@ import { populate } from "dotenv";
 import Review from "../model/rating.model.js";
 import mongoose from "mongoose";
 import { CLIENT_RENEG_LIMIT } from "node:tls";
-import { getOrSetCache, deleteCache, deleteCachePattern, setCache, getCache, acquireLock, releaseLock } from "../utils/redis.utils.js";
+import {
+  getOrSetCache,
+  deleteCache,
+  deleteCachePattern,
+  setCache,
+  getCache,
+  acquireLock,
+  releaseLock,
+} from "../utils/redis.utils.js";
 
 //user
 export const register = async (req, res) => {
@@ -41,7 +49,7 @@ export const register = async (req, res) => {
 
   try {
     const files = req.files || [];
-    
+
     const profileImageFile = files.find(
       (file) => file.fieldname === "profileImage",
     );
@@ -97,54 +105,48 @@ export const register = async (req, res) => {
     let doctorProfile = null;
 
     if (isDoctor === "true" || isDoctor === true) {
-      
       //DODO payment
-const Dodo_object = await client.products.create({
-  name: `Dr. ${Name}`,
-  description: `${Specialization} Consultation`,
-  price: {
-    type: "one_time_price",
-    currency: "INR",
-    price: 50000,
-    discount: 0,
-    purchasing_power_parity: false,
-  },
-  tax_category: "saas",
-});
-
-if (profileImageUrl) {
-  try {
-    // Step 1 - Get presigned S3 URL from Dodo
-    const imageResponse = await fetch(profileImageUrl);
-    const arrayBuffer = await imageResponse.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const imageResult = await client.products.images.update(
-      Dodo_object.product_id,
-      {
-        image: new Blob([buffer], { type: "image/jpeg" }),
-      }
-    );
-
-
-    // Step 2 - PUT image buffer directly to S3 presigned URL
-    if (imageResult.url) {
-      const s3Upload = await fetch(imageResult.url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "image/jpeg",
+      const Dodo_object = await client.products.create({
+        name: `Dr. ${Name}`,
+        description: `${Specialization} Consultation`,
+        price: {
+          type: "one_time_price",
+          currency: "INR",
+          price: 50000,
+          discount: 0,
+          purchasing_power_parity: false,
         },
-        body: buffer,
+        tax_category: "saas",
       });
-    }
-  } catch (imgError) {
-    console.log("Image upload error:", imgError.message);
-  }
 
-  
-}
+      if (profileImageUrl) {
+        try {
+          // Step 1 - Get presigned S3 URL from Dodo
+          const imageResponse = await fetch(profileImageUrl);
+          const arrayBuffer = await imageResponse.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
 
+          const imageResult = await client.products.images.update(
+            Dodo_object.product_id,
+            {
+              image: new Blob([buffer], { type: "image/jpeg" }),
+            },
+          );
 
+          // Step 2 - PUT image buffer directly to S3 presigned URL
+          if (imageResult.url) {
+            const s3Upload = await fetch(imageResult.url, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "image/jpeg",
+              },
+              body: buffer,
+            });
+          }
+        } catch (imgError) {
+          console.log("Image upload error:", imgError.message);
+        }
+      }
 
       doctorProfile = await Doctor.create({
         User_id: user._id,
@@ -159,18 +161,17 @@ if (profileImageUrl) {
       });
 
       user = await User.findByIdAndUpdate(
-      user._id,
+        user._id,
 
-      {
-        Doctor_id: doctorProfile?._id,
-      },
+        {
+          Doctor_id: doctorProfile?._id,
+        },
 
-      {
-        returnDocument: "after",
-      },
-    );
+        {
+          returnDocument: "after",
+        },
+      );
     }
-
 
     let token;
 
@@ -236,7 +237,11 @@ export const login = async (req, res) => {
 
     // Create session in Redis for both users and doctors
     const sessionKey = `session:${user._id}`;
-    await setCache(sessionKey, { userId: user._id, role, loginTime: new Date().toISOString() }, 60 * 60 * 24 * 7); // 7 days expiry
+    await setCache(
+      sessionKey,
+      { userId: user._id, role, loginTime: new Date().toISOString() },
+      60 * 60 * 24 * 7,
+    ); // 7 days expiry
 
     const isProduction = process.env.NODE_ENV === "production";
     res.cookie("token", token, {
@@ -245,10 +250,6 @@ export const login = async (req, res) => {
       sameSite: isProduction ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24 * 365,
     });
-
-
-    console.log("LOGIN SUCCESS");
-console.log("Session Key:", sessionKey);
 
     return res.status(200).json({
       message: "Login successful",
@@ -266,7 +267,6 @@ console.log("Session Key:", sessionKey);
 
 export const logout = async (req, res) => {
   try {
-    // Invalidate session in Redis if stored
     if (req.user?.userId) {
       await deleteCache(`session:${req.user.userId}`);
     }
@@ -293,21 +293,33 @@ export const logout = async (req, res) => {
 
 export const getDoshaStatus = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
+    const userId = req.user.userId;
 
-    const last = user.lastFilledAt;
+    const status = await getOrSetCache(
+      `dosha:status:${userId}`,
+      async () => {
+        const user = await User.findById(userId).select("lastFilledAt").lean();
 
-    if (!last) {
-      return res.json({ mustFill: true });
-    }
+        if (!user?.lastFilledAt) {
+          return { mustFill: true, ttl: 60 };
+        }
 
-    const diffDays = (Date.now() - new Date(last)) / (1000 * 60 * 60 * 24);
+        const diffDays =
+          (Date.now() - new Date(user.lastFilledAt)) / (1000 * 60 * 60 * 24);
 
-    if (diffDays >= 7) {
-      return res.json({ mustFill: true });
-    }
+        if (diffDays >= 7) {
+          return { mustFill: true, ttl: 60 };
+        }
 
-    res.json({ mustFill: false });
+        const remainingSeconds = Math.floor((7 - diffDays) * 24 * 60 * 60);
+        return { mustFill: false, ttl: remainingSeconds };
+      },
+      600,
+    );
+
+    await setCache(`dosha:status:${userId}`, status, status.ttl);
+
+    return res.status(200).json({ mustFill: status.mustFill });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -345,6 +357,8 @@ export const submitDosha = async (req, res) => {
       { returnDocument: "after" },
     );
 
+    await deleteCache(`dosha:status:${req.user.userId}`);
+
     return res.status(201).json({
       message: "Dosha assessment saved successfully",
       data,
@@ -358,8 +372,8 @@ export const submitDosha = async (req, res) => {
     });
   }
 };
-//patient
 
+//patient
 export const PatientUpdateProfile = async (req, res) => {
   try {
     const { Name, PhoneNumber, Age, Height, Weight } = req.body;
@@ -390,6 +404,7 @@ export const PatientUpdateProfile = async (req, res) => {
 
     await user.save();
 
+    await deleteCache(`patient:${patient.userId}`);
     return res.json({
       user,
     });
@@ -408,7 +423,7 @@ export const alldoctor = async (req, res) => {
         const docs = await Doctor.find().populate("User_id", "Name Image_url");
         return docs;
       },
-      300
+      300,
     );
 
     res.status(200).json({
@@ -438,7 +453,7 @@ export const getSingleDoctor = async (req, res) => {
         const doc = await Doctor.findById(doctorId).populate("User_id");
         return doc;
       },
-      300
+      300,
     );
 
     if (!doctor) {
@@ -467,11 +482,11 @@ export const getDoctorBookedSlots = async (req, res) => {
           Doctor_id: doctor,
         }).populate(
           "Patient_id",
-          "Name Age Image_url Email PhoneNumber Condition Dosha"
+          "Name Age Image_url Email PhoneNumber Condition Dosha",
         );
         return appts;
       },
-      60
+      60,
     );
 
     if (!patient) {
@@ -524,14 +539,23 @@ export const patient_appoinment_detail = async (req, res) => {
       });
     }
 
-    const appointment = await Appointment.find({
-      Patient_id: patientId,
-    }).populate({
-      path: "Doctor_id",
-      populate: {
-        path: "User_id",
+    const appointment = await getOrSetCache(
+      `patient:${patientId}:appointments`,
+      async () => {
+        return await Appointment.find({
+          Patient_id: patientId,
+        })
+          .populate({
+            path: "Doctor_id",
+            populate: {
+              path: "User_id",
+            },
+          })
+          .lean();
       },
-    });
+      120,
+    );
+
     return res.status(200).json({
       success: true,
       count: appointment.length,
@@ -610,16 +634,17 @@ export const patient_diet_chart = async (req, res) => {
         message: "Patient not found",
       });
     }
-// cached the diet chart for 5 min
-  const latestDietChart = await getOrSetCache(
-  `dietchart:${patientId}`,
-  async () => {
-    return await DietChart.findOne({
-      Patient_id: patientId,
-    }).sort({ createdAt: -1 });
-  },
-  300
-);
+    
+    // cached the diet chart for 5 min
+    const latestDietChart = await getOrSetCache(
+      `dietchart:${patientId}`,
+      async () => {
+        return await DietChart.findOne({
+          Patient_id: patientId,
+        }).sort({ createdAt: -1 });
+      },
+      300,
+    );
     res.status(200).json({
       success: true,
       dietChart: latestDietChart,
@@ -705,7 +730,8 @@ export const updatePatientAppointment = async (req, res) => {
         returnDocument: "after",
       },
     );
-
+    await deleteCache(`patient:${Patient}:appointments`);
+    await deleteCache(`doctor:${UpdatedAppointment.Doctor_id}:appointments`);
     return res.status(201).json({
       message: "Appointment Updated successfully",
       UpdatedAppointment,
@@ -1075,7 +1101,8 @@ export const Doctor_selected_appointment = async (req, res) => {
         message: "Appointment not found",
       });
     }
-
+    await deleteCache(`patient:${appointment.Patient_id}:appointments`);
+    await deleteCache(`doctor:${appointment.Doctor_id}:appointments`);
     return res.status(200).json({
       success: true,
       message: "appointment status  updated successfully",
@@ -1244,7 +1271,8 @@ Generate 90 days Ayurvedic diet chart JSON.
 
       note: json.note,
     });
-
+    await deleteCache(`dietchart:${user._id}`);
+    await deleteCache(`dietcharts:doctor:${req.user.doctor_id}`);
     res.status(201).json({
       success: true,
       dietChart: diet,
@@ -1281,12 +1309,18 @@ export const single_Patient = async (req, res) => {
         message: "Patient ID is required",
       });
     }
-
-    const patient = await User.findById(id)
-      .select(
-        "Name Age Email Gender Height Weight Medical_records Image_url  Dosha ",
-      )
-      .populate("Medical_records  Dosha");
+    const patient = await getOrSetCache(
+      `patient:${id}`,
+      async () => {
+        return await User.findById(id)
+          .select(
+            "Name Age Email Gender Height Weight Medical_records Image_url Dosha",
+          )
+          .populate("Medical_records Dosha")
+          .lean();
+      },
+      300,
+    );
 
     if (!patient) {
       return res.status(404).json({
@@ -1316,10 +1350,19 @@ export const getdietchart = async (req, res) => {
         message: "doctor not  found",
       });
     }
-    const dietchart = await DietChart.find({ Doctor_id: id }).populate(
-      "Patient_id",
-      "Name Age Image_url PhoneNumber Email Gender ",
+
+    const dietchart = await getOrSetCache(
+      `dietcharts:doctor:${id}`,
+      async () => {
+        return await DietChart.find({ Doctor_id: id })
+          .populate(
+            "Patient_id",
+            "Name Age Image_url PhoneNumber Email Gender ",
+          )
+          .lean();
+      },
     );
+
     if (!dietchart) {
       return res.status(400).json({
         message: "diet chart  not found",
@@ -1346,7 +1389,11 @@ export const updateDietChart = async (req, res) => {
       returnDocument: "after",
       runValidators: true,
     });
-
+    await deleteCache(`dietchart:single:${id}`);
+    if (updated?.Patient_id)
+      await deleteCache(`dietchart:${updated.Patient_id}`);
+    if (updated?.Doctor_id)
+      await deleteCache(`dietcharts:doctor:${updated.Doctor_id}`);
     return res.status(200).json({
       success: true,
       dietchart: updated,
@@ -1370,9 +1417,14 @@ export const getDietchartById = async (req, res) => {
       });
     }
 
-    const dietchart = await DietChart.findById(id).populate(
-      "Patient_id",
-      "Name Age Image_url PhoneNumber Email Gender",
+    const dietchart = await getOrSetCache(
+      `dietchart:single:${id}`,
+      async () => {
+        return await DietChart.findById(id).populate(
+          "Patient_id",
+          "Name Age Image_url PhoneNumber Email Gender",
+        );
+      },
     );
 
     if (!dietchart) {
@@ -1408,7 +1460,8 @@ export const delete_appointment = async (req, res) => {
         message: "Appointment not found.",
       });
     }
-
+    await deleteCache(`patient:${deletedAppointment.Patient_id}:appointments`);
+    await deleteCache(`doctor:${deletedAppointment.Doctor_id}:appointments`);
     return res.status(200).json({
       success: true,
       message: "Appointment deleted successfully.",
@@ -1440,20 +1493,20 @@ export const Appointment_count = async (req, res) => {
           },
           totalAppointments: { $sum: 1 },
           uniquePatients: {
-        $addToSet: "$Patient_id",
-      },
+            $addToSet: "$Patient_id",
+          },
         },
       },
-        {
-    $project: {
-      _id: 1,
-      totalAppointments: 1,
+      {
+        $project: {
+          _id: 1,
+          totalAppointments: 1,
 
-      uniquePatients: {
-        $size: "$uniquePatients",
+          uniquePatients: {
+            $size: "$uniquePatients",
+          },
+        },
       },
-    },
-  },
       {
         $sort: {
           "_id.year": 1,
@@ -1488,7 +1541,7 @@ export const Appointment_count = async (req, res) => {
         month: months[item._id.month - 1],
         year: item._id.year,
         totalAppointments: item.totalAppointments,
-         uniquePatients: item.uniquePatients,
+        uniquePatients: item.uniquePatients,
       };
     });
 

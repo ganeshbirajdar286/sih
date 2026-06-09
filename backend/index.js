@@ -8,7 +8,7 @@ import { createServer } from "http";
 import initializeSocket from "./services/video-call-services.js";
 import {rateLimitMiddleware} from "./middleware/rate.middleware.js" 
 import helmet from "helmet"
-
+import "./config/Worker.config.js"
 
 dotenv.config()
 

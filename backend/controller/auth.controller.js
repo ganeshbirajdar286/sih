@@ -31,6 +31,7 @@ import {
   acquireLock,
   releaseLock,
 } from "../utils/redis.utils.js";
+import {EmailQueue} from "../config/queue.config.js";
 
 //user
 export const register = async (req, res) => {
@@ -634,7 +635,7 @@ export const patient_diet_chart = async (req, res) => {
         message: "Patient not found",
       });
     }
-    
+
     // cached the diet chart for 5 min
     const latestDietChart = await getOrSetCache(
       `dietchart:${patientId}`,
@@ -689,6 +690,43 @@ export const patientAppointment = async (req, res) => {
         Patient_id: Patient,
         Condition,
       });
+
+      const appointmentTime = new Date(appointment.Appointment_Date);
+
+      const oneDayBefore = appointmentTime.getTime() - 24 * 60 * 60 * 1000;
+
+      const twoHoursBefore = appointmentTime.getTime() - 2 * 60 * 60 * 1000;
+
+    const job=  await EmailQueue.add("appointment-confirmation", {
+        appointment: appointment?._id,
+        Time_slot: appointment?.Time_slot,
+        Condition: appointment?.Condition,
+      });
+
+      console.log("Job added:", job.id);
+      if (oneDayBefore > Date.now()) {
+        await EmailQueue.add(
+          "reminder-24h",
+          {
+            appointment: appointment?._id,
+            Time_slot: appointment?.Time_slot,
+            Condition: appointment?.Condition,
+          },
+          { delay: oneDayBefore - Date.now() },
+        );
+      }
+
+      if (twoHoursBefore > Date.now()) {
+        await EmailQueue.add(
+          "reminder-2h",
+          {
+            appointment: appointment?._id,
+            Time_slot: appointment?.Time_slot,
+            Condition: appointment?.Condition,
+          },
+          { delay: twoHoursBefore - Date.now() },
+        );
+      }
 
       // Invalidate doctor's appointments cache
       await deleteCache(`doctor:${DOCTOR}:appointments`);

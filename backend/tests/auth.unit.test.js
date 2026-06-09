@@ -20,6 +20,7 @@ const mockSetCache = jest.fn();
 const mockGetCache = jest.fn();
 const mockAcquireLock = jest.fn();
 const mockReleaseLock = jest.fn();
+const mockEmailQueueAdd = jest.fn();
 
 jest.unstable_mockModule("../model/users.model.js", () => ({
   default: {
@@ -146,6 +147,13 @@ jest.unstable_mockModule("../model/report.model.js", () => ({
   default: {
     find: jest.fn(),
     findById: jest.fn(),
+  },
+}));
+
+
+jest.unstable_mockModule("../config/queue.config.js", () => ({
+  EmailQueue: {
+    add: mockEmailQueueAdd,
   },
 }));
 
@@ -1446,6 +1454,7 @@ describe("patientAppointment", () => {
     mockAcquireLock.mockResolvedValue(true);
     mockReleaseLock.mockResolvedValue(null);
     mockDeleteCache.mockResolvedValue(1);
+      mockEmailQueueAdd.mockResolvedValue({ id: "job_123" });
   });
 
   it("should return 400 if required fields are missing", async () => {
@@ -1464,50 +1473,67 @@ describe("patientAppointment", () => {
   });
 
   it("should create appointment and return 201", async () => {
-    const req = {
-      params: { id: "doc_123" },
-      user: { userId: "user_123" },
-      body: {
-        Appointment_Date: "2025-10-10",
-        Time_slot: "10:00 AM",
-        Condition: "Fever",
-      },
-    };
-
-    const mockAppointment = {
-      _id: "appt_123",
-      Doctor_id: "doc_123",
-      Patient_id: "user_123",
+  const req = {
+    params: { id: "doc_123" },
+    user: { userId: "user_123" },
+    body: {
       Appointment_Date: "2025-10-10",
       Time_slot: "10:00 AM",
       Condition: "Fever",
-    };
+    },
+  };
 
-    Appointment.create.mockResolvedValue(mockAppointment);
+  const mockAppointment = {
+    _id: "appt_123",
+    Doctor_id: "doc_123",
+    Patient_id: "user_123",
+    Appointment_Date: "2025-10-10",
+    Time_slot: "10:00 AM",
+    Condition: "Fever",
+  };
 
-    await patientAppointment(req, res);
+  Appointment.create.mockResolvedValue(mockAppointment);
 
-    expect(mockAcquireLock).toHaveBeenCalledWith(
-      "slot:doc_123:2025-10-10:10:00 AM",
-      10,
-    );
-    expect(Appointment.create).toHaveBeenCalledWith({
-      Appointment_Date: "2025-10-10",
-      Time_slot: "10:00 AM",
-      Doctor_id: "doc_123",
-      Patient_id: "user_123",
-      Condition: "Fever",
-    });
-    expect(mockDeleteCache).toHaveBeenCalledWith("doctor:doc_123:appointments");
-    expect(mockReleaseLock).toHaveBeenCalledWith(
-      "slot:doc_123:2025-10-10:10:00 AM",
-    );
-    expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith({
-      message: "Appointment booked successfully",
-      appointment: mockAppointment,
-    });
+  await patientAppointment(req, res);
+
+  expect(mockAcquireLock).toHaveBeenCalledWith(
+    "slot:doc_123:2025-10-10:10:00 AM",
+    10,
+  );
+
+  expect(Appointment.create).toHaveBeenCalledWith({
+    Appointment_Date: "2025-10-10",
+    Time_slot: "10:00 AM",
+    Doctor_id: "doc_123",
+    Patient_id: "user_123",
+    Condition: "Fever",
   });
+
+  // NEW ASSERTION
+  expect(mockEmailQueueAdd).toHaveBeenCalledWith(
+    "appointment-confirmation",
+    expect.objectContaining({
+      appointment: "appt_123",
+      Time_slot: "10:00 AM",
+      Condition: "Fever",
+    }),
+  );
+
+  expect(mockDeleteCache).toHaveBeenCalledWith(
+    "doctor:doc_123:appointments"
+  );
+
+  expect(mockReleaseLock).toHaveBeenCalledWith(
+    "slot:doc_123:2025-10-10:10:00 AM",
+  );
+
+  expect(res.status).toHaveBeenCalledWith(201);
+
+  expect(res.json).toHaveBeenCalledWith({
+    message: "Appointment booked successfully",
+    appointment: mockAppointment,
+  });
+});
 
   it("should return 409 if slot lock cannot be acquired", async () => {
     const req = {

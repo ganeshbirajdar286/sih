@@ -16,18 +16,18 @@ import { availableParallelism } from "node:os";
 const numCPUs = availableParallelism();
 console.log(numCPUs);
 
-if (cluster.isPrimary) {
-  console.log(`Primary ${process.pid} is running`);
+// if (cluster.isPrimary) {
+//   console.log(`Primary ${process.pid} is running`);
 
-  // Fork workers.
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
+//   // Fork workers.
+//   for (let i = 0; i < numCPUs; i++) {
+//     cluster.fork();
+//   }
 
-  cluster.on("exit", (worker, code, signal) => {
-    console.log(`worker ${worker.process.pid} died`);
-  });
-} else {
+//   cluster.on("exit", (worker, code, signal) => {
+//     console.log(`worker ${worker.process.pid} died`);
+//   });
+// } else {
   dotenv.config();
 
   connect_db();
@@ -84,4 +84,4 @@ if (cluster.isPrimary) {
   server.listen(port, "0.0.0.0", () => {
     console.log(`Server running on port ${port} `);
   });
-}
+// }

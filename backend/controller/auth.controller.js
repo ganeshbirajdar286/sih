@@ -894,9 +894,10 @@ export const createReport = async (req, res) => {
         message: "Title and Category are required",
       });
     }
+ 
+    const reportFile = files[0];
 
-    const reportFile = files.find((file) => file.fieldname === "report");
-
+   
     if (!reportFile) {
       return res.status(400).json({
         message: "Report file is required",

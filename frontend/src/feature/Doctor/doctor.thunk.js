@@ -172,3 +172,22 @@ export const AllPatientsDosha=createAsyncThunk(
     }
   }
 )
+
+export const createReport=createAsyncThunk(
+  "doctor/createReport",async({id,Title,Category,file},{rejectWithValue})=>{
+    
+    try { 
+      const formData= new FormData();
+      formData.append("Title",Title)
+      formData.append("Category",Category)
+         
+         if (file) {
+        formData.append("file", file);
+      }
+      const response = await axiosInstance.post(`/doctor/createreport/${id}`,formData)
+          return response.data ;
+    } catch (error) {
+       return rejectWithValue(error.response?.data?.message || error.message); 
+    }
+  }
+)

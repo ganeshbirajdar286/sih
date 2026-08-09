@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { single_patient } from "../../feature/Doctor/doctor.thunk";
+import { single_patient, createReport } from "../../feature/Doctor/doctor.thunk";
+import toast from "react-hot-toast";
 
 import {
   User,
@@ -15,6 +16,11 @@ import {
   Activity,
   Heart,
   Leaf,
+  UploadCloud,
+  Plus,
+  X,
+  File,
+  Check,
 } from "lucide-react";
 
 const PatientProfile = () => {
@@ -25,9 +31,71 @@ const PatientProfile = () => {
     (state) => state.doctor,
   );
 
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [reportTitle, setReportTitle] = useState("");
+  const [reportCategory, setReportCategory] = useState("Lab Reports");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+
   useEffect(() => {
     dispatch(single_patient(id));
   }, [dispatch, id]);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setSelectedFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleUploadSubmit = async (e) => {
+    e.preventDefault();
+    if (!reportTitle.trim()) {
+      toast.error("Please enter a report title");
+      return;
+    }
+    if (!selectedFile) {
+      toast.error("Please select a file to upload");
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      await dispatch(
+        createReport({
+          id,
+          Title: reportTitle.trim(),
+          Category: reportCategory,
+          file: selectedFile,
+        })
+      ).unwrap();
+
+      toast.success("Medical report uploaded successfully!");
+      setShowUploadModal(false);
+      setReportTitle("");
+      setReportCategory("Lab Report");
+      setSelectedFile(null);
+      dispatch(single_patient(id));
+    } catch (err) {
+      console.error(err);
+      toast.error(typeof err === "string" ? err : "Upload failed");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -244,12 +312,52 @@ const PatientProfile = () => {
                   {patient.Medical_records.length}
                 </span>
               )}
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="cursor-pointer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "6px 14px",
+                  background: "#10b981",
+                  color: "#ffffff",
+                  borderRadius: 10,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  border: "none",
+                  marginLeft: "auto",
+                  boxShadow: "0 2px 8px rgba(16,185,129,0.2)",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <Plus size={14} />
+                Upload Report
+              </button>
             </div>
 
             {!patient?.Medical_records?.length ? (
               <div style={styles.emptyState}>
-                <FileText size={40} style={{ color: "#d1fae5", marginBottom: 12 }} />
+                <FileText size={40} style={{ color: "#a7f3d0", marginBottom: 12 }} />
                 <p style={styles.emptyText}>No records available</p>
+                <button
+                  onClick={() => setShowUploadModal(true)}
+                  className="cursor-pointer mt-3"
+                  style={{
+                    padding: "8px 16px",
+                    background: "#ecfdf5",
+                    color: "#059669",
+                    border: "1px solid #a7f3d0",
+                    borderRadius: 10,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                >
+                  <Plus size={14} /> Upload First Report
+                </button>
               </div>
             ) : (
               <div style={styles.recordList}>
@@ -271,7 +379,7 @@ const PatientProfile = () => {
                         <p style={styles.recordTitle}>{record.Title}</p>
                         <p style={styles.recordCategory}>{record.Category}</p>
                         <p style={styles.recordDate}>
-                          {new Date(record.Report_date).toLocaleDateString("en-IN", {
+                          {new Date(record.Report_date || record.createdAt).toLocaleDateString("en-IN", {
                             day: "numeric", month: "short", year: "numeric",
                           })}
                         </p>
@@ -293,6 +401,142 @@ const PatientProfile = () => {
               </div>
             )}
           </div>
+
+          {/* Report Upload Modal for Patient */}
+          {showUploadModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+              <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-emerald-100 relative">
+                <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-emerald-100 rounded-xl text-emerald-700">
+                      <UploadCloud className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-base">Upload Report for {patient?.Name}</h3>
+                      <p className="text-xs text-gray-500">Add lab or medical report</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowUploadModal(false)}
+                    className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleUploadSubmit} className="mt-4 space-y-4 text-left">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                      Report Title *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Complete Blood Count, X-Ray Chest"
+                      value={reportTitle}
+                      onChange={(e) => setReportTitle(e.target.value)}
+                      required
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                      Category *
+                    </label>
+                    <select
+                      value={reportCategory}
+                      onChange={(e) => setReportCategory(e.target.value)}
+                      required
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option value="Lab Reports">Lab Reports</option>
+                      <option value="Imaging">Imaging</option>
+                      <option value="Diagnostic">Diagnostic</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                      Report File *
+                    </label>
+                    <div
+                      onDragEnter={handleDrag}
+                      onDragLeave={handleDrag}
+                      onDragOver={handleDrag}
+                      onDrop={handleDrop}
+                      className={`border-2 border-dashed rounded-xl p-5 text-center transition cursor-pointer ${
+                        dragActive
+                          ? "border-emerald-500 bg-emerald-50"
+                          : selectedFile
+                          ? "border-emerald-400 bg-emerald-50/40"
+                          : "border-emerald-200 bg-gray-50 hover:bg-emerald-50/30"
+                      }`}
+                      onClick={() => document.getElementById("patient-file-input").click()}
+                    >
+                      <input
+                        id="patient-file-input"
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => e.target.files?.[0] && setSelectedFile(e.target.files[0])}
+                        accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
+                      />
+
+                      {selectedFile ? (
+                        <div className="flex items-center justify-between bg-white p-2.5 rounded-lg border border-emerald-200">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            <File className="w-5 h-5 text-emerald-600 shrink-0" />
+                            <span className="text-xs font-semibold text-gray-800 truncate">{selectedFile.name}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedFile(null);
+                            }}
+                            className="p-1 text-gray-400 hover:text-red-500 transition"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div>
+                          <UploadCloud className="w-8 h-8 text-emerald-500 mx-auto mb-1" />
+                          <p className="text-xs font-semibold text-gray-700">Click or drop file to select</p>
+                          <p className="text-[10px] text-gray-400">PDF, Images, DOCX (Max 10MB)</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+                    <button
+                      type="button"
+                      onClick={() => setShowUploadModal(false)}
+                      disabled={isUploading}
+                      className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl text-xs font-semibold transition cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isUploading}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" /> Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-4 h-4" /> Save Report
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
         </div>
       </div>

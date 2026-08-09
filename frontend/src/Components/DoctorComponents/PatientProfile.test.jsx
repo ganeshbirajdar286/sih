@@ -13,6 +13,7 @@ vi.mock("../../feature/Doctor/doctor.thunk", () => ({
   Cancel_appointments: vi.fn(() => ({ type: "test/noop" })),
   conformationappointment: vi.fn(() => ({ type: "test/noop" })),
   bookedAppointments: vi.fn(() => ({ type: "test/noop" })),
+  createReport: vi.fn(() => ({ type: "test/noop" })),
 }));
 
 // Import component after mock

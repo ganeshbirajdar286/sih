@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 
+import ReportsTab from "../Components/DoctorComponents/ReportsTab.jsx";
 import PatientsTab from "../Components/DoctorComponents/PatientsTab.jsx";
 import AppointmentsTab from "../Components/DoctorComponents/AppointmentsTab.jsx";
 import DietChartsTab from "../Components/DoctorComponents/DietChartsTab.jsx";
@@ -32,6 +33,7 @@ const sidebarItems = [
   { id: "overview", icon: BarChart3, label: "Dashboard Overview", badge: "New" },
   { id: "patients", icon: Users, label: "My Patients", badge: "1.2k" },
   { id: "appointments", icon: Calendar, label: "Appointments", badge: "18" },
+  { id: "reports", icon: FileText, label: "Medical Reports", badge: "Upload" },
   { id: "dietCharts", icon: FileText, label: "Diet Charts", badge: "863" },
   { id: "profile", icon: User, label: "Doctor Profile", badge: "⭐" },
 ];
@@ -132,6 +134,7 @@ export default function DoctorDashboard({callPatient}) {
     overview: <EnhancedOverview currentTime={currentTime} setActiveTab={setActiveTab} />,
     patients: <PatientsTab searchQuery={searchQuery} callPatient={callPatient} />,
     appointments: <AppointmentsTab searchQuery={searchQuery} />,
+    reports: <ReportsTab />,
     dietCharts: <DietChartsTab />,
     profile: <ProfileTab />,
   };

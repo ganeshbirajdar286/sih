@@ -8,6 +8,8 @@ import {
   Cancel_appointments,
   conformationappointment,
   myPatient,
+  getReports,
+  deleteReports,
 } from "./doctor.thunk";
 
 // Create a mock axios instance
@@ -444,6 +446,81 @@ describe("Doctor Redux Thunks", () => {
       );
 
       expect(result.payload).toBe("Specific error message");
+    });
+  });
+
+  describe("getReports thunk", () => {
+    const mockReportsResponse = {
+      reports: [
+        { _id: "rep1", Title: "Blood Test", Category: "Lab Reports" },
+        { _id: "rep2", Title: "Chest X-Ray", Category: "Imaging" },
+      ],
+    };
+
+    it("should dispatch pending and fulfilled actions on successful fetch", async () => {
+      axiosInstance.get.mockResolvedValueOnce({ data: mockReportsResponse });
+
+      const result = await store.dispatch(getReports());
+
+      expect(result.type).toBe("doctor/getreport/fulfilled");
+      expect(result.payload).toEqual(mockReportsResponse);
+
+      const state = store.getState().doctor;
+      expect(state.loading).toBe(false);
+      expect(state.reports).toEqual(mockReportsResponse.reports);
+    });
+
+    it("should call the correct API endpoint /doctor/getreport", async () => {
+      axiosInstance.get.mockResolvedValueOnce({ data: mockReportsResponse });
+
+      await store.dispatch(getReports());
+
+      expect(axiosInstance.get).toHaveBeenCalledWith("/doctor/getreport");
+    });
+
+    it("should handle error rejection", async () => {
+      const errorMessage = "Failed to fetch reports";
+      axiosInstance.get.mockRejectedValueOnce({
+        response: { data: { message: errorMessage } },
+      });
+
+      const result = await store.dispatch(getReports());
+
+      expect(result.type).toBe("doctor/getreport/rejected");
+      expect(result.payload).toBe(errorMessage);
+    });
+  });
+
+  describe("deleteReports thunk", () => {
+    const mockDeleteResponse = { success: true, message: "Report deleted" };
+
+    it("should dispatch pending and fulfilled actions on successful deletion", async () => {
+      axiosInstance.delete.mockResolvedValueOnce({ data: mockDeleteResponse });
+
+      const result = await store.dispatch(deleteReports({ id: "rep1" }));
+
+      expect(result.type).toBe("doctor/deleteReports/fulfilled");
+      expect(result.payload).toEqual(mockDeleteResponse);
+    });
+
+    it("should call the correct API endpoint /doctor/report/:id", async () => {
+      axiosInstance.delete.mockResolvedValueOnce({ data: mockDeleteResponse });
+
+      await store.dispatch(deleteReports({ id: "rep1" }));
+
+      expect(axiosInstance.delete).toHaveBeenCalledWith("/doctor/report/rep1");
+    });
+
+    it("should handle rejection on delete failure", async () => {
+      const errorMessage = "Report not found or error deleting";
+      axiosInstance.delete.mockRejectedValueOnce({
+        response: { data: { message: errorMessage } },
+      });
+
+      const result = await store.dispatch(deleteReports({ id: "rep999" }));
+
+      expect(result.type).toBe("doctor/deleteReports/rejected");
+      expect(result.payload).toBe(errorMessage);
     });
   });
 });

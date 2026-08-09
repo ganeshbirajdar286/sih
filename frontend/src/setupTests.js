@@ -64,6 +64,7 @@ vi.mock("lucide-react", () => ({
   FolderOpen: mockIcon,
   Filter: mockIcon,
   CheckCircle2: mockIcon,
+  AlertTriangle: mockIcon,
 }));
 
 // Suppress console.log in tests

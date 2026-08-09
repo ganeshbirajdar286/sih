@@ -15,6 +15,7 @@ import {
   BarChart3,
   Plus,
   ArrowRight,
+  UploadCloud,
 } from "lucide-react";
 
 
@@ -33,23 +34,16 @@ const sidebarItems = [
   { id: "overview", icon: BarChart3, label: "Dashboard Overview", badge: "New" },
   { id: "patients", icon: Users, label: "My Patients", badge: "1.2k" },
   { id: "appointments", icon: Calendar, label: "Appointments", badge: "18" },
-  { id: "reports", icon: FileText, label: "Medical Reports", badge: "Upload" },
+  { id: "reports", icon: UploadCloud, label: "Medical Reports", badge: "Upload" },
   { id: "dietCharts", icon: FileText, label: "Diet Charts", badge: "863" },
   { id: "profile", icon: User, label: "Doctor Profile", badge: "⭐" },
 ];
 
-
-
-
-
-
-
-
 const quickActions = [
   { icon: Plus, label: "New Patient", description: "Add new patient record", color: "bg-emerald-500", link: "patients" },
+  { icon: UploadCloud, label: "Medical Reports", description: "Upload & manage reports", color: "bg-teal-600", link: "reports" },
   { icon: FileText, label: "Create Diet Chart", description: "Generate Ayurvedic diet plan", color: "bg-blue-500", link: "dietCharts" },
   { icon: Calendar, label: "Schedule Consult", description: "Book patient consultation", color: "bg-purple-500", link: "appointments" },  
-  { icon: Stethoscope, label: "New Consultation", description: "Start a new consultation", color: "bg-green-500", link: "consultations" },
 ];
 
 

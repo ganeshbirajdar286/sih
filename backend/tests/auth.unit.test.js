@@ -145,8 +145,10 @@ jest.unstable_mockModule("dotenv", () => ({
 
 jest.unstable_mockModule("../model/report.model.js", () => ({
   default: {
+    create: jest.fn(),
     find: jest.fn(),
     findById: jest.fn(),
+    findByIdAndDelete: jest.fn(),
   },
 }));
 
@@ -188,6 +190,8 @@ const {
   single_Patient,
   getprofile,
   addOrUpdateReview,
+  doctorGetReport,
+  DeleteReport,
 } = await import("../controller/auth.controller.js");
 
 const { validate } = await import("../middleware/Validate.js");
@@ -201,6 +205,7 @@ const { default: User } = await import("../model/users.model.js");
 const { default: Report } = await import("../model/report.model.js");
 const { default: DietChart } = await import("../model/Dietchart.model.js");
 const { default: Reports } = await import("../model/report.model.js");
+const { cloudinary } = await import("../config/cloudinary.config.js");
 
 const { client } = await import("../config/Dodo_Payment.config.js");
 
@@ -1984,3 +1989,152 @@ describe("addOrUpdateReview", () => {
     });
   });
 });
+
+describe("doctorGetReport", () => {
+  let res;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+  });
+
+  it("should return 400 if doctor_id is missing from req.user", async () => {
+    const req = { user: {} };
+
+    await doctorGetReport(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      message: "Doctor not found",
+    });
+  });
+
+  it("should fetch reports for doctor and return 200", async () => {
+    const req = { user: { doctor_id: "doc_123" } };
+    const mockReports = [{ _id: "rep_1", Title: "Blood Test" }];
+
+    Reports.find.mockReturnValue({
+      populate: jest.fn().mockResolvedValue(mockReports),
+    });
+
+    await doctorGetReport(req, res);
+
+    expect(Reports.find).toHaveBeenCalledWith({ Doctor_id: "doc_123" });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      success: true,
+      message: "Get all report ",
+      reports: mockReports,
+    });
+  });
+
+  it("should return 500 on error", async () => {
+    const req = { user: { doctor_id: "doc_123" } };
+    Reports.find.mockImplementation(() => {
+      throw new Error("DB Error");
+    });
+
+    await doctorGetReport(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      message: "DB Error",
+    });
+  });
+});
+
+describe("DeleteReport", () => {
+  let res;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+  });
+
+  it("should return 404 if report is not found", async () => {
+    const req = {
+      user: { doctor_id: "doc_123" },
+      params: { id: "rep_999" },
+    };
+
+    Reports.findById.mockResolvedValue(null);
+
+    await DeleteReport(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ message: "Report not found" });
+  });
+
+  it("should return 403 if report does not belong to the doctor", async () => {
+    const req = {
+      user: { doctor_id: "doc_123" },
+      params: { id: "rep_1" },
+    };
+
+    const mockReport = {
+      _id: "rep_1",
+      Doctor_id: "doc_other",
+    };
+
+    Reports.findById.mockResolvedValue(mockReport);
+
+    await DeleteReport(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({
+      message: "You are not allowed to delete this report",
+    });
+  });
+
+  it("should delete report from Cloudinary and DB and return 200", async () => {
+    const req = {
+      user: { doctor_id: "doc_123" },
+      params: { id: "rep_1" },
+    };
+
+    const mockReport = {
+      _id: "rep_1",
+      Doctor_id: "doc_123",
+      Cloudinary_public_id: "cloud_pub_id_123",
+    };
+
+    Reports.findById.mockResolvedValue(mockReport);
+    cloudinary.uploader.destroy.mockResolvedValue({ result: "ok" });
+    Reports.findByIdAndDelete.mockResolvedValue(mockReport);
+
+    await DeleteReport(req, res);
+
+    expect(cloudinary.uploader.destroy).toHaveBeenCalledWith("cloud_pub_id_123", {
+      resource_type: "raw",
+    });
+    expect(Reports.findByIdAndDelete).toHaveBeenCalledWith("rep_1");
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ message: "Report deleted successfully" });
+  });
+
+  it("should return 500 on internal server error", async () => {
+    const req = {
+      user: { doctor_id: "doc_123" },
+      params: { id: "rep_1" },
+    };
+
+    Reports.findById.mockRejectedValue(new Error("Database crash"));
+
+    await DeleteReport(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      message: "Server error",
+      error: "Database crash",
+    });
+  });
+});
+

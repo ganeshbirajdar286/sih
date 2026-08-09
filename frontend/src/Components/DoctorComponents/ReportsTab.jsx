@@ -312,7 +312,7 @@ export default function ReportsTab() {
 
       <div className="rt-container space-y-6 pb-12">
         {/* Top Banner Header */}
-        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-700 rounded-2xl p-6 text-white shadow-xl shadow-emerald-600/20 relative overflow-hidden">
+        <div className="bg-linear-to-r from-emerald-600 via-teal-600 to-green-700 rounded-2xl p-6 text-white shadow-xl shadow-emerald-600/20 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -translate-y-20 translate-x-20 pointer-events-none"></div>
           <div className="absolute bottom-0 left-0 w-36 h-36 bg-white/5 rounded-full -translate-x-16 translate-y-16 pointer-events-none"></div>
 
@@ -426,7 +426,7 @@ export default function ReportsTab() {
                   onDragLeave={handleDrag}
                   onDragOver={handleDrag}
                   onDrop={handleDrop}
-                  className={`border-2 border-dashed rounded-2xl p-6 text-center transition cursor-pointer flex flex-col items-center justify-center min-h-[140px] ${
+                  className={`border-2 border-dashed rounded-2xl p-6 text-center transition cursor-pointer flex flex-col items-center justify-center min-h-35 ${
                     dragActive
                       ? "border-emerald-500 bg-emerald-50"
                       : selectedFile
@@ -846,7 +846,7 @@ export default function ReportsTab() {
               </div>
 
               {/* View/Embed Preview Banner */}
-              <div className="p-6 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl text-white text-center shadow-md">
+              <div className="p-6 bg-linear-to-br from-emerald-600 to-teal-700 rounded-xl text-white text-center shadow-md">
                 <FileText className="w-12 h-12 mx-auto mb-2 text-emerald-100" />
                 <h4 className="font-bold text-base">Medical Report Document</h4>
                 <p className="text-xs text-emerald-100 mt-1 mb-4">Click to open or download the complete report file</p>

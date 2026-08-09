@@ -9,7 +9,7 @@ import {
   Users,
   Calendar,
   FileText,
-  Stethoscope,
+  
   Leaf,
   User,
   BarChart3,

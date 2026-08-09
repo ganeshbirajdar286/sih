@@ -7,10 +7,7 @@ import {
   getSingleDoctor,
   BookingAppointments,
   getappointmentschedule,
-  RescheduleAppointment,
   Cancel_appointments,
-  getDosha,
-  Patient,
   DietChart,
   updateProfile,
 } from "./patient.thunk";

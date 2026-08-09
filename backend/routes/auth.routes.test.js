@@ -1,5 +1,4 @@
 import { jest } from "@jest/globals";
-import { AllPatinetDosha}  from "../controller/auth.controller.js";
 
 // ─── Track middleware & controller calls ───────────────────────────────────────
 let isLoginCalled = false;
@@ -39,6 +38,11 @@ const trackers = {
   getdietchart: makeTracker(),
   Appointment_count: makeTracker(),
   AllPatinetDosha: makeTracker(),
+  doctorGetReport: makeTracker(),
+  DeleteReport: makeTracker(),
+  One_Time_Payment: makeTracker(),
+  Payment_Success: makeTracker(),
+  Payment_Cancel: makeTracker(),
 };
 
 // Build a mock controller that records calls
@@ -55,6 +59,12 @@ jest.unstable_mockModule("../controller/auth.controller.js", () =>
     Object.keys(trackers).map((name) => [name, makeController(name)])
   )
 );
+
+jest.unstable_mockModule("../controller/payment.controller.js", () => ({
+  One_Time_Payment: makeController("One_Time_Payment"),
+  Payment_Success: makeController("Payment_Success"),
+  Payment_Cancel: makeController("Payment_Cancel"),
+}));
 
 jest.unstable_mockModule("../middleware/auth.middleware.js", () => ({
   isLogin: jest.fn((req, res, next) => {

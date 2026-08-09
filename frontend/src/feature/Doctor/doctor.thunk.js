@@ -191,3 +191,25 @@ export const createReport=createAsyncThunk(
     }
   }
 )
+
+export const getReports=createAsyncThunk(
+  "doctor/getreport",async(_,{rejectWithValue})=>{
+    try {
+        const  response =await axiosInstance.get("/doctor/getreport")
+        return response.data
+    } catch (error) {
+       return rejectWithValue(error.response?.data?.message || error.message); 
+    }
+  }
+)
+
+export const deleteReports=createAsyncThunk(
+  "doctor/deleteReports", async({id},{rejectWithValue})=>{
+    try {
+      const response=await axiosInstance.delete(`/doctor/report/${id}`)
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message); 
+    }
+  }
+)

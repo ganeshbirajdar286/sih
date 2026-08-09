@@ -250,7 +250,7 @@ const Reports = () => {
               >
                 <div className="p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-start gap-4">
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 bg-green-100 p-3 rounded-lg">
+                    <div className="shrink-0 bg-green-100 p-3 rounded-lg">
                       <div className="text-xl">{getTypeIcon(report.type)}</div>
                     </div>
 
@@ -404,7 +404,7 @@ const Reports = () => {
         </div>
 
        
-        <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-6 rounded-lg text-center shadow-md">
+        <div className="bg-linear-to-r from-green-600 to-green-700 text-white p-6 rounded-lg text-center shadow-md">
 
           <div className="flex flex-col sm:flex-row justify-center items-center mb-4 gap-4">
             <FaFilePdf className="text-5xl text-white" />

@@ -1085,38 +1085,39 @@ export const getprofile = async (req, res) => {
     });
   }
 };
-// export const DeleteReport = async (req, res) => {
-//   try {
-//     const patientId = req.user.userId;
-//     const { reportId } = req.params;
 
-//     const report = await PatientReport.findById(reportId);
+export const DeleteReport = async (req, res) => {
+  try {
+    const DoctorId = req.user.doctor_id;
+    const reportId  = req.params.id;
 
-//     if (!report) {
-//       return res.status(404).json({ message: "Report not found" });
-//     }
+    const report = await Reports.findById(reportId);
+   
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
 
-//     if (report.Patient_id.toString() !== patientId.toString()) {
-//       return res
-//         .status(403)
-//         .json({ message: "You are not allowed to delete this report" });
-//     }
+    if (report.Doctor_id.toString() !== DoctorId.toString()) {
+      return res
+        .status(403)
+        .json({ message: "You are not allowed to delete this report" });
+    }
 
-//     // ✅ 1) delete from cloudinary
-//     await cloudinary.uploader.destroy(report.Cloudinary_public_id, {
-//       resource_type: "raw",
-//     });
+    // 1) delete from cloudinary
+    await cloudinary.uploader.destroy(report.Cloudinary_public_id, {
+      resource_type: "raw",
+    });
 
-//     // ✅ 2) delete from mongodb
-//     await PatientReport.findByIdAndDelete(reportId);
+    // 2) delete from mongodb
+    await Reports.findByIdAndDelete(reportId);
 
-//     return res.status(200).json({ message: "Report deleted successfully" });
-//   } catch (error) {
-//     return res
-//       .status(500)
-//       .json({ message: "Server error", error: error.message });
-//   }
-// };
+    return res.status(200).json({ message: "Report deleted successfully" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
 
 export const myPatient = async (req, res) => {
   try {

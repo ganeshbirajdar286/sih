@@ -13,7 +13,9 @@ import {
   updateDietChartbyID,
   ALLAppointmentCount,
   AllPatientsDosha,
-  createReport
+  createReport,
+  getReports,
+  deleteReports
 } from "./doctor.thunk";
 
 const initialState = {
@@ -34,6 +36,7 @@ const initialState = {
   totalAppointments: 0,
   AllPatientsDosha:[],
   doctorCreateReport:null,
+   reports: [],
 };
 
 const doctorSlice = createSlice({
@@ -265,7 +268,44 @@ const found = state.Appointment_count.find(
         state.loading=false
         state.error=action.payload
       })
-  },
+
+      builder
+        .addCase(getReports.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(getReports.fulfilled, (state, action) => {
+          state.loading = false;
+          state.reports =
+            action.payload?.reports ||
+            action.payload?.data ||
+            action.payload?.medicalReport ||
+            (Array.isArray(action.payload) ? action.payload : []);
+        })
+        .addCase(getReports.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        });
+
+      builder
+        .addCase(deleteReports.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(deleteReports.fulfilled, (state, action) => {
+          state.loading = false;
+          const deletedId = action.meta?.arg?.id;
+          if (deletedId) {
+            state.reports = state.reports.filter(
+              (report) => (report._id || report.id) !== deletedId
+            );
+          }
+        })
+        .addCase(deleteReports.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        });
+    },
 });
 
 export const { clearDietchartById, clearUpdateStatus ,incrementAppointmentCount} = doctorSlice.actions;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { single_patient, createReport } from "../../feature/Doctor/doctor.thunk";
+import { single_patient, createReport, deleteReports } from "../../feature/Doctor/doctor.thunk";
 import toast from "react-hot-toast";
 
 import {
@@ -21,6 +21,7 @@ import {
   X,
   File,
   Check,
+  Trash2,
 } from "lucide-react";
 
 const PatientProfile = () => {
@@ -94,6 +95,20 @@ const PatientProfile = () => {
       toast.error(typeof err === "string" ? err : "Upload failed");
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleDeleteReport = async (recordId) => {
+    if (!recordId) return;
+    if (!window.confirm("Are you sure you want to delete this medical report?")) return;
+
+    try {
+      await dispatch(deleteReports({ id: recordId })).unwrap();
+      toast.success("Report deleted successfully!");
+      dispatch(single_patient(id));
+    } catch (err) {
+      console.error(err);
+      toast.error(typeof err === "string" ? err : "Failed to delete report");
     }
   };
 
@@ -386,16 +401,39 @@ const PatientProfile = () => {
                       </div>
                     </div>
 
-                    <a
-                      href={record.File_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="pp-view-btn"
-                      style={styles.viewBtn}
-                    >
-                      <Download size={14} />
-                      View
-                    </a>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <a
+                        href={record.File_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="pp-view-btn"
+                        style={styles.viewBtn}
+                      >
+                        <Download size={14} />
+                        View
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteReport(record._id || record.id)}
+                        title="Delete Report"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          padding: "6px 10px",
+                          borderRadius: "8px",
+                          border: "1px solid #fecdd3",
+                          backgroundColor: "#fff1f2",
+                          color: "#e11d48",
+                          fontSize: "12px",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                        }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

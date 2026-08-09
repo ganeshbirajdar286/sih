@@ -32,6 +32,7 @@ import {
   getDietchartById,
   Appointment_count,
   AllPatinetDosha,
+  doctorGetReport,
 } from "../controller/auth.controller.js";
 import { One_Time_Payment,Payment_Cancel,Payment_Success } from "../controller/payment.controller.js";
 import { isLogin } from "../middleware/auth.middleware.js";
@@ -131,6 +132,12 @@ router.post(
   createReportValidator,validate,
   createReport,
 );
+router.get(
+  "/doctor/getreport",
+  isLogin,
+  multerMiddleWare,
+  doctorGetReport
+)
 router.delete("/doctor/deleteappointment/:id", isLogin, delete_appointment);
 router.get("/doctor/patient/:id", isLogin, single_Patient);
 router.get("/doctor/getdietcharts", isLogin, getdietchart);

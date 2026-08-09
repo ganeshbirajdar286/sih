@@ -605,6 +605,35 @@ export const getReport = async (req, res) => {
   }
 };
 
+export const doctorGetReport=async(req,res)=>{
+  try {
+    const Doctor_id=req.user.doctor_id
+
+    if(!Doctor_id){
+        return res.status(400).json({
+          success:false,
+          message:"Doctor not found"
+        })
+    }
+
+     const reports = await Reports.find({Doctor_id:Doctor_id}).populate({
+      path:"Patient_id",
+      select: "Name Image_url Age Email"
+     })
+
+     return res.status(200).json({
+      success: true,
+      message:"Get all report ",
+      reports,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
 export const getdosha = async (req, res) => {
   try {
     const user = req.user.userId;

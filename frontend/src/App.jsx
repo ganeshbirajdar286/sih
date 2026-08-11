@@ -30,6 +30,8 @@
   import { setIncomingCall, setCallEnded,setOnlineUsers } from "./feature/video_call/call.slice.js";
   import { useWebRTC } from "./hook/useWebRTC";
 import Cancel from "./Components/PatientComponents/Cancel.jsx";
+import ChatBotPage from "./Pages/ChatBotPage.jsx";
+import FloatingMetaAIChat from "./Components/ChatBot/FloatingMetaAIChat.jsx";
 
   function App() {
     const dispatch = useDispatch();
@@ -199,6 +201,15 @@ import Cancel from "./Components/PatientComponents/Cancel.jsx";
           />
 
           <Route
+            path="/chatbot"
+            element={
+              <ProtectedRoute>
+                <ChatBotPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/dashboard"
             element={
               !isAuthenticated ? (
@@ -213,6 +224,9 @@ import Cancel from "./Components/PatientComponents/Cancel.jsx";
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+
+        {/* Global Floating Swasthya AI Chatbot Button */}
+        <FloatingMetaAIChat />
 
         <Toaster position="top-center" reverseOrder={false} />
       </>

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import {
  Users, User,   Calendar,
-  TrendingUp,  Menu, X, LogOut
+  TrendingUp,  Menu, X, LogOut, Sparkles
 } from "lucide-react";
 import logo from "../../assets/logo.png"
 import { useDispatch } from "react-redux";
@@ -24,7 +24,8 @@ export default function Sidebar({ activeTab, setActiveTab, sidebarOpen, setSideb
   const otherTabs = [
     { key: "appointments", label: "Appointments", icon: <Calendar className="text-lg" /> },
     { key: "reports", label: "Reports", icon: <TrendingUp className="text-lg" /> },
-{ key: "profile", label: "Profile", icon: <User className="text-lg" /> },
+    { key: "profile", label: "Profile", icon: <User className="text-lg" /> },
+    { key: "chatbot", label: "Swasthya AI Assistant", icon: <Sparkles className="text-lg text-emerald-300" /> },
   ];
   const dispatch= useDispatch();
 

@@ -16,6 +16,7 @@ import {
   Plus,
   ArrowRight,
   UploadCloud,
+  Sparkles,
 } from "lucide-react";
 
 
@@ -25,6 +26,7 @@ import AppointmentsTab from "../Components/DoctorComponents/AppointmentsTab.jsx"
 import DietChartsTab from "../Components/DoctorComponents/DietChartsTab.jsx";
 import ProfileTab from "../Components/DoctorComponents/ProfileTab.jsx";
 import AppointmentCount from "../Components/DoctorComponents/AppointmentCount.jsx";
+import ChatBotView from "../Components/ChatBot/ChatBotView.jsx";
 import { AllPatientsDosha } from "../feature/Doctor/doctor.thunk.js";
 import { useDispatch } from "react-redux";
 
@@ -37,6 +39,7 @@ const sidebarItems = [
   { id: "reports", icon: UploadCloud, label: "Medical Reports", badge: "Upload" },
   { id: "dietCharts", icon: FileText, label: "Diet Charts", badge: "863" },
   { id: "profile", icon: User, label: "Doctor Profile", badge: "⭐" },
+  { id: "chatbot", icon: Sparkles, label: "Swasthya AI Assistant", badge: "AI" },
 ];
 
 const quickActions = [
@@ -131,6 +134,7 @@ export default function DoctorDashboard({callPatient}) {
     reports: <ReportsTab />,
     dietCharts: <DietChartsTab />,
     profile: <ProfileTab />,
+    chatbot: <ChatBotView isEmbedded={true} />,
   };
 
   return (

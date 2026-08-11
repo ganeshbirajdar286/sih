@@ -4,6 +4,7 @@ import patientReducer from "../feature/Patient/patient.slice"
 import doctorReducer from "../feature/Doctor/doctor.slice"
 import callReducer from "../feature/video_call/call.slice"
 import paymentReducer from "../feature/Payment/Payment.slice"
+import chatbotReducer from "../feature/ChatBot/chatbot.slice"
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
    patient:patientReducer,
    doctor:doctorReducer,
    call: callReducer, 
-   payment:paymentReducer,                           
+   payment:paymentReducer,   
+   chatbot:chatbotReducer,                        
   },
 })

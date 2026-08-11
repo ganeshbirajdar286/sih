@@ -11,7 +11,7 @@ import helmet from "helmet";
 import "./config/Worker.config.js";
 import cluster from "node:cluster";
 import { availableParallelism } from "node:os";
-
+import ChatRouter from "./routes/chat_bot.routes.js"
 
 const numCPUs = availableParallelism();
 console.log(numCPUs);
@@ -69,13 +69,14 @@ console.log(numCPUs);
   const port = process.env.Port || 3009;
   app.use(cors(corsOption));
 
-  app.use(rateLimitMiddleware);
-  app.use(helmet());
+  // app.use(rateLimitMiddleware);
+  // app.use(helmet());
   app.use(cookieParser());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
   app.use("/api/auth", authRouter);
+  app.use("/api/auth/chatbot",ChatRouter)
 
   app.get("/health", (req, res) => {
     res.status(200).json({ status: "OK" });

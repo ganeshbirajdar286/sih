@@ -8,6 +8,7 @@ import Appointments from "../Components/PatientDashboard/Appointment.jsx";
 import Reports from "../Components/PatientDashboard/Reports";
 import PatientsTab from "../Components/PatientDashboard/PatientsTab.jsx";
 import PatientProfileUpdate from "../Components/PatientDashboard/Patientprofileupdate.jsx";
+import ChatBotView from "../Components/ChatBot/ChatBotView.jsx";
 
 export default function PatientDashboard() {
   
@@ -21,7 +22,8 @@ export default function PatientDashboard() {
     doctors: <DoctorsTab searchQuery={searchQuery} />,
     appointments: <Appointments />,
     reports: <Reports />,
-   profile: <PatientProfileUpdate setActiveTab={setActiveTab} />
+    profile: <PatientProfileUpdate setActiveTab={setActiveTab} />,
+    chatbot: <ChatBotView isEmbedded={true} />
   };
 
   return (

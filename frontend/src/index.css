@@ -2,8 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* 2️⃣ Tailwind */
-@tailwind base;
-@tailwind components;
+
 @tailwind utilities;
 @import "tailwindcss";
 
@@ -14,7 +13,8 @@ body {
 
 /* Scrollbars */
 .sidebar-scroll::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 .sidebar-scroll::-webkit-scrollbar-track {
@@ -22,17 +22,27 @@ body {
 }
 
 .sidebar-scroll::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #10b981, #059669);
+  background: #10b981;
   border-radius: 9999px;
 }
 
 .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #059669, #047857);
+  background: #059669;
 }
 
 .sidebar-scroll {
   scrollbar-width: thin;
   scrollbar-color: #10b981 transparent;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Add this to your global CSS file or create a new animations.css */
@@ -128,14 +138,6 @@ img {
   height: auto;
 }
 
-/* Touch Target Sizes for Mobile */
-@media (max-width: 640px) {
-  button,
-  a {
-    min-height: 44px;
-    min-width: 44px;
-  }
-}
 
 /* Print Styles */
 @media print {

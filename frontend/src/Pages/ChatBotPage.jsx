@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import ChatBotView from "../Components/ChatBot/ChatBotView";
 import logo from "../assets/logo.png";
-import { ArrowLeft, Sparkles, Home, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Home} from "lucide-react";
 import { useSelector } from "react-redux";
 
 export default function ChatBotPage() {

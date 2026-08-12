@@ -16,6 +16,7 @@ import {
   X
 } from "lucide-react";
 import toast from "react-hot-toast";
+import FormattedMarkdown from "./FormattedMarkdown.jsx"
 
 const SUGGESTED_PROMPTS = [
   { icon: "🌿", title: "Dosha Balance", text: "How can I balance Vata and Pitta doshas naturally?" },
@@ -212,9 +213,7 @@ export default function ChatBotView({ isEmbedded = false, onClose = null }) {
                 }`}
               >
                 {/* Text Content */}
-                <div className="whitespace-pre-wrap font-normal tracking-wide break-words">
-                  {msg.text}
-                </div>
+                <FormattedMarkdown content={msg.text} isUser={msg.sender === "user"} />
 
                 {/* Copy button for Bot messages */}
                 {msg.sender === "bot" && (

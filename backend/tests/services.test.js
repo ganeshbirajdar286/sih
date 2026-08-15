@@ -62,6 +62,7 @@ describe("Video Call Services (initializeSocket)", () => {
       mockSocket = {
         id: "socket_123",
         emit: jest.fn(),
+        join: jest.fn(),
         on: jest.fn((event, cb) => {
           eventCallbacks[event] = cb;
         }),
@@ -74,6 +75,7 @@ describe("Video Call Services (initializeSocket)", () => {
     it("should register user and broadcast online users on 'register'", () => {
       eventCallbacks["register"]({ userId: "user_abc" });
 
+      expect(mockSocket.join).toHaveBeenCalledWith("user:user_abc");
       expect(mockIo.emit).toHaveBeenCalledWith("online-users", {
         user_abc: "socket_123",
       });

@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import { getDoctorBookedSlots } from "../../feature/Patient/patient.thunk";
 import { Paymentgateway } from "../../feature/Payment/Payment.thunk";
+import {getSocket} from "../../services/socket_init"
 
 export default function BookAppointment() {
   const { id } = useParams();
@@ -46,11 +47,31 @@ export default function BookAppointment() {
     "20:15-21:15",
   ];
 
-  useEffect(() => {
-    if (id) {
+useEffect(() => {
+  if (!id) return;
+
+  // Initial fetch
+  dispatch(getDoctorBookedSlots(id));
+
+  const socket = getSocket();
+
+  if (!socket) return;
+
+  const handleAppointmentUpdate = ({ doctorId }) => {
+    if (doctorId === id.toString()) {
+      console.log("🔄 Appointment updated");
+
       dispatch(getDoctorBookedSlots(id));
     }
-  }, [id, dispatch]);
+  };
+
+  socket.on("appointment-updated", handleAppointmentUpdate);
+
+  return () => {
+    socket.off("appointment-updated", handleAppointmentUpdate);
+  };
+}, [id, dispatch]);
+
 
   const transformedAppointments = bookedSlot.map((apt) => ({
     date: new Date(apt.Appointment_Date).toISOString().split("T")[0],

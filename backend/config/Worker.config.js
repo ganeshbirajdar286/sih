@@ -2,11 +2,14 @@ import { Worker } from "bullmq";
 import Appointment from "../model/appointments.model.js";
 import axios from "axios";
 import connection from "./queue.config.js";
-import { populate } from "dotenv";
+import dotenv from "dotenv";
+dotenv.config();
+
 
 
 const callBrevoApi = async ({ to, subject, htmlContent }) => {
   try {
+
     const response = await axios.post(
       "https://api.brevo.com/v3/smtp/email",
       {
@@ -266,7 +269,6 @@ const appointmentDoc = await Appointment.findById(job.data.appointment)
     },
   });
 
-    console.log(appointmentDoc)
     if (!appointmentDoc) {
       // appointment deleted or cancelled — don't retry, just skip
       console.warn(`[Worker] Appointment ${job.data.appointmentId} not found. Skipping.`);

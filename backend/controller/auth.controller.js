@@ -760,6 +760,13 @@ export const patientAppointment = async (req, res) => {
       // Invalidate doctor's appointments cache
       await deleteCache(`doctor:${DOCTOR}:appointments`);
 
+      const io = req.app?.get?.("io");
+      if (io) {
+        io.to(`user:${DOCTOR}`).emit("appointment-updated", {
+          doctorId: DOCTOR.toString(),
+        });
+      }
+
       return res.status(201).json({
         message: "Appointment booked successfully",
         appointment,

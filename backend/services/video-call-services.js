@@ -23,6 +23,9 @@ const initializeSocket = (server) => {
   if (!userId) return;
   userSocketMap.set(userId.toString(), socket.id);
 
+  // Personal room
+  socket.join(`user:${userId}`);
+  
   //  Broadcast updated online users map to all clients
   const onlineUsers = Object.fromEntries(userSocketMap);
   io.emit("online-users", onlineUsers); // { userId: socketId, ... }

@@ -3,6 +3,7 @@ import redis from "../config/redis.config.js";
 export async function getOrSetCache(key, callback, ttlSeconds = 300) {
   try {
     const cached = await redis.get(key);
+
     if (cached) {
       console.log(`🔵 Redis: Cache HIT for ${key}`);
       return JSON.parse(cached);
@@ -12,10 +13,18 @@ export async function getOrSetCache(key, callback, ttlSeconds = 300) {
   }
 
   const data = await callback();
-  await setCache(key, data, ttlSeconds);
-  console.log(`🟢 Redis: Cache SET for ${key}`);
+
+  try {
+    await setCache(key, data, ttlSeconds);
+    console.log(`🟢 Redis: Cache SET for ${key}`);
+  } catch (err) {
+    console.error(`Redis SET error: ${err.message}`);
+  }
+
   return data;
 }
+
+
 
 
 export async function setCache(key, value, ttlSeconds = 300) {

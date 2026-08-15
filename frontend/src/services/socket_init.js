@@ -34,12 +34,16 @@ export const initializeSocket = () => {
     },
   );
 
-  socket.on("connect", () => {
-    console.log(
-      "Connected to backend socket server with ID:",
+   socket.on("connect", () => {
+    console.log("Connected:", socket.id);
 
-      socket.id,
-    );
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (user?._id) {
+      socket.emit("register", {
+        userId: user._id,
+      });
+    }
   });
 
   socket.on(

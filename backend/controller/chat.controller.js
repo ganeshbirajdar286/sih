@@ -128,7 +128,7 @@ export const chatBot = async (req, res) => {
     }
 
     const llm = new ChatGroq({
-      model: "llama3-70b",
+      model: "openai/gpt-oss-20b",
       apiKey: process.env.GROQ_API_KEY,
     });
 

@@ -1,4 +1,4 @@
-import { ChatMistralAI } from "@langchain/mistralai";
+import { ChatGroq } from "@langchain/groq"
 import {
   StateGraph,
   MessagesAnnotation,
@@ -127,9 +127,9 @@ export const chatBot = async (req, res) => {
       });
     }
 
-    const llm = new ChatMistralAI({
-      model: "mistral-medium-3-5",
-      apiKey: process.env.MISTRAL_API_KEY,
+    const llm = new ChatGroq({
+      model: "llama3-70b",
+      apiKey: process.env.GROQ_API_KEY,
     });
 
     async function chatbot(state) {

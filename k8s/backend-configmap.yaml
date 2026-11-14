@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: swasthya
+  labels:
+    app: backend
+    app.kubernetes.io/part-of: swasthya
+data:
+  PORT: "3009"
+  NODE_ENV: "production"
+  REDIS_URL: "redis://redis-service:6379"
+  FRONTEND_URL: "http://localhost,http://localhost:80,http://swasthya.local"

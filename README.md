@@ -17,7 +17,18 @@ This platform provides:
 * Cloud media uploads
 * Redis-based rate limiting & caching
 * Payment gateway integration (Dodo Payments)
-* Deployment-ready frontend and backend
+* Deployment-ready frontend and backend (Docker, Docker Compose, Kubernetes)
+
+---
+
+## 🏛️ System Architecture
+
+SWASTHYA follows a **Decoupled 2-Tier Client-Server Architecture with a Monolithic Backend**, organized inside a **Monorepo**:
+
+* **Frontend (Decoupled SPA)**: Built with React 19 and Vite, styled with Tailwind CSS, communicating with the backend over REST endpoints (`/api`) and WebSockets (`Socket.IO`).
+* **Backend (Modular Monolith)**: A unified Node.js/Express service housing authentication, payment verification, dosha assessment, AI diet chart generation, WebRTC signaling, and Redis rate-limiting/caching.
+* **Shared Data Layer**: Centralized MongoDB Atlas cluster for document persistence and Redis for session caching and rate-limiting.
+* **Deployment Models**: Supports standalone dev environments, Docker Compose multi-container setups, and production Kubernetes (k8s) clusters with Nginx Ingress.
 
 ---
 
@@ -60,12 +71,13 @@ This platform provides:
 
 ### DevOps & Deployment
 
-* Docker
-* Docker Compose
-* Frontend: Vercel
-* Backend: Render
+* Docker & Docker Compose
+* Kubernetes (k8s) & Kustomize
+* Frontend: Vercel / Nginx
+* Backend: Render / Containerized Node.js
 * Database: MongoDB Atlas
 * Cache: Redis
+* Ingress: NGINX Ingress Controller
 * CI/CD: GitHub Actions (9-job pipeline)
 
 ---
@@ -82,6 +94,19 @@ sih/
 │       ├── README.md
 │       ├── SETUP.md
 │       └── VISUAL_GUIDE.md
+├── k8s/
+│   ├── backend-configmap.yaml
+│   ├── backend-deployment.yaml
+│   ├── backend-secret.yaml
+│   ├── backend-service.yaml
+│   ├── frontend-deployment.yaml
+│   ├── frontend-service.yaml
+│   ├── ingress.yaml
+│   ├── kustomization.yaml
+│   ├── namespace.yaml
+│   ├── README.md
+│   ├── redis-deployment.yaml
+│   └── redis-service.yaml
 ├── backend/
 │   ├── config/
 │   │   ├── cloudinary.config.js
@@ -561,6 +586,67 @@ DOCKER_PASSWORD
 * Build Command: `npm install`
 * Start Command: `npm start`
 * Health Check Path: `/health`
+
+### Kubernetes (k8s) Cluster Deployment
+
+The project contains complete, production-ready Kubernetes manifests split into modular, individual configuration files in the [`k8s/`](k8s/) directory.
+
+#### Manifest Breakdown
+* **Namespace**: [`k8s/namespace.yaml`](k8s/namespace.yaml) (Namespace: `swasthya`)
+* **Environment Configuration**: [`k8s/backend-configmap.yaml`](k8s/backend-configmap.yaml) (Non-sensitive env vars: `PORT`, `NODE_ENV`, `REDIS_URL`, `FRONTEND_URL`)
+* **Secrets Configuration**: [`k8s/backend-secret.yaml`](k8s/backend-secret.yaml) (Sensitive credentials: `JWT_SECRET`, `MONGODB_URL`, `GROQ_API_KEY`, etc.)
+* **Redis**: [`k8s/redis-deployment.yaml`](k8s/redis-deployment.yaml) & [`k8s/redis-service.yaml`](k8s/redis-service.yaml)
+* **Backend Workload**: [`k8s/backend-deployment.yaml`](k8s/backend-deployment.yaml) (2 replicas, `/health` probes) & [`k8s/backend-service.yaml`](k8s/backend-service.yaml) (Port 3009)
+* **Frontend Workload**: [`k8s/frontend-deployment.yaml`](k8s/frontend-deployment.yaml) (2 replicas, Nginx) & [`k8s/frontend-service.yaml`](k8s/frontend-service.yaml) (Port 80)
+* **Ingress Routing**: [`k8s/ingress.yaml`](k8s/ingress.yaml) (NGINX Ingress routing `/api`, `/socket.io`, and `/`)
+* **Kustomize Orchestration**: [`k8s/kustomization.yaml`](k8s/kustomization.yaml)
+
+#### Quick Deployment Steps
+
+1. **Build and Tag Container Images**:
+   ```bash
+   docker build -t swasthya-frontend:latest ./frontend
+   docker build -t swasthya-backend:latest ./backend
+   ```
+   *(If deploying on Minikube: `minikube image load swasthya-frontend:latest` and `minikube image load swasthya-backend:latest`)*
+
+2. **Configure Secrets**:
+   Edit [`k8s/backend-secret.yaml`](k8s/backend-secret.yaml) with your actual MongoDB URI, JWT secret, and API keys.
+
+3. **Deploy via Kustomize (Single Command)**:
+   ```bash
+   kubectl apply -k k8s/
+   ```
+
+   *Or apply individual files in order:*
+   ```bash
+   kubectl apply -f k8s/namespace.yaml
+   kubectl apply -f k8s/backend-configmap.yaml
+   kubectl apply -f k8s/backend-secret.yaml
+   kubectl apply -f k8s/redis-deployment.yaml
+   kubectl apply -f k8s/redis-service.yaml
+   kubectl apply -f k8s/backend-deployment.yaml
+   kubectl apply -f k8s/backend-service.yaml
+   kubectl apply -f k8s/frontend-deployment.yaml
+   kubectl apply -f k8s/frontend-service.yaml
+   kubectl apply -f k8s/ingress.yaml
+   ```
+
+4. **Verify Deployment**:
+   ```bash
+   kubectl get all -n swasthya
+   ```
+
+5. **Port Forwarding (Local Access)**:
+   ```bash
+   # Access Frontend on http://localhost:8080
+   kubectl port-forward -n swasthya svc/frontend-service 8080:80
+
+   # Access Backend on http://localhost:3009
+   kubectl port-forward -n swasthya svc/backend-service 3009:3009
+   ```
+
+For full documentation and tuning options, refer to [`k8s/README.md`](k8s/README.md).
 
 ---
 
